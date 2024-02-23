@@ -2,7 +2,9 @@ package ssg
 
 import (
 	"bytes"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"text/template"
@@ -19,7 +21,7 @@ type Generator struct {
 	renderedHTML    []bytes.Buffer
 }
 
-func (g *Generator) ParseMarkdown() {
+func (g *Generator) parseMarkdown() {
 	// Listing all files in the ./content/ directory
 	files, err := os.ReadDir("./content/")
 	if err != nil {
@@ -57,6 +59,8 @@ func (g *Generator) ParseMarkdown() {
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite() {
+	g.parseMarkdown()
+
 	// Creating the "rendered" directory if not present
 	err := os.MkdirAll("rendered/", 0750)
 	if err != nil {
@@ -86,5 +90,13 @@ func (g *Generator) RenderSite() {
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
 		}
+	}
+}
+
+func (g *Generator) ServeSite(addr string) {
+	fmt.Println("Serving content at", addr)
+	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
 	}
 }
