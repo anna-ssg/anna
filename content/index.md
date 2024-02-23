@@ -2,6 +2,6 @@
 
 ## Heading 212
 
-![link](google.com)
+![image](./static/plane.jpg)
 
 ### heading 3

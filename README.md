@@ -1,4 +1,4 @@
-# ssg prototype
+# Static Site Generator
 
 ### Directory structure
 
@@ -6,15 +6,27 @@ The ssg currently requires the following directory structure
 ```text
 ssg/
 |--content/  
-|   |-- index.md (This file is necessary and cannot be omitted)  
-|   |-- about.md  
-|     .....  
+|  |--index.md (This file is necessary and cannot be omitted)  
+|  |--about.md  
+|    ....  
+|
 |--layout/  
-|   |-- layout.html  
-|--rendered/  
-|   |-- index.html  
-|   |-- about.html  
+|  |--layout.html (This file is necessary and cannot be omitted)
+|
+|--static/
+|  |--image1.jpg
+|    ....
+|
+|--rendered/ (This directory is created by the ssg)
+   |--index.html  
+   |--about.html  
+   |--static/
+      |--image1.jpg
+       ....
 ```
+
+### Notes:
+1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "./static/[imagename.format]" as the image link format in the markdown files.
 
 ### Flags
 
