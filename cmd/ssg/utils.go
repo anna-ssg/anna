@@ -3,6 +3,7 @@ package ssg
 import (
 	"io"
 	"os"
+	"strings"
 )
 
 // Copies the contents of the dirPath directory to outDirPath
@@ -43,5 +44,48 @@ func (g *Generator) copyFiles(srcPath string, destPath string) {
 	_, err = io.Copy(destination, source)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
+	}
+}
+
+func (g *Generator) readMdDir(dirPath string) {
+	// Listing all files in the dirPath directory
+	dirEntries, err := os.ReadDir(dirPath)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Storing the markdown file names and paths
+	for _, entry := range dirEntries {
+
+		if entry.IsDir() {
+			g.readMdDir(dirPath + entry.Name() + "/")
+			return
+		}
+		if !strings.HasSuffix(entry.Name(), ".md") {
+			continue
+		}
+
+		g.mdFilesName = append(g.mdFilesName, entry.Name())
+
+		filepath := dirPath + entry.Name()
+		g.mdFilesPath = append(g.mdFilesPath, filepath)
+	}
+
+	// Reading the markdown files into memory
+	for _, filepath := range g.mdFilesPath {
+		content, err := os.ReadFile(filepath)
+		if err != nil {
+			g.ErrorLogger.Fatal(err)
+		}
+
+		frontmatter, body := g.parseMarkdownContent(string(content))
+
+		page := Page{
+			Frontmatter: frontmatter,
+			Body:        body,
+			Layout:      g.LayoutConfig,
+		}
+
+		g.mdParsed = append(g.mdParsed, page)
 	}
 }

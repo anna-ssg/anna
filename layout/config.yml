@@ -1,0 +1,6 @@
+navbar:
+  - about
+  - posts
+
+posts:
+  - qapture

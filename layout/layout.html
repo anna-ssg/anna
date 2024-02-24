@@ -6,26 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Frontmatter.Title}}</title>
-    <style>
-        * {
-            margin: 0px;
-            padding: 0px;
-            box-sizing: border-box;
-        }
-
-        body {
-            padding: 1rem;
-            font-size: 1rem;
-            color: white;
-            background-color: black;
-        }
-    </style>
     <link rel="stylesheet" href="./static/style.css">
 </head>
 
 <body>
-    {{.Frontmatter.Date}}
-    {{.Body}}
+    <header>
+        <nav>
+            {{range .Layout.NavbarElements}}
+            <a href=" {{.}}.html">{{.}}</a>
+            {{end}}
+        </nav>
+    </header>
+    <div class="body">
+        {{.Body}}
+    </div>
+    <footer></footer>
 </body>
 
 </html>

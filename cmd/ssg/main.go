@@ -14,6 +14,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type LayoutConfig struct {
+	NavbarElements []string `yaml:"navbar"`
+	Posts          []string `yaml:"posts"`
+}
+
 type Frontmatter struct {
 	Title string `yaml:"title"`
 	Date  string `yaml:"date"`
@@ -22,6 +27,7 @@ type Frontmatter struct {
 type Page struct {
 	Frontmatter Frontmatter
 	Body        string
+	Layout      LayoutConfig
 }
 
 type Generator struct {
@@ -30,12 +36,14 @@ type Generator struct {
 	mdFilesPath     []string
 	mdParsed        []Page
 	layoutFilesPath []string
+	LayoutConfig    LayoutConfig
 	staticFilesPath []string
 }
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite() {
-	g.readMarkdownFiles()
+	g.parseConfig()
+	g.readMdDir("content/")
 	g.copyStaticContent()
 
 	// Creating the "rendered" directory if not present
@@ -52,7 +60,21 @@ func (g *Generator) RenderSite() {
 	// Writing each parsed markdown file as a separate HTML file
 	for i, page := range g.mdParsed {
 
-		filename, _ := strings.CutSuffix(g.mdFilesName[i], ".md")
+		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
+
+		// Creating subdirectories if the filepath contains '/'
+		if strings.Contains(filename, "/") {
+			// Extracting the directory path from the filepath
+			dirPath, _ := strings.CutSuffix(filename, g.mdFilesName[i])
+			dirPath = "rendered/" + dirPath
+
+			err := os.MkdirAll(dirPath, 0750)
+			if err != nil {
+				g.ErrorLogger.Fatal(err)
+			}
+		}
+
+		filename, _ = strings.CutSuffix(filename, ".md")
 		filepath := "rendered/" + filename + ".html"
 		var buffer bytes.Buffer
 
@@ -68,6 +90,24 @@ func (g *Generator) RenderSite() {
 			g.ErrorLogger.Fatal(err)
 		}
 	}
+
+	var buffer bytes.Buffer
+	// Rendering the 'posts.html' separately
+	postsTemplate, err := template.ParseFiles("layout/posts.html")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	err = postsTemplate.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Flushing 'posts.html' to the disk
+	err = os.WriteFile("rendered/posts.html", buffer.Bytes(), 0666)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 }
 
 // Serves the rendered files over the address 'addr'
@@ -76,43 +116,6 @@ func (g *Generator) ServeSite(addr string) {
 	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
-	}
-}
-
-func (g *Generator) readMarkdownFiles() {
-	// Listing all files in the content/ directory
-	files, err := os.ReadDir("content/")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	// Storing the markdown file names and paths
-	for _, filename := range files {
-		if !strings.HasSuffix(filename.Name(), ".md") {
-			continue
-		}
-
-		g.mdFilesName = append(g.mdFilesName, filename.Name())
-
-		filepath := "content/" + filename.Name()
-		g.mdFilesPath = append(g.mdFilesPath, filepath)
-	}
-
-	// Reading the markdown files into memory
-	for _, filepath := range g.mdFilesPath {
-		content, err := os.ReadFile(filepath)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-
-		frontmatter, body := g.parseMarkdownContent(string(content))
-
-		page := Page{
-			Frontmatter: frontmatter,
-			Body:        body,
-		}
-
-		g.mdParsed = append(g.mdParsed, page)
 	}
 }
 
@@ -149,4 +152,17 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 // Copies the contents of the 'static/' directory to 'rendered/'
 func (g *Generator) copyStaticContent() {
 	g.copyDirectoryContents("static/", "rendered/static/")
+}
+
+// Parse 'config.yml' to configure the layout of the site
+func (g *Generator) parseConfig() {
+	configFile, err := os.ReadFile("layout/config.yml")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	err = yaml.Unmarshal(configFile, &g.LayoutConfig)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 }
