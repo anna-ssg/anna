@@ -1,8 +1,9 @@
 # Static Site Generator
 
-### Directory structure
+## Directory structure
 
 The ssg currently requires the following directory structure
+
 ```text
 ssg/
 |--content/  
@@ -25,8 +26,28 @@ ssg/
        ....
 ```
 
-### Notes:
+### Layout
+
+The layout files can access the following rendered data from the markdown files:
+
+- {{.Body}} : Returns the markdown body rendered to HTML
+- {{.Frontmatter.[Tagname]}} : Returns the value of the frontmatter tag
+   - Example: {{.Frontmatter.Title}} : Returns the value of the title tag
+
+### Notes
+
 1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "./static/[imagename.format]" as the image link format in the markdown files.
+
+2. CSS: CSS can be added in the following ways:
+
+- In an external file in the 'static/' directory and linked to layout.html
+- Placed inside `<style></style>` tags in the `<head></head>` of layout.html
+- Inline with the html elements
+
+3. Frontmatter: Metadata such as the title of the page can be added as frontmatter to the markdown files in the YAML format. Currently, the following tags are supported:
+
+- title : The title of the current page
+- date: The date of the current page
 
 ### Flags
 

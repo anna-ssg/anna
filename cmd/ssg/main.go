@@ -7,61 +7,36 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/yuin/goldmark"
+	"gopkg.in/yaml.v3"
 )
+
+type Frontmatter struct {
+	Title string `yaml:"title"`
+	Date  string `yaml:"date"`
+}
+
+type Page struct {
+	Frontmatter Frontmatter
+	Body        string
+}
 
 type Generator struct {
 	ErrorLogger     *log.Logger
 	mdFilesName     []string
 	mdFilesPath     []string
-	mdFilesContent  [][]byte
+	mdParsed        []Page
 	layoutFilesPath []string
 	staticFilesPath []string
-	renderedHTML    []bytes.Buffer
-}
-
-func (g *Generator) parseMarkdown() {
-	// Listing all files in the content/ directory
-	files, err := os.ReadDir("content/")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	// Storing the markdown file names and paths
-	for _, filename := range files {
-		g.mdFilesName = append(g.mdFilesName, filename.Name())
-
-		filepath := "content/" + filename.Name()
-		g.mdFilesPath = append(g.mdFilesPath, filepath)
-	}
-
-	// Reading the markdown files into memory
-	for _, filepath := range g.mdFilesPath {
-		content, err := os.ReadFile(filepath)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-
-		g.mdFilesContent = append(g.mdFilesContent, content)
-	}
-
-	// Parsing markdown to HTML
-	for _, filecontent := range g.mdFilesContent {
-		var buffer bytes.Buffer
-		if err := goldmark.Convert(filecontent, &buffer); err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-
-		g.renderedHTML = append(g.renderedHTML, buffer)
-	}
 }
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite() {
-	g.parseMarkdown()
+	g.readMarkdownFiles()
 	g.copyStaticContent()
 
 	// Creating the "rendered" directory if not present
@@ -76,14 +51,14 @@ func (g *Generator) RenderSite() {
 	}
 
 	// Writing each parsed markdown file as a separate HTML file
-	for i, page := range g.renderedHTML {
+	for i, page := range g.mdParsed {
 
 		filename, _ := strings.CutSuffix(g.mdFilesName[i], ".md")
 		filepath := "rendered/" + filename + ".html"
 		var buffer bytes.Buffer
 
 		// Storing the rendered HTML file to a buffer
-		err = templ.ExecuteTemplate(&buffer, "layout", page.String())
+		err = templ.ExecuteTemplate(&buffer, "layout", page)
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
 		}
@@ -94,6 +69,82 @@ func (g *Generator) RenderSite() {
 			g.ErrorLogger.Fatal(err)
 		}
 	}
+}
+
+// Serves the rendered files over the address 'addr'
+func (g *Generator) ServeSite(addr string) {
+	fmt.Println("Serving content at", addr)
+	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+}
+
+func (g *Generator) readMarkdownFiles() {
+	// Listing all files in the content/ directory
+	files, err := os.ReadDir("content/")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Storing the markdown file names and paths
+	for _, filename := range files {
+		if !strings.HasSuffix(filename.Name(), ".md") {
+			continue
+		}
+
+		g.mdFilesName = append(g.mdFilesName, filename.Name())
+
+		filepath := "content/" + filename.Name()
+		g.mdFilesPath = append(g.mdFilesPath, filepath)
+	}
+
+	// Reading the markdown files into memory
+	for _, filepath := range g.mdFilesPath {
+		content, err := os.ReadFile(filepath)
+		if err != nil {
+			g.ErrorLogger.Fatal(err)
+		}
+
+		frontmatter, body := g.parseMarkdownContent(string(content))
+
+		page := Page{
+			Frontmatter: frontmatter,
+			Body:        body,
+		}
+
+		g.mdParsed = append(g.mdParsed, page)
+	}
+}
+
+func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, string) {
+	var parsedFrontmatter Frontmatter
+	var markdown string
+
+	// Find the '---' tags for frontmatter in the markdown file
+	re := regexp.MustCompile(`(---[\S\s]*---)`)
+	frontmatter := re.FindString(filecontent)
+
+	if frontmatter != "" {
+		// Parsing YAML frontmatter
+		err := yaml.Unmarshal([]byte(frontmatter), &parsedFrontmatter)
+		if err != nil {
+			g.ErrorLogger.Fatal(err)
+		}
+
+		// Splitting and storing pure markdown content separately
+		markdown = strings.Split(filecontent, "---")[2]
+	} else {
+		markdown = filecontent
+	}
+
+	// Parsing markdown to HTML
+	var parsedMarkdown bytes.Buffer
+	if err := goldmark.Convert([]byte(markdown), &parsedMarkdown); err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	return parsedFrontmatter, parsedMarkdown.String()
 }
 
 // Copies the 'static/' directory and its contents to 'rendered/'
@@ -134,14 +185,5 @@ func (g *Generator) copyStaticContent() {
 			g.ErrorLogger.Fatal(err)
 		}
 
-	}
-}
-
-// Serves the rendered files over the address 'addr'
-func (g *Generator) ServeSite(addr string) {
-	fmt.Println("Serving content at", addr)
-	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
 	}
 }
