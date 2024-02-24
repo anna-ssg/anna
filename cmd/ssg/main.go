@@ -3,7 +3,6 @@ package ssg
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -147,43 +146,7 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	return parsedFrontmatter, parsedMarkdown.String()
 }
 
-// Copies the 'static/' directory and its contents to 'rendered/'
+// Copies the contents of the 'static/' directory to 'rendered/'
 func (g *Generator) copyStaticContent() {
-	files, err := os.ReadDir("static/")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	// Storing the static file names and paths
-	for _, filename := range files {
-		filepath := "static/" + filename.Name()
-		g.staticFilesPath = append(g.staticFilesPath, filepath)
-	}
-
-	err = os.MkdirAll("rendered/static", 0750)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	// Copying the contents of the 'static/' directory
-	for _, filepath := range g.staticFilesPath {
-		source, err := os.Open(filepath)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-		defer source.Close()
-
-		new_filepath := "rendered/" + filepath
-		destination, err := os.Create(new_filepath)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-		defer destination.Close()
-
-		_, err = io.Copy(destination, source)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-
-	}
+	g.copyDirectoryContents("static/", "rendered/static/")
 }
