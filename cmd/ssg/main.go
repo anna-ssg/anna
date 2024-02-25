@@ -15,9 +15,9 @@ import (
 )
 
 type LayoutConfig struct {
-	NavbarElements []string `yaml:"navbar"`
-	Posts          []string `yaml:"posts"`
-	BaseURL        string   `yaml:"baseURL"`
+	Navbar  []string `yaml:"navbar"`
+	Posts   []string `yaml:"posts"`
+	BaseURL string   `yaml:"baseURL"`
 }
 
 type Frontmatter struct {
@@ -53,10 +53,7 @@ func (g *Generator) RenderSite() {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	templ, err := template.ParseFiles("layout/layout.html")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+	templ := g.parseLayoutFiles()
 
 	// Writing each parsed markdown file as a separate HTML file
 	for i, page := range g.mdParsed {
@@ -80,7 +77,7 @@ func (g *Generator) RenderSite() {
 		var buffer bytes.Buffer
 
 		// Storing the rendered HTML file to a buffer
-		err = templ.ExecuteTemplate(&buffer, "layout", page)
+		err = templ.ExecuteTemplate(&buffer, "page", page)
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
 		}
@@ -94,12 +91,7 @@ func (g *Generator) RenderSite() {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
-	postsTemplate, err := template.ParseFiles("layout/posts.html")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	err = postsTemplate.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
+	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -175,4 +167,21 @@ func (g *Generator) generateAbsoluteStaticLinks(mdBody *string) {
 	re := regexp.MustCompile(`static\/`)
 	absLink := g.LayoutConfig.BaseURL + "/" + "static/"
 	*mdBody = re.ReplaceAllString(*mdBody, absLink)
+}
+
+// Parse all the ".html" layout files in the layout/ directory
+func (g *Generator) parseLayoutFiles() *template.Template {
+	// Parsing all files in the layout/ dir which match the "*.html" pattern
+	templ, err := template.ParseGlob("layout/*.html")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Parsing all files in the partials/ dir which match the "*.html" pattern
+	templ, err = templ.ParseGlob("layout/partials/*.html")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	return templ
 }

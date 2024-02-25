@@ -1,30 +1,18 @@
 {{ define "posts"}}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{.Frontmatter.Title}}</title>
-  <link rel="stylesheet" href="{{.Layout.BaseURL}}static/style.css">
-</head>
+{{ template "head" .}}
 
 <body>
-  <header>
-    <nav>
-      {{ $baseURL := .Layout.BaseURL }}
-      {{range .Layout.NavbarElements}}
-      <a href=" {{$baseURL}}{{.}}.html">{{.}}</a>
-      {{end}}
-    </nav>
-  </header>
+  {{template "header" .}}
+
   <div class="body">
     {{$baseURL := .Layout.BaseURL}}
+
     {{range .Layout.Posts}}
     <a href="{{$baseURL}}posts/{{.}}.html">{{.}}</a>
     {{end}}
+
   </div>
-  <footer></footer>
+
 </body>
 
 </html>

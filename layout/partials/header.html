@@ -1,0 +1,10 @@
+{{define "header"}}
+<header>
+  <nav>
+    {{ $baseURL := .Layout.BaseURL }}
+    {{range .Layout.Navbar}}
+    <a href=" {{$baseURL}}{{.}}.html">{{.}}</a>
+    {{end}}
+  </nav>
+</header>
+{{end}}
