@@ -1,4 +1,4 @@
-module github.com/anirudhsudhir/ssg
+module github.com/acmpesuecc/ssg
 
 go 1.22.0
 

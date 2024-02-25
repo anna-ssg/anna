@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/anirudhsudhir/ssg/cmd/ssg"
+	"github.com/acmpesuecc/ssg/cmd/ssg"
 )
 
 func main() {
