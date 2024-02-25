@@ -1,6 +1,7 @@
 package ssg
 
 import (
+	"html/template"
 	"io"
 	"os"
 	"strings"
@@ -82,7 +83,7 @@ func (g *Generator) readMdDir(dirPath string) {
 
 		page := Page{
 			Frontmatter: frontmatter,
-			Body:        body,
+			Body:        template.HTML(body),
 			Layout:      g.LayoutConfig,
 		}
 

@@ -1,0 +1,1 @@
+- Parse all layouts and use "template" syntax in layout files

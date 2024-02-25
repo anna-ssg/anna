@@ -45,10 +45,12 @@ The layout files can access the following rendered data from the markdown files:
 - {{.Body}} : Returns the markdown body rendered to HTML
 - {{.Frontmatter.[Tagname]}} : Returns the value of the frontmatter tag
    - Example: {{.Frontmatter.Title}} : Returns the value of the title tag
+- {{.Layout.[Tagname]}}: Returns the particular configuration detail of the page
+   - Example: {{.Layout.Navbar}} : Returns a string slice with the names of all the navbar elements
 
 ### Notes
 
-1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "./static/[imagename.format]" as the image link format in the markdown files.
+1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "static/[imagename.format]" as the image link format in the markdown files.
 
 2. CSS: CSS can be added in the following ways:
 
@@ -65,6 +67,7 @@ The layout files can access the following rendered data from the markdown files:
 
 - navbar: Stores the links to be added to the navbar (same name as the markdown files)
 - posts: Stores the posts to be listed in "posts.html" (same name as the markdown files in the posts/ folder)
+- baseURL: Stores the base URL of the site
 
 Sample config.yml:
 
@@ -76,6 +79,7 @@ navbar:
 posts:
   - post1
 
+baseURL: http://localhost:8000/
 ```
 
 ### Flags

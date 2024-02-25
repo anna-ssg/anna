@@ -3,12 +3,12 @@ package ssg
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
-	"text/template"
 
 	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
@@ -17,6 +17,7 @@ import (
 type LayoutConfig struct {
 	NavbarElements []string `yaml:"navbar"`
 	Posts          []string `yaml:"posts"`
+	BaseURL        string   `yaml:"baseURL"`
 }
 
 type Frontmatter struct {
@@ -26,7 +27,7 @@ type Frontmatter struct {
 
 type Page struct {
 	Frontmatter Frontmatter
-	Body        string
+	Body        template.HTML
 	Layout      LayoutConfig
 }
 
@@ -140,6 +141,8 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 		markdown = filecontent
 	}
 
+	g.generateAbsoluteStaticLinks(&markdown)
+
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
 	if err := goldmark.Convert([]byte(markdown), &parsedMarkdown); err != nil {
@@ -165,4 +168,11 @@ func (g *Generator) parseConfig() {
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
+}
+
+// Make links to static assets absolute
+func (g *Generator) generateAbsoluteStaticLinks(mdBody *string) {
+	re := regexp.MustCompile(`static\/`)
+	absLink := g.LayoutConfig.BaseURL + "/" + "static/"
+	*mdBody = re.ReplaceAllString(*mdBody, absLink)
 }

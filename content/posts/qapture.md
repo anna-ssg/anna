@@ -23,7 +23,7 @@ Forensic images are exact copies or replicas of digital storage media, typically
 
 qapture uses the RAW image format since it contains a bit-by-bit copy of the entire storage medium. The metadata associated with the disk or the files are stored separately, simplifying recovery.
 
-![Schematic of a forensic image](./static/images/posts/qapture/qapture_ForensicImage.png)
+![Schematic of a forensic image](static/images/posts/qapture/qapture_ForensicImage.png)
 
 ## How JPEGs are stored in memory
 
@@ -37,7 +37,7 @@ These markers are represented by various hexadecimal codes:
 - APPn - 0xFF(255), 0xEn(224 to 239) (where n represents any hexadecimal digit)
 - EOI - 0xFF(255), 0xD9(217)
 
-![Segmented view of various markers in a JPEG file](./static/images/posts/qapture/qapture_SegmentedMarkers.png)
+![Segmented view of various markers in a JPEG file](static/images/posts/qapture/qapture_SegmentedMarkers.png)
 
 ## Block Size
 
@@ -45,7 +45,7 @@ Block size refers to the minimum amount of data that can be stored or retrieved 
 
 Blocks are highly important as they drastically increase the speed of any file IO operation.
 
-![Files stored as Blocks](./static/images/posts/qapture/qapture_BlocksFS.png)
+![Files stored as Blocks](static/images/posts/qapture/qapture_BlocksFS.png)
 
 ## How qapture works
 
@@ -74,7 +74,7 @@ qapture then reads the following block from the RAW image.
 
 This process continues until all of the RAW image is read.
 
-![Schematic depicting how qapture functions](./static/images/posts/qapture/qapture_Working.png)
+![Schematic depicting how qapture functions](static/images/posts/qapture/qapture_Working.png)
 
 Once the entire image is read, qapture prints the number of JPEGs which have been successfully recovered.
 These JPEGs are stored in an 'images' directory created by the application within the project directory.

@@ -6,4 +6,4 @@ title: Home
 ### Hi, I'm Anirudh!
 A computer science student and tech enthusiast. Welcome to my home on the internet.
 
-![demo-image](./static/plane.jpg)
+![demo-image](static/plane.jpg)
