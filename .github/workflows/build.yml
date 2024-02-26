@@ -38,7 +38,7 @@ jobs:
         go-version: '1.22'
 
     - name: Build ssg
-      run: go build -v ./...
+      run: go build -v ./... && ls
 
     - name: Setup Pages
       id: pages
@@ -46,7 +46,6 @@ jobs:
 
     - name: Build with ssg
       run: |
-        ls \ # check if the ssg binary is here
         chmod +x ssg \
         ./ssg
         
