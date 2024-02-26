@@ -43,8 +43,11 @@ jobs:
     - name: Setup Pages
       id: pages
       uses: actions/configure-pages@v4
+
     - name: Build with ssg
       run: |
+        ls \ # check if the ssg binary is here
+        chmod +x ssg \
         ./ssg
         
     - name: Upload artifact
