@@ -1,6 +1,7 @@
 ---
 date: 23-11-2023
-title:
+title: Git Set Go!
+draft: true
 ---
 
 # Introduction

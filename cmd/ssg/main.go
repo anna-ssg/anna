@@ -2,12 +2,13 @@ package ssg
 
 import (
 	"bytes"
-	"fmt"
+    "fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/yuin/goldmark"
@@ -22,9 +23,11 @@ type LayoutConfig struct {
 type Frontmatter struct {
 	Title string `yaml:"title"`
 	Date  string `yaml:"date"`
+    Draft bool   `yaml:"draft"`
 }
 
 type Page struct {
+    Filename    string
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
@@ -38,6 +41,18 @@ type Generator struct {
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
 	mdPosts      []string
+    mdNonDrafts  []string
+    Draft        bool
+}
+
+func (g *Generator) draftChecker() {
+    for _, parsedpage := range g.mdParsed {
+        if !parsedpage.Frontmatter.Draft {
+            if slices.Contains(g.mdPosts, parsedpage.Filename) {
+                g.mdNonDrafts = append(g.mdNonDrafts, parsedpage.Filename)
+            }
+        }
+    }
 }
 
 // Write rendered HTML to disk
@@ -46,6 +61,11 @@ func (g *Generator) RenderSite(addr string) {
 	g.parseConfig()
 	g.readMdDir("content/")
 	g.copyStaticContent()
+    if !g.Draft {
+        g.draftChecker()
+    } else {
+        g.mdNonDrafts = g.mdPosts
+    }
 
 	// Creating the "rendered" directory if not present
 	err := os.MkdirAll("rendered/", 0750)
@@ -59,8 +79,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = g.mdPosts
-		page.Posts = g.mdPosts
+		g.mdParsed[i].Posts = g.mdNonDrafts
+		page.Posts = g.mdNonDrafts
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 

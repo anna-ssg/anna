@@ -11,6 +11,7 @@ import (
 func main() {
 	var serve bool
 	var addr string
+    var draft bool
 
 	rootCmd := &cobra.Command{
 		Use:   "ssg",
@@ -19,6 +20,9 @@ func main() {
 			generator := ssg.Generator{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 			}
+            if draft { 
+                generator.Draft = true
+            }
 			generator.RenderSite(addr)
 
 			if serve {
@@ -29,6 +33,7 @@ func main() {
 
 	rootCmd.Flags().BoolVarP(&serve, "serve", "s", false, "serve the rendered content")
 	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "ip address to serve rendered content to")
+	rootCmd.Flags().BoolVarP(&draft, "draft", "d", false, "renders draft posts")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
