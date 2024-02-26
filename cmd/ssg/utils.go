@@ -48,38 +48,6 @@ func (g *Generator) copyFiles(srcPath string, destPath string) {
 	}
 }
 
-// func tion get an unmarshaled Layoutconfig
-// func (g *Generator) ymlUnmarshaledConfig() LayoutConfig {
-// 	configFile, err := os.ReadFile("layout/config.yml")
-// 	if err != nil {
-// 		g.ErrorLogger.Fatal(err)
-// 	}
-
-// 	var config LayoutConfig
-// 	if err = yaml.Unmarshal(configFile, &config); err != nil {
-// 		g.ErrorLogger.Fatal(err)
-// 	}
-
-// 	return config
-// }
-//
-// func (g *Generator) ymlConfigUpdater(config LayoutConfig) {
-// 	marshaledConfig, err := yaml.Marshal(&config)
-// 	if err != nil {
-// 		g.ErrorLogger.Fatal(err)
-// 	}
-
-// 	if err = os.WriteFile("layout/config.yml", marshaledConfig, 0666); err != nil {
-// 		g.ErrorLogger.Fatal(err)
-// 	}
-// }
-
-// func (g *Generator) configExtend(filenameWithoutExtension string) {
-// 	config := g.ymlUnmarshaledConfig()
-
-// 	g.ymlConfigUpdater(config)
-// }
-
 func (g *Generator) readMdDir(dirPath string) {
 	// Listing all files in the dirPath directory
 	dirEntries, err := os.ReadDir(dirPath)
@@ -110,7 +78,7 @@ func (g *Generator) readMdDir(dirPath string) {
 	}
 
 	// Reading the markdown files into memory
-	for _, filepath := range g.mdFilesPath {
+	for i, filepath := range g.mdFilesPath {
 		content, err := os.ReadFile(filepath)
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
@@ -119,11 +87,12 @@ func (g *Generator) readMdDir(dirPath string) {
 		frontmatter, body := g.parseMarkdownContent(string(content))
 
 		page := Page{
+            Filename:    strings.Split(g.mdFilesName[i], ".")[0],
 			Frontmatter: frontmatter,
 			Body:        template.HTML(body),
 			Layout:      g.LayoutConfig,
 		}
 
-		g.mdParsed = append(g.mdParsed, page)
-	}
+        g.mdParsed = append(g.mdParsed, page) 
+    }
 }

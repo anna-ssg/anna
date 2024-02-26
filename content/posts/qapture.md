@@ -1,6 +1,7 @@
 ---
 date: 23-11-2023
 title: Qapture
+draft: false
 ---
 
 This post is part of a talk I gave at the Mentor Expo conducted by [HSP](https://homebrew.hsp-ec.xyz), the developer community at my college.
