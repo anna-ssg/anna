@@ -44,7 +44,7 @@ ssg/
 ## Description of the directory structure
 
 - The markdown content for the site is stored in content/. It can contain subdirectories as the folder is recursively rendered
-- Static assets such as images and fonts are stores in static/
+- Static assets such as images and fonts are stored in static/
 - The layout of the site is configured using html files in layout/
 
    - The 'config.yml' file stores the configuration of the site and includes details such as the baseURL

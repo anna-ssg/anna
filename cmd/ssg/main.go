@@ -41,7 +41,8 @@ type Generator struct {
 }
 
 // Write rendered HTML to disk
-func (g *Generator) RenderSite() {
+func (g *Generator) RenderSite(addr string) {
+	g.replaceBaseURL(addr)
 	g.parseConfig()
 	g.readMdDir("content/")
 	g.copyStaticContent()
@@ -105,11 +106,33 @@ func (g *Generator) RenderSite() {
 		g.ErrorLogger.Fatal(err)
 	}
 }
+func (g *Generator) replaceBaseURL(addr string) {
+	configFile, err := os.ReadFile("layout/config.yml")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+    var config LayoutConfig
+    if err := yaml.Unmarshal(configFile, &config); err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+
+    config.BaseURL = "http://localhost:" + addr + "/"
+
+    updatedConfig, err := yaml.Marshal(config)
+    if err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+
+    if err = os.WriteFile("layout/config.yml", updatedConfig, 0666); err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+}
 
 // Serves the rendered files over the address 'addr'
 func (g *Generator) ServeSite(addr string) {
 	fmt.Println("Serving content at", addr)
-	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
+	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
