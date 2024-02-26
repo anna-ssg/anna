@@ -16,7 +16,6 @@ import (
 
 type LayoutConfig struct {
 	Navbar  []string `yaml:"navbar"`
-	Posts   []string `yaml:"posts"`
 	BaseURL string   `yaml:"baseURL"`
 }
 
@@ -29,16 +28,16 @@ type Page struct {
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
+	Posts       []string
 }
 
 type Generator struct {
-	ErrorLogger     *log.Logger
-	mdFilesName     []string
-	mdFilesPath     []string
-	mdParsed        []Page
-	layoutFilesPath []string
-	LayoutConfig    LayoutConfig
-	staticFilesPath []string
+	ErrorLogger  *log.Logger
+	mdFilesName  []string
+	mdFilesPath  []string
+	mdParsed     []Page
+	LayoutConfig LayoutConfig
+	mdPosts      []string
 }
 
 // Write rendered HTML to disk
@@ -57,6 +56,10 @@ func (g *Generator) RenderSite() {
 
 	// Writing each parsed markdown file as a separate HTML file
 	for i, page := range g.mdParsed {
+
+		// Adding the names of all the files in posts/ dir to the page data
+		g.mdParsed[i].Posts = g.mdPosts
+		page.Posts = g.mdPosts
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -116,15 +119,15 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	var parsedFrontmatter Frontmatter
 	var markdown string
 
-    /*
-    ---
-    frontmatter_content
-    ---
+	/*
+	   ---
+	   frontmatter_content
+	   ---
 
-    markdown content 
-    --- => markdown divider and not to be touched while yaml parsing
-    */
-    frontmatterSplit := strings.Split(filecontent, "---")[1]
+	   markdown content
+	   --- => markdown divider and not to be touched while yaml parsing
+	*/
+	frontmatterSplit := strings.Split(filecontent, "---")[1]
 
 	if frontmatterSplit != "" {
 		// Parsing YAML frontmatter
@@ -133,9 +136,9 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 			g.ErrorLogger.Fatal(err)
 		}
 
-        // we want to make sure that all filecontent is included and 
-        // not ignoring the horizontal markdown splitter "---"
-        markdown = strings.Join(strings.Split(filecontent, "---")[2:], "")
+		// we want to make sure that all filecontent is included and
+		// not ignoring the horizontal markdown splitter "---"
+		markdown = strings.Join(strings.Split(filecontent, "---")[2:], "")
 	} else {
 		markdown = filecontent
 	}

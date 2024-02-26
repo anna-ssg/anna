@@ -5,8 +5,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"gopkg.in/yaml.v3"
 )
 
 // Copies the contents of the dirPath directory to outDirPath
@@ -51,47 +49,36 @@ func (g *Generator) copyFiles(srcPath string, destPath string) {
 }
 
 // func tion get an unmarshaled Layoutconfig
-func (g *Generator) ymlUnmarshaledConfig() LayoutConfig {
-	configFile, err := os.ReadFile("layout/config.yml")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+// func (g *Generator) ymlUnmarshaledConfig() LayoutConfig {
+// 	configFile, err := os.ReadFile("layout/config.yml")
+// 	if err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
 
-	var config LayoutConfig
-	if err = yaml.Unmarshal(configFile, &config); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+// 	var config LayoutConfig
+// 	if err = yaml.Unmarshal(configFile, &config); err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
 
-	return config
-}
+// 	return config
+// }
+//
+// func (g *Generator) ymlConfigUpdater(config LayoutConfig) {
+// 	marshaledConfig, err := yaml.Marshal(&config)
+// 	if err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
 
-func (g *Generator) ymlConfigUpdater(config LayoutConfig) {
-	marshaledConfig, err := yaml.Marshal(&config)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+// 	if err = os.WriteFile("layout/config.yml", marshaledConfig, 0666); err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
+// }
 
-	if err = os.WriteFile("layout/config.yml", marshaledConfig, 0666); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
+// func (g *Generator) configExtend(filenameWithoutExtension string) {
+// 	config := g.ymlUnmarshaledConfig()
 
-func (g *Generator) configExtend(filenameWithoutExtension string) {
-	config := g.ymlUnmarshaledConfig()
-
-	found := false
-	for _, post := range config.Posts {
-		if post == filenameWithoutExtension {
-			found = true
-			break
-		}
-	}
-	if !found {
-		config.Posts = append(config.Posts, filenameWithoutExtension)
-	}
-
-	g.ymlConfigUpdater(config)
-}
+// 	g.ymlConfigUpdater(config)
+// }
 
 func (g *Generator) readMdDir(dirPath string) {
 	// Listing all files in the dirPath directory
@@ -99,10 +86,6 @@ func (g *Generator) readMdDir(dirPath string) {
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-
-	config := g.ymlUnmarshaledConfig()
-	config.Posts = []string{}
-	g.ymlConfigUpdater(config)
 
 	// Storing the markdown file names and paths
 	for _, entry := range dirEntries {
@@ -120,12 +103,9 @@ func (g *Generator) readMdDir(dirPath string) {
 		filepath := dirPath + entry.Name()
 		g.mdFilesPath = append(g.mdFilesPath, filepath)
 
-		/* Check if file is part of the /posts dir
-		and call the yml updater function
-		*/
+		// Parsing titles of md files in the posts folder
 		if dirPath == "content/posts/" {
-			// call the function here
-			g.configExtend(strings.Split(entry.Name(), ".")[0])
+			g.mdPosts = append(g.mdPosts, (strings.Split(entry.Name(), ".")[0]))
 		}
 	}
 

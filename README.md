@@ -83,7 +83,6 @@ The layout files can access the following rendered data from the markdown files:
 4. config.yml: This file stores additional information regarding the layout
 
 - navbar: Stores the links to be added to the navbar (same name as the markdown files)
-- posts: Stores the posts to be listed in "posts.html" (same name as the markdown files in the posts/ folder)
 - baseURL: Stores the base URL of the site
 
 Sample config.yml:
@@ -92,9 +91,6 @@ Sample config.yml:
 navbar:
   - about
   - posts
-
-posts:
-  - post1
 
 baseURL: http://localhost:8000/
 ```
