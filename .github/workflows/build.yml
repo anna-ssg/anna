@@ -1,10 +1,10 @@
-# Sample workflow for building and deploying a Hugo site to GitHub Pages
+# Sample workflow for building and deploying an ssg site to GitHub pages
 name: Deploy ssg site to Pages
 
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: [meta-gh-actions]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,7 +21,6 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-# Default to bash
 defaults:
   run:
     shell: bash
@@ -38,7 +37,7 @@ jobs:
         go-version: '1.22'
 
     - name: Build ssg
-      run: go build . && chmod +x ./ssg
+      run: go build
 
     - name: Setup Pages
       id: pages
@@ -46,7 +45,8 @@ jobs:
 
     - name: Build with ssg
       run: |
-        ./ssg
+        ./ssg \
+        ls
         
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
