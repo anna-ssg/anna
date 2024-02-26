@@ -116,19 +116,26 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	var parsedFrontmatter Frontmatter
 	var markdown string
 
-	// Find the '---' tags for frontmatter in the markdown file
-	re := regexp.MustCompile(`(---[\S\s]*---)`)
-	frontmatter := re.FindString(filecontent)
+    /*
+    ---
+    frontmatter_content
+    ---
 
-	if frontmatter != "" {
+    markdown content 
+    --- => markdown divider and not to be touched while yaml parsing
+    */
+    frontmatterSplit := strings.Split(filecontent, "---")[1]
+
+	if frontmatterSplit != "" {
 		// Parsing YAML frontmatter
-		err := yaml.Unmarshal([]byte(frontmatter), &parsedFrontmatter)
+		err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
 		}
 
-		// Splitting and storing pure markdown content separately
-		markdown = strings.Split(filecontent, "---")[2]
+        // we want to make sure that all filecontent is included and 
+        // not ignoring the horizontal markdown splitter "---"
+        markdown = strings.Join(strings.Split(filecontent, "---")[2:], "")
 	} else {
 		markdown = filecontent
 	}
