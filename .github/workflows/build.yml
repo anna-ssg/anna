@@ -42,9 +42,12 @@ jobs:
     - name: Build site with ssg
       run: |
         ./ssg
-        
+   
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
     - name: Upload artifact
-      uses: actions/upload-artifact@master
+      uses: actions/upload-pages-artifact@v3
       with:
         path: 'rendered'
         if-no-files-found: error
@@ -55,18 +58,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{steps.deployment.outputs.page_url}}
+
     steps:
-    - name: Download rendered
-      uses: actions/download-artifact@master
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: '.'
-
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
