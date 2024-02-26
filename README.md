@@ -93,10 +93,20 @@ navbar:
   - posts
 
 baseURL: http://localhost:8000/
+# Replace this with the actual canonical-url of your site.
+
+# baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet. It's also embeded in your sitemap / atom feed and can be used to change metadata about your site. 
 ```
 
 ## Flags
 
-1. -serve=true (default: false) : Serves the rendered content on the browser
+```
+Usage:
+  ssg [flags]
 
-2. -addr=":6060" (default: ":8000") : Specifies the address over which the rendered files are served
+Flags:
+  -a, --addr string   ip address to serve rendered content to (default "8000")
+  -d, --draft         renders draft posts
+  -h, --help          help for ssg
+  -s, --serve         serve the rendered content
+```
