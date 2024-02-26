@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
+//	"regexp"
 	"slices"
 	"strings"
 
@@ -186,8 +186,6 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 		markdown = filecontent
 	}
 
-	g.generateAbsoluteStaticLinks(&markdown)
-
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
 	if err := goldmark.Convert([]byte(markdown), &parsedMarkdown); err != nil {
@@ -215,12 +213,13 @@ func (g *Generator) parseConfig() {
 	}
 }
 
-// Make links to static assets absolute
+/* // Make links to static assets load from root dir /
 func (g *Generator) generateAbsoluteStaticLinks(mdBody *string) {
 	re := regexp.MustCompile(`static\/`)
-	absLink := g.LayoutConfig.BaseURL + "/" + "static/"
+	absLink := "/" + "static/"
 	*mdBody = re.ReplaceAllString(*mdBody, absLink)
 }
+*/
 
 // Parse all the ".html" layout files in the layout/ directory
 func (g *Generator) parseLayoutFiles() *template.Template {
