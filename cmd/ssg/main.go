@@ -102,11 +102,28 @@ func (g *Generator) RenderSite() {
 		g.ErrorLogger.Fatal(err)
 	}
 }
+func (g *Generator) replaceBaseURL(addr string) {
+	configFile, err := os.ReadFile("layout/config.yml")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Replace the base URL in the config YAML file
+	configString := string(configFile)
+	newConfigString := strings.Replace(configString, g.LayoutConfig.BaseURL, "http://localhost:"+addr+"/", 1)
+
+	// Write the updated config YAML file
+	err = os.WriteFile("layout/config.yml", []byte(newConfigString), 0644)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+}
 
 // Serves the rendered files over the address 'addr'
 func (g *Generator) ServeSite(addr string) {
+	g.replaceBaseURL(addr)
 	fmt.Println("Serving content at", addr)
-	err := http.ListenAndServe(addr, http.FileServer(http.Dir("./rendered")))
+	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
