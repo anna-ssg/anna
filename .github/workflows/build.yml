@@ -38,7 +38,7 @@ jobs:
         go-version: '1.22'
 
     - name: Build ssg
-      run: go build -v ./... && ls
+      run: go build . && chmod +x ./ssg
 
     - name: Setup Pages
       id: pages
@@ -46,7 +46,6 @@ jobs:
 
     - name: Build with ssg
       run: |
-        chmod +x ssg \
         ./ssg
         
     - name: Upload artifact
