@@ -19,7 +19,7 @@ func main() {
 			generator := ssg.Generator{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 			}
-			generator.RenderSite()
+			generator.RenderSite(addr)
 
 			if serve {
 				generator.ServeSite(addr)
