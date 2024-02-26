@@ -2,6 +2,4 @@ navbar:
     - index
     - about
     - posts
-posts:
-    - qapture
-baseURL: http://localhost:9000/
+baseURL: http://localhost:8000/

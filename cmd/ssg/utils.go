@@ -48,6 +48,38 @@ func (g *Generator) copyFiles(srcPath string, destPath string) {
 	}
 }
 
+// func tion get an unmarshaled Layoutconfig
+// func (g *Generator) ymlUnmarshaledConfig() LayoutConfig {
+// 	configFile, err := os.ReadFile("layout/config.yml")
+// 	if err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
+
+// 	var config LayoutConfig
+// 	if err = yaml.Unmarshal(configFile, &config); err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
+
+// 	return config
+// }
+//
+// func (g *Generator) ymlConfigUpdater(config LayoutConfig) {
+// 	marshaledConfig, err := yaml.Marshal(&config)
+// 	if err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
+
+// 	if err = os.WriteFile("layout/config.yml", marshaledConfig, 0666); err != nil {
+// 		g.ErrorLogger.Fatal(err)
+// 	}
+// }
+
+// func (g *Generator) configExtend(filenameWithoutExtension string) {
+// 	config := g.ymlUnmarshaledConfig()
+
+// 	g.ymlConfigUpdater(config)
+// }
+
 func (g *Generator) readMdDir(dirPath string) {
 	// Listing all files in the dirPath directory
 	dirEntries, err := os.ReadDir(dirPath)
@@ -70,6 +102,11 @@ func (g *Generator) readMdDir(dirPath string) {
 
 		filepath := dirPath + entry.Name()
 		g.mdFilesPath = append(g.mdFilesPath, filepath)
+
+		// Parsing titles of md files in the posts folder
+		if dirPath == "content/posts/" {
+			g.mdPosts = append(g.mdPosts, (strings.Split(entry.Name(), ".")[0]))
+		}
 	}
 
 	// Reading the markdown files into memory

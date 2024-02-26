@@ -7,7 +7,7 @@
   <div class="body">
     {{$baseURL := .Layout.BaseURL}}
 
-    {{range .Layout.Posts}}
+    {{range .Posts}}
     <a href="{{$baseURL}}posts/{{.}}.html">{{.}}</a>
     {{end}}
 
