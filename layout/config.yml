@@ -1,5 +1,6 @@
 navbar:
     - index
     - about
+    - docs
     - posts
 baseURL: http://localhost:8000/
