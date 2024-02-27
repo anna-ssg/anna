@@ -57,6 +57,12 @@ func (g *Generator) draftChecker() {
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
+	// Creating the "rendered" directory if not present
+	err := os.MkdirAll("rendered/", 0750)
+        if err != nil {
+                g.ErrorLogger.Fatal(err)
+        }
+
 	g.replaceBaseURL(addr)
 	g.parseConfig()
 	g.readMdDir("content/")
@@ -67,12 +73,6 @@ func (g *Generator) RenderSite(addr string) {
 		g.draftChecker()
 	} else {
 		g.mdNonDrafts = g.mdPosts
-	}
-
-	// Creating the "rendered" directory if not present
-	err := os.MkdirAll("rendered/", 0750)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
 	}
 
 	templ := g.parseLayoutFiles()
