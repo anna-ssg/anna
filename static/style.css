@@ -11,10 +11,9 @@
 
 body {
   padding: 1rem;
-  font-size: 1.2rem;
   font-family: monospace, custom-font, sans-serif;
   color: white;
-  background-color: black;
+  background-color: #000000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,12 +27,39 @@ nav {
   gap: 2rem;
 
   & > a {
-    font-size: 1.3rem;
+      font-size: 1.65rem;
   }
+
 }
 
 a {
-  color: white;
+    color: white;
+    text-decoration: underline;
+    /* make sure text is not selectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+a:hover {
+    color: #4592af;
+    text-decoration: none;
+}
+
+a:active {
+    color: #4592af;
+    text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #4592AF;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.8rem;
 }
 
 .body {
@@ -41,20 +67,23 @@ a {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-}
+  text-align: justify;
 
-.body > p {
-  /* margin-inline: 2rem; */
-  margin: auto;
-}
+  & > p {
+      margin: auto;
+      font-size: 1.2rem;
+  }
 
-.body > a {
-  font-size: 1.5rem;
-  word-break: break-all;
-}
+  & > a {
+      font-size: 1.2rem;
+      text-align: justify;
+      word-break: break-all;
+      color: white;
+  }
 
-.body > p {
-  font-size: 1.1rem;
+  & > ul > li {
+      font-size: 1.2rem;
+  }
 }
 
 img {
@@ -64,33 +93,62 @@ img {
 
   transition: opacity 300ms ease-in-out;
   &:hover {
-    opacity: 0.85;
+      opacity: 0.85;
   }
-}
-
-ul > li {
-  font-size: 1.5rem;
 }
 
 @media screen and (max-width: 900px) {
   img {
-    max-width: 300px;
-    height: auto;
+      max-width: 300px;
+      min-width: 200px;
+      height: auto;
   }
   body {
-    margin-inline: 1.3rem;
-    margin: auto;
-    text-align: justify;
+      margin-inline: 1.4rem;
+      /* margin: auto; */
+      text-align: left;
   }
-  p {
-    font-size: 1.1rem;
-  }
-  ul > li {
-    font-size: 1.1rem;
-    margin-inline: 1rem;
+  .body > p {
+      font-size: 1.1rem;
   }
 
   .body > a {
-    font-size: 1.1rem;
+      font-size: 1.1rem;
   }
+
+  .body > ul > li {
+      margin-inline: 2rem;
+  }
+}
+
+
+
+/* Code styling */
+
+pre code {
+  width: 75vh;
+  background-color: #0e0e0e;
+  border: 2px solid #99999982;
+  border-radius: .5rem;
+  display: block;
+  padding: 20px;
+  overflow-x: scroll;
+  scrollbar-width: none;
+}
+
+h1 > code,
+h2 > code,
+h3 > code,
+h4 > code,
+p > code,
+li > code,
+dd > code,
+td > code {
+  /* font-size: 1.1rem; */
+  background-color: #afafaf93;
+  color: black;
+  word-wrap: break-word;
+  box-decoration-break: clone;
+  padding-inline: .1rem;
+  border-radius: .2rem;
 }
