@@ -1,6 +1,7 @@
-# Static Site Generator
-
-Checkout this doc-page [rendered](https://ssg-test-org.github.io/docs.html) using our ssg
+---
+title: Documentation
+date: 2024-02-27
+---
 
 ## Directory structure
 
@@ -95,6 +96,7 @@ navbar:
   - posts
 
 baseURL: http://localhost:8000/
+# Replace this with the actual canonical-url of your site.
 
 # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet. 
 # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site. 

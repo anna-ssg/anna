@@ -151,7 +151,7 @@ func (g *Generator) replaceBaseURL(addr string) {
 	}
 }
 
-// link sitemap ad the end of robots.txt
+// link sitemap at the end of robots.txt
 func (g *Generator) parseRobots() {
 	tmpl, err := template.ParseFiles("layout/robots.txt")
 	if err != nil {
