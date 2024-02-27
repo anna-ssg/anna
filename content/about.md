@@ -4,7 +4,6 @@ title: About
 ---
 
 ## About Me
-please tell me it works?ig it does now
 I'm a sdadsads science freshman at PES University, Bangalore.NAAA hmm
 HMMM DOES IT WORK?
 I love exploring and building projects. Take a look at what I've [built](/pages/projects/) (or my [Github](https://github.com/anirudhsudhir)).
