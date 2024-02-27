@@ -2,7 +2,7 @@ package ssg
 
 import (
 	"bytes"
-    "fmt"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -23,11 +23,11 @@ type LayoutConfig struct {
 type Frontmatter struct {
 	Title string `yaml:"title"`
 	Date  string `yaml:"date"`
-    Draft bool   `yaml:"draft"`
+	Draft bool   `yaml:"draft"`
 }
 
 type Page struct {
-    Filename    string
+	Filename    string
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
@@ -41,18 +41,18 @@ type Generator struct {
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
 	mdPosts      []string
-    mdNonDrafts  []string
-    Draft        bool
+	mdNonDrafts  []string
+	Draft        bool
 }
 
 func (g *Generator) draftChecker() {
-    for _, parsedpage := range g.mdParsed {
-        if !parsedpage.Frontmatter.Draft {
-            if slices.Contains(g.mdPosts, parsedpage.Filename) {
-                g.mdNonDrafts = append(g.mdNonDrafts, parsedpage.Filename)
-            }
-        }
-    }
+	for _, parsedpage := range g.mdParsed {
+		if !parsedpage.Frontmatter.Draft {
+			if slices.Contains(g.mdPosts, parsedpage.Filename) {
+				g.mdNonDrafts = append(g.mdNonDrafts, parsedpage.Filename)
+			}
+		}
+	}
 }
 
 // Write rendered HTML to disk
@@ -60,12 +60,14 @@ func (g *Generator) RenderSite(addr string) {
 	g.replaceBaseURL(addr)
 	g.parseConfig()
 	g.readMdDir("content/")
+	g.parseRobots()
+	g.generateSitemap()
 	g.copyStaticContent()
-    if !g.Draft {
-        g.draftChecker()
-    } else {
-        g.mdNonDrafts = g.mdPosts
-    }
+	if !g.Draft {
+		g.draftChecker()
+	} else {
+		g.mdNonDrafts = g.mdPosts
+	}
 
 	// Creating the "rendered" directory if not present
 	err := os.MkdirAll("rendered/", 0750)
@@ -132,26 +134,73 @@ func (g *Generator) replaceBaseURL(addr string) {
 		g.ErrorLogger.Fatal(err)
 	}
 
-    var config LayoutConfig
-    if err := yaml.Unmarshal(configFile, &config); err != nil {
-        g.ErrorLogger.Fatal(err)
-    }
+	var config LayoutConfig
+	if err := yaml.Unmarshal(configFile, &config); err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 
-    config.BaseURL = "http://localhost:" + addr + "/"
+	config.BaseURL = "http://localhost:" + addr + "/"
 
-    updatedConfig, err := yaml.Marshal(config)
-    if err != nil {
-        g.ErrorLogger.Fatal(err)
-    }
+	updatedConfig, err := yaml.Marshal(config)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 
-    if err = os.WriteFile("layout/config.yml", updatedConfig, 0666); err != nil {
-        g.ErrorLogger.Fatal(err)
-    }
+	if err = os.WriteFile("layout/config.yml", updatedConfig, 0666); err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+}
+
+// link sitemap ad the end of robots.txt
+func (g *Generator) parseRobots() {
+	tmpl, err := template.ParseFiles("layout/robots.txt")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	var buffer bytes.Buffer
+	err = tmpl.Execute(&buffer, g.LayoutConfig)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	outputFile, err := os.Create("rendered/robots.txt")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	defer outputFile.Close()
+	_, err = outputFile.Write(buffer.Bytes())
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+}
+
+func (g *Generator) generateSitemap() {
+	var buffer bytes.Buffer
+	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	buffer.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
+
+	// iterate over parsed markdown files
+	for _, page := range g.mdParsed {
+		url := g.LayoutConfig.BaseURL + page.Filename + ".html"
+		buffer.WriteString(" <url>\n")
+		buffer.WriteString("    <loc>" + url + "</loc>\n")
+		buffer.WriteString("    <lastmod>" + page.Frontmatter.Date + "</lastmod>\n")
+		buffer.WriteString(" </url>\n")
+	}
+	buffer.WriteString("</urlset>\n")
+	outputFile, err := os.Create("rendered/sitemap.xml")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	defer outputFile.Close()
+	_, err = outputFile.Write(buffer.Bytes())
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 }
 
 // Serves the rendered files over the address 'addr'
 func (g *Generator) ServeSite(addr string) {
-	fmt.Println("Serving content at", addr)
+	fmt.Print("Serving content at: http://localhost:", addr, "\n")
 	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
