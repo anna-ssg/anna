@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"slices"
 	"strings"
 
 	"github.com/yuin/goldmark"
@@ -41,24 +40,17 @@ type Generator struct {
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
 	mdPosts      []string
-	mdNonDrafts  []string
 	Draft        bool
-}
-
-func (g *Generator) draftChecker() {
-	for _, parsedpage := range g.mdParsed {
-		if !parsedpage.Frontmatter.Draft {
-			if slices.Contains(g.mdPosts, parsedpage.Filename) {
-				g.mdNonDrafts = append(g.mdNonDrafts, parsedpage.Filename)
-			}
-		}
-	}
 }
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
-	err := os.MkdirAll("rendered/", 0750)
+    err := os.RemoveAll("rendered/")
+    if err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+	err = os.MkdirAll("rendered/", 0750)
         if err != nil {
                 g.ErrorLogger.Fatal(err)
         }
@@ -69,11 +61,6 @@ func (g *Generator) RenderSite(addr string) {
 	g.parseRobots()
 	g.generateSitemap()
 	g.copyStaticContent()
-	if !g.Draft {
-		g.draftChecker()
-	} else {
-		g.mdNonDrafts = g.mdPosts
-	}
 
 	templ := g.parseLayoutFiles()
 
@@ -81,8 +68,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = g.mdNonDrafts
-		page.Posts = g.mdNonDrafts
+		g.mdParsed[i].Posts = g.mdPosts
+		page.Posts = g.mdPosts
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -117,6 +104,7 @@ func (g *Generator) RenderSite(addr string) {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
+
 	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
