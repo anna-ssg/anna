@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/yuin/goldmark"
@@ -51,11 +50,10 @@ func (g *Generator) RenderSite(addr string) {
         g.ErrorLogger.Fatal(err)
     }
 	err = os.MkdirAll("rendered/", 0750)
-        if err != nil {
-                g.ErrorLogger.Fatal(err)
-        }
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 
-	g.replaceBaseURL(addr)
 	g.parseConfig()
 	g.readMdDir("content/")
 	g.parseRobots()
@@ -116,30 +114,7 @@ func (g *Generator) RenderSite(addr string) {
 		g.ErrorLogger.Fatal(err)
 	}
 }
-func (g *Generator) replaceBaseURL(addr string) {
-	configFile, err := os.ReadFile("layout/config.yml")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
 
-	var config LayoutConfig
-	if err := yaml.Unmarshal(configFile, &config); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	config.BaseURL = "http://localhost:" + addr + "/"
-
-	updatedConfig, err := yaml.Marshal(config)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	if err = os.WriteFile("layout/config.yml", updatedConfig, 0666); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-// link sitemap at the end of robots.txt
 func (g *Generator) parseRobots() {
 	tmpl, err := template.ParseFiles("layout/robots.txt")
 	if err != nil {
@@ -207,7 +182,11 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	   markdown content
 	   --- => markdown divider and not to be touched while yaml parsing
 	*/
-	frontmatterSplit := strings.Split(filecontent, "---")[1]
+	splitContents := strings.Split(filecontent, "---")
+	frontmatterSplit := ""
+	if len(splitContents) > 1 {
+		frontmatterSplit = splitContents[1]
+	}
 
 	if frontmatterSplit != "" {
 		// Parsing YAML frontmatter
@@ -222,8 +201,6 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	} else {
 		markdown = filecontent
 	}
-
-	g.generateAbsoluteStaticLinks(&markdown)
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
@@ -250,13 +227,6 @@ func (g *Generator) parseConfig() {
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-}
-
-// Make links to static assets load from root dir /
-func (g *Generator) generateAbsoluteStaticLinks(mdBody *string) {
-	re := regexp.MustCompile(`static\/`)
-	absLink := "/" + "static/"
-	*mdBody = re.ReplaceAllString(*mdBody, absLink)
 }
 
 // Parse all the ".html" layout files in the layout/ directory

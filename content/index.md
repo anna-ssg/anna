@@ -4,6 +4,7 @@ title: Home
 ---
 
 # Henlo!
-A computer science student and tech enthusiast. Welcome to my home on the internet.
 
-![demo-image](static/plane.jpg)
+This is the documentation for the SSG
+
+![demo-image](/static/plane.jpg)
