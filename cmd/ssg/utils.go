@@ -64,9 +64,9 @@ func (g *Generator) readMdDir(dirPath string) {
 			return
 		}
 
-		if !strings.HasSuffix(entry.Name(), ".md") {
-			continue
-		}
+        if !strings.HasSuffix(entry.Name(), ".md") {
+            continue
+        }
 
         content, err := os.ReadFile(strings.Join([]string{dirPath, entry.Name()}, "/"))
         if err != nil {
@@ -74,6 +74,7 @@ func (g *Generator) readMdDir(dirPath string) {
         }
 
         frontmatter, body := g.parseMarkdownContent(string(content))
+
         if frontmatter.Draft && g.Draft {
             g.AddFileAndRender(dirPath, entry, frontmatter, body)
         } else if frontmatter.Draft && !g.Draft {
@@ -83,7 +84,7 @@ func (g *Generator) readMdDir(dirPath string) {
         if !frontmatter.Draft {
             g.AddFileAndRender(dirPath, entry, frontmatter, body)
         }
-	}
+    }
 }
 
 func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmatter Frontmatter, body string) {
@@ -92,9 +93,6 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
     g.mdFilesPath = append(g.mdFilesPath, filepath)
 
     // Parsing titles of md files in the posts folder
-    if dirPath == "content/posts/" {
-        g.mdPosts = append(g.mdPosts, (strings.Split(entry.Name(), ".")[0]))
-    }
 
     page := Page {
         Filename: strings.Split(entry.Name(), ".")[0],
@@ -102,5 +100,10 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
         Body: template.HTML(body),
         Layout: g.LayoutConfig,
     }
+
+    if frontmatter.Type == "post" {
+        g.MdPosts = append(g.MdPosts, page)
+    }
+
     g.mdParsed = append(g.mdParsed, page)
 }

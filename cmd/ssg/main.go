@@ -22,6 +22,8 @@ type Frontmatter struct {
 	Title string `yaml:"title"`
 	Date  string `yaml:"date"`
 	Draft bool   `yaml:"draft"`
+    Type  string `yaml:"type"`
+    Description string `yaml:"description"`
 }
 
 type Page struct {
@@ -38,8 +40,16 @@ type Generator struct {
 	mdFilesPath  []string
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
-	mdPosts      []string
+	MdPosts      []Page
 	Draft        bool
+}
+
+func getFileNames(page []Page) []string {
+    var filenames []string
+    for _, p := range page {
+        filenames = append(filenames, p.Filename)
+    }
+    return filenames
 }
 
 // Write rendered HTML to disk
@@ -66,8 +76,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = g.mdPosts
-		page.Posts = g.mdPosts
+		g.mdParsed[i].Posts = getFileNames(g.MdPosts) 
+		page.Posts = getFileNames(g.MdPosts)  
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -103,7 +113,19 @@ func (g *Generator) RenderSite(addr string) {
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
 
-	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
+    type TemplateData struct {
+        Generator       *Generator
+        Frontmatter     Frontmatter
+        Layout         LayoutConfig
+    }
+    data := TemplateData{
+        Generator: g,
+        Frontmatter: Frontmatter{Title: "Posts"},
+        Layout: g.LayoutConfig,
+    }
+
+
+	err = templ.ExecuteTemplate(&buffer, "posts", data)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}

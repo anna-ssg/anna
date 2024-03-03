@@ -2,6 +2,8 @@
 date: 23-11-2023
 title: XKCD Grab
 draft: true
+type: post
+description: My presentation in the HSP Project Expo. All about the xkcd-cli tool, fuzzy searching and web scraping. This blog is a summary of summary of the documentation
 ---
 
 # xkcd-grab v2

@@ -1,10 +1,11 @@
 ---
 title: Sample Post
 author: John Doe
-date: 2024-02-23
+date: 23-02-2024
 categories:
   - Technology
   - Programming
+type: post
 ---
 
 # heading L1
