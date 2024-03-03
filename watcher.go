@@ -20,7 +20,7 @@ var (
 	extensions = []string{".go", ".md"}                        // File extensions to monitor,
 )
 
-func main() {
+func nomain() {							//couldnt think of anything else :D
 	fmt.Println("Watcher is running...")
 	watch()
 }
