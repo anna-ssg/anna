@@ -1,7 +1,3 @@
-# Static Site Generator
-
-Checkout this doc-page [rendered](https://ssg-test-org.github.io/docs.html) using our ssg
-
 ## Directory structure
 
 The ssg currently requires the following directory structure
@@ -66,7 +62,7 @@ The layout files can access the following rendered data from the markdown files:
 
 ## Notes
 
-1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "static/[imagename.format]" as the image link format in the markdown files.
+1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "/static/[imagename.format]" as the image link format in the markdown files.
 
 2. CSS: CSS can be added in the following ways:
 
@@ -95,6 +91,7 @@ navbar:
   - posts
 
 baseURL: http://localhost:8000/
+# Replace this with the actual canonical-url of your site.
 
 # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet. 
 # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site. 

@@ -1,3 +1,5 @@
 rendered/
 ssg
 !ssg/
+*.exe
+**/.DS_Store

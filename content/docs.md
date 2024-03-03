@@ -67,7 +67,7 @@ The layout files can access the following rendered data from the markdown files:
 
 ## Notes
 
-1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "static/[imagename.format]" as the image link format in the markdown files.
+1. Images: To add images, add it to the 'static/' folder or a subdirectory under it. Use "/static/[imagename.format]" as the image link format in the markdown files.
 
 2. CSS: CSS can be added in the following ways:
 

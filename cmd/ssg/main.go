@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
-	"slices"
 	"strings"
 
 	"github.com/yuin/goldmark"
@@ -41,39 +39,26 @@ type Generator struct {
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
 	mdPosts      []string
-	mdNonDrafts  []string
 	Draft        bool
-}
-
-func (g *Generator) draftChecker() {
-	for _, parsedpage := range g.mdParsed {
-		if !parsedpage.Frontmatter.Draft {
-			if slices.Contains(g.mdPosts, parsedpage.Filename) {
-				g.mdNonDrafts = append(g.mdNonDrafts, parsedpage.Filename)
-			}
-		}
-	}
 }
 
 // Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
-	g.replaceBaseURL(addr)
+	// Creating the "rendered" directory if not present
+    err := os.RemoveAll("rendered/")
+    if err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+	err = os.MkdirAll("rendered/", 0750)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
 	g.parseConfig()
 	g.readMdDir("content/")
 	g.parseRobots()
 	g.generateSitemap()
 	g.copyStaticContent()
-	if !g.Draft {
-		g.draftChecker()
-	} else {
-		g.mdNonDrafts = g.mdPosts
-	}
-
-	// Creating the "rendered" directory if not present
-	err := os.MkdirAll("rendered/", 0750)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
 
 	templ := g.parseLayoutFiles()
 
@@ -81,8 +66,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = g.mdNonDrafts
-		page.Posts = g.mdNonDrafts
+		g.mdParsed[i].Posts = g.mdPosts
+		page.Posts = g.mdPosts
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -117,6 +102,7 @@ func (g *Generator) RenderSite(addr string) {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
+
 	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
@@ -128,30 +114,7 @@ func (g *Generator) RenderSite(addr string) {
 		g.ErrorLogger.Fatal(err)
 	}
 }
-func (g *Generator) replaceBaseURL(addr string) {
-	configFile, err := os.ReadFile("layout/config.yml")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
 
-	var config LayoutConfig
-	if err := yaml.Unmarshal(configFile, &config); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	config.BaseURL = "http://localhost:" + addr + "/"
-
-	updatedConfig, err := yaml.Marshal(config)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	if err = os.WriteFile("layout/config.yml", updatedConfig, 0666); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-// link sitemap at the end of robots.txt
 func (g *Generator) parseRobots() {
 	tmpl, err := template.ParseFiles("layout/robots.txt")
 	if err != nil {
@@ -219,7 +182,11 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	   markdown content
 	   --- => markdown divider and not to be touched while yaml parsing
 	*/
-	frontmatterSplit := strings.Split(filecontent, "---")[1]
+	splitContents := strings.Split(filecontent, "---")
+	frontmatterSplit := ""
+	if len(splitContents) > 1 {
+		frontmatterSplit = splitContents[1]
+	}
 
 	if frontmatterSplit != "" {
 		// Parsing YAML frontmatter
@@ -234,8 +201,6 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	} else {
 		markdown = filecontent
 	}
-
-	g.generateAbsoluteStaticLinks(&markdown)
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
@@ -262,13 +227,6 @@ func (g *Generator) parseConfig() {
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-}
-
-// Make links to static assets load from root dir /
-func (g *Generator) generateAbsoluteStaticLinks(mdBody *string) {
-	re := regexp.MustCompile(`static\/`)
-	absLink := "/" + "static/"
-	*mdBody = re.ReplaceAllString(*mdBody, absLink)
 }
 
 // Parse all the ".html" layout files in the layout/ directory
