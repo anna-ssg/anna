@@ -27,6 +27,7 @@ func main() {
 
 			if serve {
 				generator.ServeSite(addr)
+				go NoMain()
 			}
 		},
 	}
