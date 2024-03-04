@@ -2,18 +2,22 @@
 {{ template "head" .}}
 
 <body>
-  {{template "header" .}}
+    {{template "header" .}}
 
-  <div class="body">
-    {{$baseURL := .Layout.BaseURL}}
+    <div class="body">
+        {{$baseURL := .Layout.BaseURL}}
 
-    <div class="posts">
-      {{range .Posts}}
-      <a href="posts/{{.}}.html">{{.}}</a>
-      {{end}}
+        <div class="posts">
+            {{range .Posts}}
+            <a href="posts/{{.}}.html">{{.}}</a>
+            {{end}}
+        </div>
+
     </div>
 
-  </div>
+    {{range .Frontmatter.JSFiles}}
+    <script src="script/{{.}}"></script>
+    {{end}}
 
 </body>
 

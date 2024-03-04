@@ -5,6 +5,8 @@ date: 2024-02-23
 categories:
   - Technology
   - Programming
+scripts:
+  - light.js
 ---
 
 # heading L1
@@ -17,6 +19,6 @@ officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat
 
 ## heading L2
 
-***bold and italics*** 
+**_bold and italics_**
 
 > quote text

@@ -19,9 +19,10 @@ type LayoutConfig struct {
 }
 
 type Frontmatter struct {
-	Title string `yaml:"title"`
-	Date  string `yaml:"date"`
-	Draft bool   `yaml:"draft"`
+	Title   string   `yaml:"title"`
+	Date    string   `yaml:"date"`
+	Draft   bool     `yaml:"draft"`
+	JSFiles []string `yaml:"scripts"`
 }
 
 type Page struct {
@@ -45,10 +46,10 @@ type Generator struct {
 // Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
-    err := os.RemoveAll("rendered/")
-    if err != nil {
-        g.ErrorLogger.Fatal(err)
-    }
+	err := os.RemoveAll("rendered/")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 	err = os.MkdirAll("rendered/", 0750)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
@@ -59,6 +60,7 @@ func (g *Generator) RenderSite(addr string) {
 	g.parseRobots()
 	g.generateSitemap()
 	g.copyStaticContent()
+	g.copyScriptContent()
 
 	templ := g.parseLayoutFiles()
 
@@ -102,7 +104,6 @@ func (g *Generator) RenderSite(addr string) {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
-
 	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
@@ -214,6 +215,10 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 // Copies the contents of the 'static/' directory to 'rendered/'
 func (g *Generator) copyStaticContent() {
 	g.copyDirectoryContents("static/", "rendered/static/")
+}
+
+func (g *Generator) copyScriptContent() {
+	g.copyDirectoryContents("script/", "rendered/script/")
 }
 
 // Parse 'config.yml' to configure the layout of the site
