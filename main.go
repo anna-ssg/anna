@@ -11,7 +11,7 @@ import (
 func main() {
 	var serve bool
 	var addr string
-    var draft bool
+	var draft bool
 
 	rootCmd := &cobra.Command{
 		Use:   "ssg",
@@ -20,15 +20,14 @@ func main() {
 			generator := ssg.Generator{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 			}
-            if draft { 
-                generator.Draft = true
-            }
-			generator.RenderSite(addr)
+			if draft {
+				generator.Draft = true
+			}
 
 			if serve {
-				generator.ServeSite(addr)
-				go NoMain()
+				generator.StartLiveReload(addr)
 			}
+			generator.RenderSite(addr)
 		},
 	}
 
