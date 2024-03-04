@@ -7,7 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
+
+	//"sort"
 	"strings"
+	"time"
 
 	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
@@ -28,6 +32,7 @@ type Frontmatter struct {
 
 type Page struct {
 	Filename    string
+    Date        int64
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
@@ -50,6 +55,14 @@ func getFileNames(page []Page) []string {
         filenames = append(filenames, p.Filename)
     }
     return filenames
+}
+
+func (g *Generator) dateParse(date string) time.Time {
+    parsedTime, err := time.Parse("2006-01-02", date)
+    if err != nil {
+        g.ErrorLogger.Fatal(err)
+    }
+    return parsedTime
 }
 
 // Write rendered HTML to disk
@@ -76,8 +89,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = getFileNames(g.MdPosts) 
-		page.Posts = getFileNames(g.MdPosts)  
+		g.mdParsed[i].Posts = getFileNames(g.MdPosts)
+		page.Posts = getFileNames(g.MdPosts)
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -112,6 +125,14 @@ func (g *Generator) RenderSite(addr string) {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
+
+
+    out := g.MdPosts
+
+    sort.Slice(out, func(i, j int) bool {
+        return out[i].Date > out[j].Date
+    })
+
 
     type TemplateData struct {
         Generator       *Generator

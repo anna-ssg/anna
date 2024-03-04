@@ -1,7 +1,7 @@
 ---
 title: Sample Post
 author: John Doe
-date: 23-02-2024
+date: 2024-02-23
 categories:
   - Technology
   - Programming

@@ -94,7 +94,15 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
 
     // Parsing titles of md files in the posts folder
 
+    var date int64
+    if frontmatter.Date != "" {
+        date = g.dateParse(frontmatter.Date).Unix()
+    } else {
+        date = 0
+    }
+
     page := Page {
+        Date: date, 
         Filename: strings.Split(entry.Name(), ".")[0],
         Frontmatter: frontmatter,
         Body: template.HTML(body),
