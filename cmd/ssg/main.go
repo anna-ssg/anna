@@ -2,10 +2,8 @@ package ssg
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
@@ -45,21 +43,21 @@ type Generator struct {
 // Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
-    err := os.RemoveAll("rendered/")
-    if err != nil {
-        g.ErrorLogger.Fatal(err)
-    }
+	err := os.RemoveAll("rendered/")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
 	err = os.MkdirAll("rendered/", 0750)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
 	g.parseConfig()
+	g.mdPosts = []string{}
 	g.readMdDir("content/")
 	g.parseRobots()
 	g.generateSitemap()
 	g.copyStaticContent()
-
 	templ := g.parseLayoutFiles()
 
 	// Writing each parsed markdown file as a separate HTML file
@@ -156,15 +154,6 @@ func (g *Generator) generateSitemap() {
 	}
 	defer outputFile.Close()
 	_, err = outputFile.Write(buffer.Bytes())
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-// Serves the rendered files over the address 'addr'
-func (g *Generator) ServeSite(addr string) {
-	fmt.Print("Serving content at: http://localhost:", addr, "\n")
-	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}

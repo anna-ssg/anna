@@ -68,39 +68,39 @@ func (g *Generator) readMdDir(dirPath string) {
 			continue
 		}
 
-        content, err := os.ReadFile(strings.Join([]string{dirPath, entry.Name()}, "/"))
-        if err != nil {
-            g.ErrorLogger.Fatal(err)
-        }
+		content, err := os.ReadFile(strings.Join([]string{dirPath, entry.Name()}, "/"))
+		if err != nil {
+			g.ErrorLogger.Fatal(err)
+		}
 
-        frontmatter, body := g.parseMarkdownContent(string(content))
-        if frontmatter.Draft && g.Draft {
-            g.AddFileAndRender(dirPath, entry, frontmatter, body)
-        } else if frontmatter.Draft && !g.Draft {
-            continue
-        }
+		frontmatter, body := g.parseMarkdownContent(string(content))
+		if frontmatter.Draft && g.Draft {
+			g.AddFileAndRender(dirPath, entry, frontmatter, body)
+		} else if frontmatter.Draft && !g.Draft {
+			continue
+		}
 
-        if !frontmatter.Draft {
-            g.AddFileAndRender(dirPath, entry, frontmatter, body)
-        }
+		if !frontmatter.Draft {
+			g.AddFileAndRender(dirPath, entry, frontmatter, body)
+		}
 	}
 }
 
 func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmatter Frontmatter, body string) {
-    g.mdFilesName = append(g.mdFilesName, entry.Name())
-    filepath := dirPath + entry.Name()
-    g.mdFilesPath = append(g.mdFilesPath, filepath)
+	g.mdFilesName = append(g.mdFilesName, entry.Name())
+	filepath := dirPath + entry.Name()
+	g.mdFilesPath = append(g.mdFilesPath, filepath)
 
-    // Parsing titles of md files in the posts folder
-    if dirPath == "content/posts/" {
-        g.mdPosts = append(g.mdPosts, (strings.Split(entry.Name(), ".")[0]))
-    }
+	// Parsing titles of md files in the posts folder
+	if dirPath == "content/posts/" {
+		g.mdPosts = append(g.mdPosts, (strings.Split(entry.Name(), ".")[0]))
+	}
 
-    page := Page {
-        Filename: strings.Split(entry.Name(), ".")[0],
-        Frontmatter: frontmatter,
-        Body: template.HTML(body),
-        Layout: g.LayoutConfig,
-    }
-    g.mdParsed = append(g.mdParsed, page)
+	page := Page{
+		Filename:    strings.Split(entry.Name(), ".")[0],
+		Frontmatter: frontmatter,
+		Body:        template.HTML(body),
+		Layout:      g.LayoutConfig,
+	}
+	g.mdParsed = append(g.mdParsed, page)
 }
