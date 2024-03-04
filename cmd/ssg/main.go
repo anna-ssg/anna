@@ -12,8 +12,9 @@ import (
 )
 
 type LayoutConfig struct {
-	Navbar  []string `yaml:"navbar"`
-	BaseURL string   `yaml:"baseURL"`
+	Navbar    []string `yaml:"navbar"`
+	BaseURL   string   `yaml:"baseURL"`
+	SitePlugs []string `yaml:"plugins"` // example : "light.js"
 }
 
 type Frontmatter struct {

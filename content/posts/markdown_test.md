@@ -6,7 +6,6 @@ categories:
   - Technology
   - Programming
 scripts:
-  - light.js
 ---
 
 # heading L1

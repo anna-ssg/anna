@@ -107,7 +107,7 @@ baseURL: http://localhost:8000/
 
 ## Flags
 
-```
+```text
 Usage:
   ssg [flags]
 

@@ -16,6 +16,10 @@
     <script src="/script/{{.}}"></script>
     {{end}}
 
+    {{range .Layout.SitePlugs}}
+    <script src="/script/{{.}}"></script>
+    {{end}}
+
 </body>
 
 </html>
