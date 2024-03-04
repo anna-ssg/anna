@@ -48,7 +48,7 @@ func (g *Generator) RenderSite(addr string) {
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-	err := os.RemoveAll("rendered/")
+	err = os.RemoveAll("rendered/")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
