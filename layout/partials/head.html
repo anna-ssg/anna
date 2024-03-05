@@ -8,6 +8,7 @@
     <title>{{.Frontmatter.Title}}</title>
     <link rel="preload stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/prism.css">
+    <link rel="alternate" type="application/atom+xml" title="feed" href="/feed.atom">
     
     {{range .Frontmatter.JSFiles}}
     <script src="/script/{{.}}" defer></script>
