@@ -7,8 +7,6 @@ import (
 	"log"
 	"os"
 	"sort"
-
-	//"sort"
 	"strings"
 	"time"
 
@@ -19,6 +17,7 @@ import (
 type LayoutConfig struct {
 	Navbar    []string `yaml:"navbar"`
 	BaseURL   string   `yaml:"baseURL"`
+	SiteTitle string   `yaml:"siteTitle"`
 	SitePlugs []string `yaml:"plugins"` // example : "light.js"
 }
 
@@ -88,6 +87,7 @@ func (g *Generator) RenderSite(addr string) {
 	g.readMdDir("content/")
 	g.parseRobots()
 	g.generateSitemap()
+	g.generateFeed()
 	g.copyStaticContent()
 	g.copyScriptContent()
 	templ := g.parseLayoutFiles()
@@ -199,6 +199,39 @@ func (g *Generator) generateSitemap() {
 	}
 	buffer.WriteString("</urlset>\n")
 	outputFile, err := os.Create("rendered/sitemap.xml")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	defer outputFile.Close()
+	_, err = outputFile.Write(buffer.Bytes())
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+}
+
+func (g *Generator) generateFeed() {
+	var buffer bytes.Buffer
+	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
+	buffer.WriteString("    <title>" + g.LayoutConfig.SiteTitle + "</title>\n")
+	buffer.WriteString("    <link href=\"" + g.LayoutConfig.BaseURL + "\" rel=\"self\"/>\n")
+	buffer.WriteString("    <updated>" + time.Now().Format(time.RFC3339) + "</updated>\n")
+
+	// iterate over parsed markdown files that are non-draft posts
+	for _, page := range g.MdPosts {
+		if !page.Frontmatter.Draft {
+			buffer.WriteString("    <entry>\n")
+			buffer.WriteString("        <title>" + page.Frontmatter.Title + "</title>\n")
+			buffer.WriteString("        <link href=\"" + g.LayoutConfig.BaseURL + "posts/" + page.Filename + ".html\"/>\n")
+			buffer.WriteString("        <id>" + g.LayoutConfig.BaseURL + page.Filename + ".html</id>\n")
+			buffer.WriteString("        <updated>" + time.Unix(page.Date, 0).Format(time.RFC3339) + "</updated>\n")
+			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(page.Body) + "]]></content>\n")
+			buffer.WriteString("    </entry>\n")
+		}
+	}
+
+	buffer.WriteString("</feed>\n")
+	outputFile, err := os.Create("rendered/feed.atom")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
