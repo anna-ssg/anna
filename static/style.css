@@ -27,12 +27,26 @@ body {
     flex-direction: column;
     /* align-items: center; */
     text-align: justify;
+    height: 100vh;
 
     margin: auto;
     margin-inline: 5%;
 
 }
 
+header {
+    flex: 0;
+}
+
+footer {
+    width: 100%;
+    flex: 0;
+
+    align-self: center;
+    padding: 1rem 0;
+
+    text-align: center;
+}
 
 nav {
     font-size: 1.8rem;
@@ -82,6 +96,7 @@ h3 { font-size: 2.0rem;}
 h4 {font-size: 1.8rem;}
 
 .body {
+    flex: 1 0 auto;
   
     & > a,
     & > ul > li > a,
@@ -245,7 +260,3 @@ td>code {
         }
     }
 }
-
-
-
-

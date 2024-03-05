@@ -61,7 +61,7 @@ func (g *Generator) readMdDir(dirPath string) {
 
 		if entry.IsDir() {
 			g.readMdDir(dirPath + entry.Name() + "/")
-			return
+			continue
 		}
 
         if !strings.HasSuffix(entry.Name(), ".md") {
