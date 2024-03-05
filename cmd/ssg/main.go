@@ -2,23 +2,20 @@ package ssg
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"log"
 	"os"
 	"sort"
 	"strings"
-	"time"
 
-	"github.com/yuin/goldmark"
-	"gopkg.in/yaml.v3"
+	"github.com/acmpesuecc/ssg/pkg/helpers"
 )
 
 type LayoutConfig struct {
-	Navbar    []string `yaml:"navbar"`
-	BaseURL   string   `yaml:"baseURL"`
-	SiteTitle string   `yaml:"siteTitle"`
-	SitePlugs []string `yaml:"plugins"` // example : "light.js"
+	Navbar      []string `yaml:"navbar"`
+	BaseURL     string   `yaml:"baseURL"`
+	SiteTitle   string   `yaml:"siteTitle"`
+	SiteScripts []string `yaml:"siteScripts"`
 }
 
 type Frontmatter struct {
@@ -31,127 +28,85 @@ type Frontmatter struct {
 	PreviewImage string   `yaml:"previewimage"`
 }
 
-type Page struct {
+type Date int64
+
+type Generator struct {
+	// Templates stores the template data of all the pages of the site
+	// Access the data for a particular page by using the relative path to the file as the key
+	Templates    map[template.URL]TemplateData
+	Posts        []TemplateData
+	LayoutConfig LayoutConfig
+
+	ErrorLogger  *log.Logger
+	mdFilesName  []string
+	mdFilesPath  []string
+	RenderDrafts bool
+}
+
+// This struct holds all of the data required to render any page of the site
+// Pass this struct without modification to ExecuteTemplate()
+type TemplateData struct {
 	Filename    string
 	Date        int64
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
-	Posts       []string
 }
 
-type Generator struct {
-	ErrorLogger  *log.Logger
-	mdFilesName  []string
-	mdFilesPath  []string
-	mdParsed     []Page
-	LayoutConfig LayoutConfig
-	MdPosts      []Page
-	Draft        bool
+// This struct holds the data required to render posts.html
+type postsTemplateData struct {
+	Posts []TemplateData
+	TemplateData
 }
 
-func getFileNames(page []Page) []string {
-	var filenames []string
-	for _, p := range page {
-		filenames = append(filenames, p.Filename)
-	}
-	return filenames
-}
-
-func (g *Generator) dateParse(date string) time.Time {
-	parsedTime, err := time.Parse("2006-01-02", date)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	return parsedTime
-}
-
-// Write rendered HTML to disk
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
 	err := os.RemoveAll("rendered/")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-	err = os.RemoveAll("rendered/")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+
 	err = os.MkdirAll("rendered/", 0750)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
+	g.Posts = []TemplateData{}
 	g.parseConfig()
-	g.MdPosts = []Page{}
 	g.readMdDir("content/")
 	g.parseRobots()
 	g.generateSitemap()
 	g.generateFeed()
-	g.copyStaticContent()
-	g.copyScriptContent()
-	templ := g.parseLayoutFiles()
 
-	// Writing each parsed markdown file as a separate HTML file
-	for i, page := range g.mdParsed {
+	sort.Slice(g.Posts, func(i, j int) bool {
+		return g.Posts[i].Frontmatter.Date > g.Posts[j].Frontmatter.Date
+	})
 
-		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = getFileNames(g.MdPosts)
-		page.Posts = getFileNames(g.MdPosts)
+	helper := helpers.Helper{
+		ErrorLogger: g.ErrorLogger,
+	}
 
-		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
+	// Copies the contents of the 'static/' directory to 'rendered/'
+	helper.CopyDirectoryContents("static/", "rendered/static/")
+	helper.CopyDirectoryContents("script/", "rendered/script/")
 
-		// Creating subdirectories if the filepath contains '/'
-		if strings.Contains(filename, "/") {
-			// Extracting the directory path from the filepath
-			dirPath, _ := strings.CutSuffix(filename, g.mdFilesName[i])
-			dirPath = "rendered/" + dirPath
+	template := helper.ParseLayoutFiles()
 
-			err := os.MkdirAll(dirPath, 0750)
-			if err != nil {
-				g.ErrorLogger.Fatal(err)
-			}
-		}
-
-		filename, _ = strings.CutSuffix(filename, ".md")
-		filepath := "rendered/" + filename + ".html"
-		var buffer bytes.Buffer
-
-		// Storing the rendered HTML file to a buffer
-		err = templ.ExecuteTemplate(&buffer, "page", page)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
-
-		// Flushing data from the buffer to the disk
-		err := os.WriteFile(filepath, buffer.Bytes(), 0666)
-		if err != nil {
-			g.ErrorLogger.Fatal(err)
-		}
+	for pagePath, templateData := range g.Templates {
+		g.RenderPage(pagePath, templateData, template)
 	}
 
 	var buffer bytes.Buffer
-	// Rendering the 'posts.html' separately
-	out := g.MdPosts
 
-	sort.Slice(out, func(i, j int) bool {
-		return out[i].Date > out[j].Date
-	})
-
-	fmt.Printf("%v\n", getFileNames(out))
-
-	type TemplateData struct {
-		Generator   *Generator
-		Frontmatter Frontmatter
-		Layout      LayoutConfig
-	}
-	data := TemplateData{
-		Generator:   g,
-		Frontmatter: Frontmatter{Title: "Posts"},
-		Layout:      g.LayoutConfig,
+	postsData := postsTemplateData{
+		Posts: g.Posts,
+		TemplateData: TemplateData{
+			Frontmatter: Frontmatter{Title: "Posts"},
+			Layout:      g.LayoutConfig,
+		},
 	}
 
-	err = templ.ExecuteTemplate(&buffer, "posts", data)
+	err = template.ExecuteTemplate(&buffer, "posts", postsData)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -163,161 +118,33 @@ func (g *Generator) RenderSite(addr string) {
 	}
 }
 
-func (g *Generator) parseRobots() {
-	tmpl, err := template.ParseFiles("layout/robots.txt")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	var buffer bytes.Buffer
-	err = tmpl.Execute(&buffer, g.LayoutConfig)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	outputFile, err := os.Create("rendered/robots.txt")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	defer outputFile.Close()
-	_, err = outputFile.Write(buffer.Bytes())
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
+func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData, template *template.Template) {
 
-func (g *Generator) generateSitemap() {
-	var buffer bytes.Buffer
-	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-	buffer.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
+	// Creating subdirectories if the filepath contains '/'
+	if strings.Contains(string(pagePath), "/") {
+		// Extracting the directory path from the filepath
+		dirPath, _ := strings.CutSuffix(string(pagePath), templateData.Filename+".md")
+		dirPath = "rendered/" + dirPath
 
-	// iterate over parsed markdown files
-	for _, page := range g.mdParsed {
-		url := g.LayoutConfig.BaseURL + "/" + page.Filename + ".html"
-		buffer.WriteString(" <url>\n")
-		buffer.WriteString("    <loc>" + url + "</loc>\n")
-		buffer.WriteString("    <lastmod>" + page.Frontmatter.Date + "</lastmod>\n")
-		buffer.WriteString(" </url>\n")
-	}
-	buffer.WriteString("</urlset>\n")
-	outputFile, err := os.Create("rendered/sitemap.xml")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	defer outputFile.Close()
-	_, err = outputFile.Write(buffer.Bytes())
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-func (g *Generator) generateFeed() {
-	var buffer bytes.Buffer
-	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
-	buffer.WriteString("    <title>" + g.LayoutConfig.SiteTitle + "</title>\n")
-	buffer.WriteString("    <link href=\"" + g.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
-	buffer.WriteString("    <updated>" + time.Now().Format(time.RFC3339) + "</updated>\n")
-
-	// iterate over parsed markdown files that are non-draft posts
-	for _, page := range g.MdPosts {
-		if !page.Frontmatter.Draft {
-			buffer.WriteString("    <entry>\n")
-			buffer.WriteString("        <title>" + page.Frontmatter.Title + "</title>\n")
-			buffer.WriteString("        <link href=\"" + g.LayoutConfig.BaseURL + "/posts/" + page.Filename + ".html\"/>\n")
-			buffer.WriteString("        <id>" + g.LayoutConfig.BaseURL + "/" + page.Filename + ".html</id>\n")
-			buffer.WriteString("        <updated>" + time.Unix(page.Date, 0).Format(time.RFC3339) + "</updated>\n")
-			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(page.Body) + "]]></content>\n")
-			buffer.WriteString("    </entry>\n")
-		}
-	}
-
-	buffer.WriteString("</feed>\n")
-	outputFile, err := os.Create("rendered/feed.atom")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	defer outputFile.Close()
-	_, err = outputFile.Write(buffer.Bytes())
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, string) {
-	var parsedFrontmatter Frontmatter
-	var markdown string
-
-	/*
-	   ---
-	   frontmatter_content
-	   ---
-
-	   markdown content
-	   --- => markdown divider and not to be touched while yaml parsing
-	*/
-	splitContents := strings.Split(filecontent, "---")
-	frontmatterSplit := ""
-	if len(splitContents) > 1 {
-		frontmatterSplit = splitContents[1]
-	}
-
-	if frontmatterSplit != "" {
-		// Parsing YAML frontmatter
-		err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
+		err := os.MkdirAll(dirPath, 0750)
 		if err != nil {
 			g.ErrorLogger.Fatal(err)
 		}
-
-		// we want to make sure that all filecontent is included and
-		// not ignoring the horizontal markdown splitter "---"
-		markdown = strings.Join(strings.Split(filecontent, "---")[2:], "")
-	} else {
-		markdown = filecontent
 	}
 
-	// Parsing markdown to HTML
-	var parsedMarkdown bytes.Buffer
-	if err := goldmark.Convert([]byte(markdown), &parsedMarkdown); err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
+	filename, _ := strings.CutSuffix(string(pagePath), ".md")
+	filepath := "rendered/" + filename + ".html"
+	var buffer bytes.Buffer
 
-	return parsedFrontmatter, parsedMarkdown.String()
-}
-
-// Copies the contents of the 'static/' directory to 'rendered/'
-func (g *Generator) copyStaticContent() {
-	g.copyDirectoryContents("static/", "rendered/static/")
-}
-
-func (g *Generator) copyScriptContent() {
-	g.copyDirectoryContents("script/", "rendered/script/")
-}
-
-// Parse 'config.yml' to configure the layout of the site
-func (g *Generator) parseConfig() {
-	configFile, err := os.ReadFile("layout/config.yml")
+	// Storing the rendered HTML file to a buffer
+	err := template.ExecuteTemplate(&buffer, "page", templateData)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	err = yaml.Unmarshal(configFile, &g.LayoutConfig)
+	// Flushing data from the buffer to the disk
+	err = os.WriteFile(filepath, buffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
-}
-
-// Parse all the ".html" layout files in the layout/ directory
-func (g *Generator) parseLayoutFiles() *template.Template {
-	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob("layout/*.html")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	// Parsing all files in the partials/ dir which match the "*.html" pattern
-	templ, err = templ.ParseGlob("layout/partials/*.html")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	return templ
 }

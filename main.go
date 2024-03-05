@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"os"
 
@@ -20,9 +21,10 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			generator := ssg.Generator{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+				Templates:   make(map[template.URL]ssg.TemplateData),
 			}
 			if draft {
-				generator.Draft = true
+				generator.RenderDrafts = true
 			}
 
 			if serve {

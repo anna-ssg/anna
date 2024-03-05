@@ -1,8 +1,10 @@
 ---
 title: week-0
 date: 2024-03-02
+type: post
 draft: true
 ---
+
 # week-0
 
 # Anirudh’s Progress 

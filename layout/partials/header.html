@@ -1,7 +1,6 @@
 {{define "header"}}
 <header>
   <nav>
-    {{ $baseURL := .Layout.BaseURL }}
     {{range .Layout.Navbar}}
     <a href="/{{.}}.html">{{.}}</a>
     {{end}}
