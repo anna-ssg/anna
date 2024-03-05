@@ -89,7 +89,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 }
 
 func (lr *liveReload) startServer(addr string) {
-	fmt.Println("Serving content at: http://localhost:", addr)
+	fmt.Print("Serving content at: http://localhost:", addr, "\n")
 	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
 	if err != nil {
 		lr.errorLogger.Fatal(err)
