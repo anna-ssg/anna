@@ -191,7 +191,7 @@ func (g *Generator) generateSitemap() {
 
 	// iterate over parsed markdown files
 	for _, page := range g.mdParsed {
-		url := g.LayoutConfig.BaseURL + page.Filename + ".html"
+		url := g.LayoutConfig.BaseURL + "/" + page.Filename + ".html"
 		buffer.WriteString(" <url>\n")
 		buffer.WriteString("    <loc>" + url + "</loc>\n")
 		buffer.WriteString("    <lastmod>" + page.Frontmatter.Date + "</lastmod>\n")
@@ -214,7 +214,7 @@ func (g *Generator) generateFeed() {
 	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
 	buffer.WriteString("    <title>" + g.LayoutConfig.SiteTitle + "</title>\n")
-	buffer.WriteString("    <link href=\"" + g.LayoutConfig.BaseURL + "\" rel=\"self\"/>\n")
+	buffer.WriteString("    <link href=\"" + g.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
 	buffer.WriteString("    <updated>" + time.Now().Format(time.RFC3339) + "</updated>\n")
 
 	// iterate over parsed markdown files that are non-draft posts
@@ -222,8 +222,8 @@ func (g *Generator) generateFeed() {
 		if !page.Frontmatter.Draft {
 			buffer.WriteString("    <entry>\n")
 			buffer.WriteString("        <title>" + page.Frontmatter.Title + "</title>\n")
-			buffer.WriteString("        <link href=\"" + g.LayoutConfig.BaseURL + "posts/" + page.Filename + ".html\"/>\n")
-			buffer.WriteString("        <id>" + g.LayoutConfig.BaseURL + page.Filename + ".html</id>\n")
+			buffer.WriteString("        <link href=\"" + g.LayoutConfig.BaseURL + "/posts/" + page.Filename + ".html\"/>\n")
+			buffer.WriteString("        <id>" + g.LayoutConfig.BaseURL + "/" + page.Filename + ".html</id>\n")
 			buffer.WriteString("        <updated>" + time.Unix(page.Date, 0).Format(time.RFC3339) + "</updated>\n")
 			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(page.Body) + "]]></content>\n")
 			buffer.WriteString("    </entry>\n")

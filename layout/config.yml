@@ -2,7 +2,7 @@ navbar:
     - index
     - docs
     - posts
-baseURL: https://ssg-test-org.github.io/
+baseURL: https://ssg-test-org.github.io
 siteTitle: ssg
 plugins:
     - prism.js
