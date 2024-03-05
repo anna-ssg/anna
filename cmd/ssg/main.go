@@ -2,10 +2,15 @@ package ssg
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"os"
+	"sort"
+
+	//"sort"
 	"strings"
+	"time"
 
 	"github.com/yuin/goldmark"
 	"gopkg.in/yaml.v3"
@@ -18,14 +23,17 @@ type LayoutConfig struct {
 }
 
 type Frontmatter struct {
-	Title   string   `yaml:"title"`
-	Date    string   `yaml:"date"`
-	Draft   bool     `yaml:"draft"`
+	Title         string   `yaml:"title"`
+	Date          string   `yaml:"date"`
+	Draft         bool     `yaml:"draft"`
 	JSFiles []string `yaml:"scripts"`
+	Type        string `yaml:"type"`
+	Description string `yaml:"description"`
 }
 
 type Page struct {
 	Filename    string
+	Date        int64
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
@@ -38,8 +46,24 @@ type Generator struct {
 	mdFilesPath  []string
 	mdParsed     []Page
 	LayoutConfig LayoutConfig
-	mdPosts      []string
+	MdPosts      []Page
 	Draft        bool
+}
+
+func getFileNames(page []Page) []string {
+	var filenames []string
+	for _, p := range page {
+		filenames = append(filenames, p.Filename)
+	}
+	return filenames
+}
+
+func (g *Generator) dateParse(date string) time.Time {
+	parsedTime, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+	return parsedTime
 }
 
 // Write rendered HTML to disk
@@ -59,7 +83,7 @@ func (g *Generator) RenderSite(addr string) {
 	}
 
 	g.parseConfig()
-	g.mdPosts = []string{}
+	g.MdPosts = []Page{}
 	g.readMdDir("content/")
 	g.parseRobots()
 	g.generateSitemap()
@@ -71,8 +95,8 @@ func (g *Generator) RenderSite(addr string) {
 	for i, page := range g.mdParsed {
 
 		// Adding the names of all the files in posts/ dir to the page data
-		g.mdParsed[i].Posts = g.mdPosts
-		page.Posts = g.mdPosts
+		g.mdParsed[i].Posts = getFileNames(g.MdPosts)
+		page.Posts = getFileNames(g.MdPosts)
 
 		filename, _ := strings.CutPrefix(g.mdFilesPath[i], "content/")
 
@@ -107,7 +131,26 @@ func (g *Generator) RenderSite(addr string) {
 
 	var buffer bytes.Buffer
 	// Rendering the 'posts.html' separately
-	err = templ.ExecuteTemplate(&buffer, "posts", g.mdParsed[0])
+	out := g.MdPosts
+
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Date > out[j].Date
+	})
+
+	fmt.Printf("%v\n", getFileNames(out))
+
+	type TemplateData struct {
+		Generator   *Generator
+		Frontmatter Frontmatter
+		Layout      LayoutConfig
+	}
+	data := TemplateData{
+		Generator:   g,
+		Frontmatter: Frontmatter{Title: "Posts"},
+		Layout:      g.LayoutConfig,
+	}
+
+	err = templ.ExecuteTemplate(&buffer, "posts", data)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}

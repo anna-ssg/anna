@@ -6,6 +6,7 @@ categories:
   - Technology
   - Programming
 scripts:
+type: post
 ---
 
 # heading L1

@@ -151,18 +151,38 @@ img {
         border-radius: 5px;
         margin: .5rem;
         padding: .5rem;
-        font-size: 2rem;
         word-wrap: break-word;
-        text-align: center;
-  
+        text-decoration: none;
+
         transition: background-color 150ms ease-in-out;
+
+
     }
-  
+
     & > a:hover {
-      background-color: #4141417a;
+        background-color: #4141417a;
     }
-  
-  }
+
+}
+
+.post-card {
+    color: #ffffff55;
+}
+
+.post-card-div {
+    display: grid;
+
+    & > *  {
+        padding-inline: 1rem;
+    }
+
+    & > p {
+        margin: 0;
+        padding: 0;
+        padding-inline: 1rem;
+        font-size: 1.1rem;
+    }
+}
 
 .body > img {
     /* center the image wrt the screen*/
