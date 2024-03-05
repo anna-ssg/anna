@@ -5,17 +5,16 @@
   {{template "header" .}}
 
   <div class="body">
-    {{$baseURL := .Layout.BaseURL}}
 
     <div class="posts">
-      {{range .Generator.MdPosts}}
-      <a class="post-card" href="posts/{{.Filename}}.html">
+      {{range $PostDate, $Post := .Posts}}
+      <a class="post-card" href="posts/{{$Post.Filename}}.html">
         <div class="post-card-div">
           <div class="post-card description">
-            <h3>{{.Frontmatter.Title}}</h3>
-            <p>{{.Frontmatter.Description}}</p>
+            <h3>{{$Post.Frontmatter.Title}}</h3>
+            <p>{{$Post.Frontmatter.Description}}</p>
           </div>
-          <p>{{.Frontmatter.Date}}</p>
+          <p>{{$Post.Frontmatter.Date}}</p>
         </div>
       </a>
       {{end}}
