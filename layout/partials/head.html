@@ -1,11 +1,19 @@
 {{define "head"}}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{.Frontmatter.Title}}</title>
-  <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Frontmatter.Title}}</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/prism.css" />
+    {{range .Frontmatter.JSFiles}}
+    <script src="/script/{{.}}" defer></script>
+    {{end}}
+
+    {{range .Layout.SitePlugs}}
+    <script src="/script/{{.}}" defer></script>
+    {{end}}
 </head>
 {{end}}

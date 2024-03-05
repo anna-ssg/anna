@@ -1,6 +1,7 @@
 ---
-date: 24-02-2024
+date: 2024-02-24
 title: Home
+scripts:
 ---
 
 # Henlo!

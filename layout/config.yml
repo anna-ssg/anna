@@ -3,3 +3,5 @@ navbar:
     - docs
     - posts
 baseURL: https://ssg-test-org.github.io/
+plugins:
+    - prism.js

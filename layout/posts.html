@@ -8,12 +8,21 @@
     {{$baseURL := .Layout.BaseURL}}
 
     <div class="posts">
-      {{range .Posts}}
-      <a href="posts/{{.}}.html">{{.}}</a>
+      {{range .Generator.MdPosts}}
+      <a class="post-card" href="posts/{{.Filename}}.html">
+        <div class="post-card-div">
+          <div class="post-card description">
+            <h3>{{.Frontmatter.Title}}</h3>
+            <p>{{.Frontmatter.Description}}</p>
+          </div>
+          <p>{{.Frontmatter.Date}}</p>
+        </div>
+      </a>
       {{end}}
     </div>
 
   </div>
+
   {{template "footer" .}}
 </body>
 
