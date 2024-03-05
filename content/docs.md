@@ -85,11 +85,13 @@ The layout files can access the following rendered data from the markdown files:
 
 - title : The title of the current page
 - date: The date of the current page
+- scripts: Stores slice of js files to be included
 
 4. config.yml: This file stores additional information regarding the layout
 
 - navbar: Stores the links to be added to the navbar (same name as the markdown files)
 - baseURL: Stores the base URL of the site
+- plugin: Stores slice of js files to be included
 
 Sample config.yml:
 

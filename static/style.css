@@ -198,7 +198,7 @@ img {
 }
 
 /* Code styling */
-pre code {
+/* pre code {
     font-family: agave, monospace;
     display: block;
     background: #41414193;
@@ -210,7 +210,7 @@ pre code {
     max-width: 100%;
     min-width: 100px;
     padding: 1rem;
-}
+} */
 p > code,
 li > code,
 dd>code,

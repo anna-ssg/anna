@@ -5,6 +5,7 @@ date: 2024-02-23
 categories:
   - Programming
 scripts:
+type: post
 ---
 
 ## struct in rust

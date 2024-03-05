@@ -2,35 +2,28 @@
 {{ template "head" .}}
 
 <body>
-    {{template "header" .}}
+  {{template "header" .}}
 
-    <div class="body">
-        {{$baseURL := .Layout.BaseURL}}
+  <div class="body">
+    {{$baseURL := .Layout.BaseURL}}
 
     <div class="posts">
-        {{range .Generator.MdPosts}} 
-        <a class="post-card"  href="posts/{{.Filename}}.html">
-            <div class="post-card-div">
-            <div class="post-card description">
-                <h3>{{.Frontmatter.Title}}</h3>
-                <p>{{.Frontmatter.Description}}</p>
-            </div>
-            <p>{{.Frontmatter.Date}}</p>
-            </div>
-        </a>
-        {{end}}
+      {{range .Generator.MdPosts}}
+      <a class="post-card" href="posts/{{.Filename}}.html">
+        <div class="post-card-div">
+          <div class="post-card description">
+            <h3>{{.Frontmatter.Title}}</h3>
+            <p>{{.Frontmatter.Description}}</p>
+          </div>
+          <p>{{.Frontmatter.Date}}</p>
+        </div>
+      </a>
+      {{end}}
     </div>
 
-    </div>
-    {{range .Frontmatter.JSFiles}}
-    <script src="script/{{.}}"></script>
-    {{end}}
+  </div>
 
-    {{range .Layout.SitePlugs}}
-    <script src="/script/{{.}}"></script>
-    {{end}}
-
-    {{template "footer" .}}
+  {{template "footer" .}}
 </body>
 
 </html>
