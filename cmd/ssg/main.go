@@ -23,12 +23,13 @@ type LayoutConfig struct {
 }
 
 type Frontmatter struct {
-	Title         string   `yaml:"title"`
-	Date          string   `yaml:"date"`
-	Draft         bool     `yaml:"draft"`
-	JSFiles []string `yaml:"scripts"`
-	Type        string `yaml:"type"`
-	Description string `yaml:"description"`
+	Title        string   `yaml:"title"`
+	Date         string   `yaml:"date"`
+	Draft        bool     `yaml:"draft"`
+	JSFiles      []string `yaml:"scripts"`
+	Type         string   `yaml:"type"`
+	Description  string   `yaml:"description"`
+	PreviewImage string   `yaml:"previewimage"`
 }
 
 type Page struct {

@@ -6,14 +6,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{.Frontmatter.Title}}</title>
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="stylesheet" href="/static/prism.css" />
+    <link rel="preload stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/prism.css">
+    
     {{range .Frontmatter.JSFiles}}
     <script src="/script/{{.}}" defer></script>
     {{end}}
-
     {{range .Layout.SitePlugs}}
     <script src="/script/{{.}}" defer></script>
     {{end}}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ .Frontmatter.Title }}">
+    <meta property="og:description" content="{{ .Frontmatter.Description }}">
+    <meta property="og:image" content="{{ .Frontmatter.PreviewImage }}">
+
 </head>
 {{end}}

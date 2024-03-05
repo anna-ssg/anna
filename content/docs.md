@@ -2,6 +2,7 @@
 title: Documentation
 date: 2024-02-27
 scripts:
+description: "documentation for our ssg"
 ---
 
 ## Directory structure
