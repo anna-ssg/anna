@@ -2,6 +2,11 @@
 {{ template "head" .}}
 
 <body>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/go.min.js"></script>
+
     {{template "header" .}}
 
     <div class="body">
@@ -13,6 +18,12 @@
         data-slug="adityahegde" data-color="#FF5F5F" data-emoji="" data-font="Cookie" data-text="Buy me a coffee"
         data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00"></script> -->
 
+        <script>hljs.highlightAll();</script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              // document.querySelectorAll('hljs').style.background = "#1e1e2d";
+            })
+        </script>
 </body>
 
 {{template "footer" .}}

@@ -5,4 +5,5 @@ navbar:
 baseURL: https://ssg-test-org.github.io
 siteTitle: ssg
 siteScripts:
-    - prism.js
+    # - prism.js
+author: Anna

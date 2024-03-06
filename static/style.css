@@ -17,10 +17,9 @@
 body {
 
     font-family: custom-font, agave, monospace;
-    font-size: .9rem;
     line-height: 1.6;
 
-    background-color: #000000;
+    background-color: #11111a;
     color: #ffffff;
 
     display: flex;
@@ -42,6 +41,7 @@ footer {
     width: 100%;
     flex: 0;
 
+    font-size: 1.1rem;
     align-self: center;
     padding: 1rem 0;
 
@@ -49,15 +49,19 @@ footer {
 }
 
 nav {
-    font-size: 1.8rem;
-    
+    font-size: 1.4rem;
+
     margin: auto;
     margin-top: 1.2rem;
     margin-bottom: 1.2rem;
 
     display: flex;
-    justify-content: center;
-    gap: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    & > a {
+        word-wrap: break-word;
+    }
 }
 
 a {
@@ -66,6 +70,15 @@ a {
 
     /* font-size: 1.4rem; */
     transition: color 150ms ease-in-out
+}
+
+/* Thank you, @kepano! */
+a:not(.plain):not(.tag):not(.internal-link):not(.footnote):not( .reversefootnote ):not(.post-card) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='gray' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25' /%3E%3C/svg%3E%0A");
+    background-position: right 33%;
+    background-repeat: no-repeat;
+    background-size: 0.7em;
+    padding-right: 0.75em;
 }
 
 a:hover {
@@ -90,14 +103,14 @@ h1, h2, h3, h4, h5, h6 {
     color: #5990ac;
 }
 
-h1 { font-size: 3rem;}
-h2 { font-size: 2.5rem;}
-h3 { font-size: 2.0rem;}
-h4 {font-size: 1.8rem;}
+h1 { font-size: 2.5rem;}
+h2 { font-size: 2.2rem;}
+h3 { font-size: 1.85rem;}
+h4 {font-size: 1.7rem;}
 
 .body {
     flex: 1 0 auto;
-  
+
     & > a,
     & > ul > li > a,
     & > ol > li > a,
@@ -112,10 +125,10 @@ h4 {font-size: 1.8rem;}
         padding: 0;
     }
 
-    & > a, 
-    & > p, & > ul > li, 
-    & > ol > li,  
-    & > ul > li > a, 
+    & > a,
+    & > p, & > ul > li,
+    & > ol > li,
+    & > ul > li > a,
     & > ol > li > a {
         font-size: 1.3rem;
     }
@@ -145,7 +158,7 @@ img {
     flex-direction: column;
     /* align-items: center; */
     margin: auto;
-  
+
     & > a {
         background-color: #41414141;
         border-radius: 5px;
@@ -211,6 +224,19 @@ img {
     min-width: 100px;
     padding: 1rem;
 } */
+
+pre code {
+    font-family: agave, monospace;
+    background: white;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    border-radius: .5rem;
+}
+
+pre code.hljs {
+    background: #1e1e2d;
+}
+
 p > code,
 li > code,
 dd>code,
@@ -231,10 +257,9 @@ td>code {
 /* styling for viewports width < 600px */
 @media (max-width: 600px) {
     nav {
-        font-size: 1.5rem;
-        gap: 1.5rem;
+        font-size: 1.1rem;
     }
-    
+
     body {
         margin-inline: 5%;
     }
@@ -251,12 +276,16 @@ td>code {
     }
 
     .body {
-        & > a, 
-        & > p, & > ul > li, 
-        & > ol > li,  
-        & > ul > li > a, 
+        & > a,
+        & > p, & > ul > li,
+        & > ol > li,
+        & > ul > li > a,
         & > ol > li > a {
             font-size: 1.15rem;
         }
+    }
+
+    .post-card > h3 {
+        font-size: 1.5rem;
     }
 }

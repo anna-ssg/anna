@@ -5,6 +5,7 @@ scripts:
 description: "documentation for our ssg"
 ---
 
+
 ## Directory structure
 
 The ssg currently requires the following directory structure
