@@ -21,8 +21,8 @@ func newLiveReload(logger *log.Logger) *liveReload {
 	lr := liveReload{
 		errorLogger: logger,
 		fileTimes:   make(map[string]time.Time),
-		rootDirs:    []string{"content", "cmd/ssg", "layout", "."}, // Directories to monitor, so add or remove as needed
-		extensions:  []string{".go", ".md"},                        // File extensions to monitor
+		rootDirs:    []string{SiteDataPath}, // Directories to monitor, so add or remove as needed
+		extensions:  []string{".go", ".md"}, // File extensions to monitor
 	}
 
 	return &lr
@@ -90,7 +90,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 
 func (lr *liveReload) startServer(addr string) {
 	fmt.Print("Serving content at: http://localhost:", addr, "\n")
-	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir("./rendered")))
+	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir(SiteDataPath+"./rendered")))
 	if err != nil {
 		lr.errorLogger.Fatal(err)
 	}

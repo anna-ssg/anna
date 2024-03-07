@@ -70,7 +70,7 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
 		Layout:      g.LayoutConfig,
 	}
 
-	key, _ := strings.CutPrefix(filepath, "content/")
+	key, _ := strings.CutPrefix(filepath, SiteDataPath+"content/")
 	if frontmatter.Type == "post" {
 		g.Posts = append(g.Posts, page)
 	}
@@ -79,7 +79,7 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
 }
 
 func (g *Generator) parseConfig() {
-	configFile, err := os.ReadFile("layout/config.yml")
+	configFile, err := os.ReadFile(SiteDataPath + "layout/config.yml")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func (g *Generator) parseConfig() {
 }
 
 func (g *Generator) parseRobots() {
-	tmpl, err := template.ParseFiles("layout/robots.txt")
+	tmpl, err := template.ParseFiles(SiteDataPath + "layout/robots.txt")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func (g *Generator) parseRobots() {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	outputFile, err := os.Create("rendered/robots.txt")
+	outputFile, err := os.Create(SiteDataPath + "rendered/robots.txt")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func (g *Generator) generateSitemap() {
 		buffer.WriteString(" </url>\n")
 	}
 	buffer.WriteString("</urlset>\n")
-	outputFile, err := os.Create("rendered/sitemap.xml")
+	outputFile, err := os.Create(SiteDataPath + "rendered/sitemap.xml")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func (g *Generator) generateFeed() {
 	}
 
 	buffer.WriteString("</feed>\n")
-	outputFile, err := os.Create("rendered/feed.atom")
+	outputFile, err := os.Create(SiteDataPath + "rendered/feed.atom")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}

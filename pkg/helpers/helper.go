@@ -8,7 +8,8 @@ import (
 )
 
 type Helper struct {
-	ErrorLogger *log.Logger
+	ErrorLogger  *log.Logger
+	SiteDataPath string
 }
 
 // Copies the contents of the dirPath directory to outDirPath
@@ -55,13 +56,13 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 // Parse all the ".html" layout files in the layout/ directory
 func (h *Helper) ParseLayoutFiles() *template.Template {
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob("layout/*.html")
+	templ, err := template.ParseGlob(h.SiteDataPath + "layout/*.html")
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
 
 	// Parsing all files in the partials/ dir which match the "*.html" pattern
-	templ, err = templ.ParseGlob("layout/partials/*.html")
+	templ, err = templ.ParseGlob(h.SiteDataPath + "layout/partials/*.html")
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}

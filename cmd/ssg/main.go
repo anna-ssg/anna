@@ -11,6 +11,8 @@ import (
 	"github.com/acmpesuecc/anna/pkg/helpers"
 )
 
+const SiteDataPath string = "site/"
+
 type LayoutConfig struct {
 	Navbar      []string `yaml:"navbar"`
 	BaseURL     string   `yaml:"baseURL"`
@@ -62,19 +64,19 @@ type postsTemplateData struct {
 
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
-	err := os.RemoveAll("rendered/")
+	err := os.RemoveAll(SiteDataPath + "rendered/")
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	err = os.MkdirAll("rendered/", 0750)
+	err = os.MkdirAll(SiteDataPath+"rendered/", 0750)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
 	g.Posts = []TemplateData{}
 	g.parseConfig()
-	g.readMdDir("content/")
+	g.readMdDir(SiteDataPath + "content/")
 	g.parseRobots()
 	g.generateSitemap()
 	g.generateFeed()
@@ -84,12 +86,12 @@ func (g *Generator) RenderSite(addr string) {
 	})
 
 	helper := helpers.Helper{
-		ErrorLogger: g.ErrorLogger,
+		ErrorLogger:  g.ErrorLogger,
+		SiteDataPath: SiteDataPath,
 	}
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
-	helper.CopyDirectoryContents("static/", "rendered/static/")
-	helper.CopyDirectoryContents("script/", "rendered/script/")
+	helper.CopyDirectoryContents(SiteDataPath+"static/", SiteDataPath+"rendered/static/")
 
 	template := helper.ParseLayoutFiles()
 
@@ -113,7 +115,7 @@ func (g *Generator) RenderSite(addr string) {
 	}
 
 	// Flushing 'posts.html' to the disk
-	err = os.WriteFile("rendered/posts.html", buffer.Bytes(), 0666)
+	err = os.WriteFile(SiteDataPath+"rendered/posts.html", buffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -125,7 +127,7 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 	if strings.Contains(string(pagePath), "/") {
 		// Extracting the directory path from the filepath
 		dirPath, _ := strings.CutSuffix(string(pagePath), templateData.Filename+".md")
-		dirPath = "rendered/" + dirPath
+		dirPath = SiteDataPath + "rendered/" + dirPath
 
 		err := os.MkdirAll(dirPath, 0750)
 		if err != nil {
@@ -134,7 +136,7 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 	}
 
 	filename, _ := strings.CutSuffix(string(pagePath), ".md")
-	filepath := "rendered/" + filename + ".html"
+	filepath := SiteDataPath + "rendered/" + filename + ".html"
 	var buffer bytes.Buffer
 
 	// Storing the rendered HTML file to a buffer
