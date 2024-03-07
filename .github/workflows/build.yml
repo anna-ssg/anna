@@ -47,7 +47,7 @@ jobs:
     - name: upload /rendered
       uses: actions/upload-artifact@master
       with:
-        path: 'rendered'
+        path: 'site/rendered'
         if-no-files-found: error
 
   deploy:
