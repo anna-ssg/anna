@@ -1,4 +1,4 @@
-module github.com/acmpesuecc/ssg
+module github.com/acmpesuecc/anna
 
 go 1.22.0
 

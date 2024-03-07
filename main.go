@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/acmpesuecc/ssg/cmd/ssg"
+	"github.com/acmpesuecc/anna/cmd/ssg"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ func main() {
 	var validateHTML bool
 
 	rootCmd := &cobra.Command{
-		Use:   "ssg",
+		Use:   "anna",
 		Short: "Static Site Generator",
 		Run: func(cmd *cobra.Command, args []string) {
 			generator := ssg.Generator{

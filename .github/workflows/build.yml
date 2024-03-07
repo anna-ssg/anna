@@ -1,4 +1,4 @@
-# Sample workflow for building and deploying an ssg site to GitHub pages
+# Sample workflow for building and deploying an anna site to GitHub pages
 name: ci
 
 on:
@@ -37,12 +37,12 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
-    - name: build ssg
+    - name: build anna
       run: go build
 
-    - name: build site with ssg
+    - name: build site with anna
       run: |
-        ./ssg
+        ./anna
 
     - name: upload /rendered
       uses: actions/upload-artifact@master

@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/acmpesuecc/ssg/pkg/helpers"
+	"github.com/acmpesuecc/anna/pkg/helpers"
 )
 
 type LayoutConfig struct {

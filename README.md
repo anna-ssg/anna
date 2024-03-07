@@ -1,3 +1,18 @@
+```text
+    ___
+   /   |  ____  ____  ____ _
+  / /| | / __ \/ __ \/ __ `/
+ / ___ |/ / / / / / / /_/ /
+/_/  |_/_/ /_/_/ /_/\__,_/
+
+A static site generator in go
+```
+
+Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowjee/saaru), this static site generator aims to take performance to the next level with parallel rendering, live reloads and so much more, all in Go.
+
+This Project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
+
+
 ## Directory structure
 
 The ssg currently requires the following directory structure
@@ -112,7 +127,7 @@ baseURL: http://localhost:8000/
 # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet.
 # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site.
 
-siteTitle: ssg
+siteTitle: anna
 siteScripts:
     - prism.js
 ```
@@ -121,11 +136,15 @@ siteScripts:
 
 ```text
 Usage:
-  ssg [flags]
+  anna [flags]
 
 Flags:
-  -a, --addr string   ip address to serve rendered content to (default "8000")
-  -d, --draft         renders draft posts
-  -h, --help          help for ssg
-  -s, --serve         serve the rendered content
+  -a, --addr string     ip address to serve rendered content to (default "8000")
+  -d, --draft           renders draft posts
+  -h, --help            help for ssg
+  -s, --serve           serve the rendered content
+  -v, --validate-html   validate semantic HTML
 ```
+
+---
+Pronounced: `/ɐnːɐ/` which means rice in Kannada 🍚
