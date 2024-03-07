@@ -1,0 +1,27 @@
+{{ define "page"}}
+{{ template "head" .}}
+
+<body>
+
+    {{template "header" .}}
+
+    <div class="body">
+        <div class="tags-paceholder">
+            {{range .Frontmatter.Tags}}
+            <div class="tag">
+            <a href="/tags/{{.}}.html">{{.}}</a>
+            </div>
+            {{end}}
+        </div>
+        {{.Body}}
+    </div>
+
+
+    {{template "footer" .}}
+
+    <script>hljs.highlightAll();</script>
+
+</body>
+</html>
+
+{{ end}}

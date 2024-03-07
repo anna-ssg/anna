@@ -7,6 +7,8 @@ categories:
   - Programming
 scripts:
 type: post
+tags:
+  - test-post
 ---
 
 # heading L1

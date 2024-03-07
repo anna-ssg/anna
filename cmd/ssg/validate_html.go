@@ -11,7 +11,7 @@ import (
 )
 
 func ValidateHTMLContent() {
-	root, err := filepath.Abs("rendered")
+	root, err := filepath.Abs(SiteDataPath + "rendered")
 	if err != nil {
 		log.Fatalf("Error getting absolute path: %v", err)
 	}
