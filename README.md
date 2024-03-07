@@ -12,7 +12,6 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 
 This Project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
 
-
 ## Directory structure
 
 The ssg currently requires the following directory structure
