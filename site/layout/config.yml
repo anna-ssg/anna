@@ -1,6 +1,7 @@
 navbar:
     - index
     - docs
+    - tags
     - posts
 baseURL: https://ssg-test-org.github.io
 siteTitle: ssg

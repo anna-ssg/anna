@@ -62,7 +62,11 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
 		date = 0
 	}
 
+	key, _ := strings.CutPrefix(filepath, SiteDataPath+"content/")
+	url, _ := strings.CutSuffix(key, ".md")
+	url += ".html"
 	page := TemplateData{
+		URL:         template.URL(url),
 		Date:        date,
 		Filename:    strings.Split(entry.Name(), ".")[0],
 		Frontmatter: frontmatter,
@@ -70,12 +74,17 @@ func (g *Generator) AddFileAndRender(dirPath string, entry fs.DirEntry, frontmat
 		Layout:      g.LayoutConfig,
 	}
 
-	key, _ := strings.CutPrefix(filepath, SiteDataPath+"content/")
+	// Adding the page to the merged map storing all site pages
 	if frontmatter.Type == "post" {
 		g.Posts = append(g.Posts, page)
 	}
 
 	g.Templates[template.URL(key)] = page
+
+	//Adding the page to the tags map with the corresponding tags
+	for _, tag := range page.Frontmatter.Tags {
+		g.TagsMap[tag] = append(g.TagsMap[tag], page)
+	}
 }
 
 func (g *Generator) parseConfig() {

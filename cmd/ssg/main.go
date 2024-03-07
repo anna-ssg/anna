@@ -29,6 +29,7 @@ type Frontmatter struct {
 	Type         string   `yaml:"type"`
 	Description  string   `yaml:"description"`
 	PreviewImage string   `yaml:"previewimage"`
+	Tags         []string `yaml:"tags"`
 }
 
 type Date int64
@@ -39,6 +40,7 @@ type Generator struct {
 	Templates    map[template.URL]TemplateData
 	Posts        []TemplateData
 	LayoutConfig LayoutConfig
+	TagsMap      map[string][]TemplateData
 
 	ErrorLogger  *log.Logger
 	mdFilesName  []string
@@ -49,11 +51,17 @@ type Generator struct {
 // This struct holds all of the data required to render any page of the site
 // Pass this struct without modification to ExecuteTemplate()
 type TemplateData struct {
+	URL         template.URL
 	Filename    string
 	Date        int64
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
+
+	//Do not use these fields to store tags!!
+	//These fields are only used by RenderTags() to pass merged tag data
+	Tags       []string
+	MergedTags []TemplateData
 }
 
 // This struct holds the data required to render posts.html
@@ -93,13 +101,13 @@ func (g *Generator) RenderSite(addr string) {
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(SiteDataPath+"static/", SiteDataPath+"rendered/static/")
 
-	template := helper.ParseLayoutFiles()
+	templ := helper.ParseLayoutFiles()
 
 	for pagePath, templateData := range g.Templates {
-		g.RenderPage(pagePath, templateData, template)
+		g.RenderPage(pagePath, templateData, templ, "page")
 	}
 
-	var buffer bytes.Buffer
+	var postsBuffer bytes.Buffer
 
 	postsData := postsTemplateData{
 		Posts: g.Posts,
@@ -109,19 +117,21 @@ func (g *Generator) RenderSite(addr string) {
 		},
 	}
 
-	err = template.ExecuteTemplate(&buffer, "posts", postsData)
+	err = templ.ExecuteTemplate(&postsBuffer, "posts", postsData)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
 	// Flushing 'posts.html' to the disk
-	err = os.WriteFile(SiteDataPath+"rendered/posts.html", buffer.Bytes(), 0666)
+	err = os.WriteFile(SiteDataPath+"rendered/posts.html", postsBuffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
+
+	g.RenderTags(templ)
 }
 
-func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData, template *template.Template) {
+func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData, templ *template.Template, templateStart string) {
 
 	// Creating subdirectories if the filepath contains '/'
 	if strings.Contains(string(pagePath), "/") {
@@ -140,7 +150,7 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 	var buffer bytes.Buffer
 
 	// Storing the rendered HTML file to a buffer
-	err := template.ExecuteTemplate(&buffer, "page", templateData)
+	err := templ.ExecuteTemplate(&buffer, templateStart, templateData)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -149,5 +159,50 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 	err = os.WriteFile(filepath, buffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
+	}
+}
+
+func (g *Generator) RenderTags(templ *template.Template) {
+
+	var tagsBuffer bytes.Buffer
+
+	//Extracting tag titles
+	tags := make([]string, 0, len(g.TagsMap))
+	for tag := range g.TagsMap {
+		tags = append(tags, tag)
+	}
+
+	tagNames := TemplateData{
+		Filename:    "Tags",
+		Layout:      g.LayoutConfig,
+		Frontmatter: Frontmatter{Title: "Tags"},
+		Tags:        tags,
+	}
+
+	// Rendering the page displaying all tags
+	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagNames)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Flushing 'tags.html' to the disk
+	err = os.WriteFile(SiteDataPath+"rendered/tags.html", tagsBuffer.Bytes(), 0666)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Rendering the subpages with merged tagged posts
+	for tag, taggedTemplates := range g.TagsMap {
+		pagePath := "tags/" + tag
+		templateData := TemplateData{
+			Filename: tag,
+			Layout:   g.LayoutConfig,
+			Frontmatter: Frontmatter{
+				Title: tag,
+			},
+			MergedTags: taggedTemplates,
+		}
+
+		g.RenderPage(template.URL(pagePath), templateData, templ, "tag-subpage")
 	}
 }

@@ -110,6 +110,7 @@ The layout files can access the following rendered data from the markdown files:
 - `previewimage`: Stores the preview image of the current page
 - `description`: Stores the description of the current post previewed in posts.html
 - `scripts`: Stores a slice of javascript files to be included with the current page only
+- `tags:`: Stores a slice of the page tags
 
 (**The above tags are Frontmatter tags**)
 

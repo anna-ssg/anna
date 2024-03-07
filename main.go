@@ -22,6 +22,7 @@ func main() {
 			generator := ssg.Generator{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 				Templates:   make(map[template.URL]ssg.TemplateData),
+				TagsMap:     make(map[string][]ssg.TemplateData),
 			}
 			if draft {
 				generator.RenderDrafts = true

@@ -2,10 +2,11 @@
 title: Language Codeblock Test
 author: John Doe
 date: 2024-02-23
-categories:
-  - Programming
 scripts:
 type: post
+tags: 
+    - rust
+    - C
 ---
 
 ## struct in rust

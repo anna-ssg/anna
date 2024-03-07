@@ -64,6 +64,17 @@ nav {
     }
 }
 
+.tags-placeholder {
+    display: flex;
+}
+
+.tag {
+    display: inline;
+    border: 0.1px solid white;
+    width: fit-content;
+    padding: 0.3rem;
+}
+
 a {
     color:#5990ac;
     text-decoration: none;
