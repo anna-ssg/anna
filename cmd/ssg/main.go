@@ -58,8 +58,8 @@ type TemplateData struct {
 	Body        template.HTML
 	Layout      LayoutConfig
 
-	//Do not use these fields to store tags!!
-	//These fields are only used by RenderTags() to pass merged tag data
+	// Do not use these fields to store tags!!
+	// These fields are only used by RenderTags() to pass merged tag data
 	Tags       []string
 	MergedTags []TemplateData
 }
@@ -83,6 +83,8 @@ func (g *Generator) RenderSite(addr string) {
 	}
 
 	g.Posts = []TemplateData{}
+	g.Templates = make(map[template.URL]TemplateData)
+	g.TagsMap = make(map[string][]TemplateData)
 	g.parseConfig()
 	g.readMdDir(SiteDataPath + "content/")
 	g.parseRobots()
@@ -132,7 +134,6 @@ func (g *Generator) RenderSite(addr string) {
 }
 
 func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData, templ *template.Template, templateStart string) {
-
 	// Creating subdirectories if the filepath contains '/'
 	if strings.Contains(string(pagePath), "/") {
 		// Extracting the directory path from the filepath
@@ -163,10 +164,9 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 }
 
 func (g *Generator) RenderTags(templ *template.Template) {
-
 	var tagsBuffer bytes.Buffer
 
-	//Extracting tag titles
+	// Extracting tag titles
 	tags := make([]string, 0, len(g.TagsMap))
 	for tag := range g.TagsMap {
 		tags = append(tags, tag)

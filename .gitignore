@@ -4,3 +4,4 @@ ssg
 !ssg/
 *.exe
 **/.DS_Store
+*.pprof
