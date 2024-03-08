@@ -40,6 +40,10 @@ jobs:
     - name: build anna
       run: go build
 
+    - name: Insert commit hash in footer
+      run: |
+        sed -i "s/COMMIT_HASH/${{ github.sha }}/g" site/layout/partials/footer.html
+
     - name: build site with anna
       run: |
         ./anna
