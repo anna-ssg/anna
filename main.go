@@ -36,6 +36,14 @@ func main() {
 			}
 
 			if serve {
+				if prof {
+					go func() {
+						for {
+							time.Sleep(5 * time.Second) //change as per needed
+							PrintStats(time.Since(startTime))
+						}
+					}()
+				}
 				generator.StartLiveReload(addr)
 			}
 
@@ -100,14 +108,14 @@ func StartProfiling() {
 	}()
 }
 
-func StopProfiling() {
-	runtime.GC()
-}
-
 func PrintStats(elapsedTime time.Duration) {
+	memStats := new(runtime.MemStats)
+	runtime.ReadMemStats(memStats)
+	log.Printf("Memory Usage: %d bytes", memStats.Alloc)
+	log.Printf("Time Elapsed: %s", elapsedTime)
 	cpuUsage := runtime.NumCPU()
 	threads := runtime.GOMAXPROCS(0)
-	memStats := new(runtime.MemStats)
+	// memStats := new(runtime.MemStats)
 	runtime.ReadMemStats(memStats)
 
 	log.Printf("Threads: %d", threads)
@@ -119,4 +127,9 @@ func PrintStats(elapsedTime time.Duration) {
 	log.Printf("Heap Memory Idle: %d bytes", memStats.HeapIdle)
 	log.Printf("Heap Memory Released: %d bytes", memStats.HeapReleased)
 	log.Printf("Number of Goroutines: %d", runtime.NumGoroutine())
+	print("-----------------------------------\n")
+}
+
+func StopProfiling() {
+	pprof.StopCPUProfile()
 }
