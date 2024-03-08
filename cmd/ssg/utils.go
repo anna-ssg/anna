@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/yuin/goldmark"
+    "github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
 
@@ -215,7 +216,14 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
-	if err := goldmark.Convert([]byte(markdown), &parsedMarkdown); err != nil {
+
+    md := goldmark.New(
+        goldmark.WithRendererOptions(
+            html.WithUnsafe(),
+        ),
+    ) 
+
+	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
 
