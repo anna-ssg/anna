@@ -82,6 +82,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 		lr.fileTimes[path] = modTime
 		if lr.serverRunning {
 			fmt.Println("The following file has changed: ", path)
+			print("-----------------------------\n")
 		}
 		return true
 	}
