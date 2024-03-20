@@ -1,0 +1,4 @@
+[build]
+  command = "sh build.sh"
+  publish = "site/rendered"
+  environment = { GO_VERSION = "1.22.1" }
