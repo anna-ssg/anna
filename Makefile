@@ -1,15 +1,15 @@
+all: 
+	@make install
+	@make build
 install: 
-	@echo "installing go bin"
+	@echo "go: installing anna"
 	@go install github.com/acmpesuecc/anna@latest 
 build:
-	@echo "building site"
+	@echo "anna: building site"
 	@$(GOPATH)/bin/anna
 serve: 
-	@echo "serving site"
+	@echo "anna: serving site"
 	@$(GOPATH)/bin/anna -s
 clean: 
-	@echo "cleaning site/rendered"
+	@echo "bash: purging site/rendered"
 	@rm -rf site/rendered
-all: 
-	@install
-	@build
