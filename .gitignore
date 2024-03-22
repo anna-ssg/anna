@@ -1,7 +1,6 @@
 rendered/
 anna
-ssg
-!ssg/
+!anna/
 *.exe
 **/.DS_Store
 *.pprof

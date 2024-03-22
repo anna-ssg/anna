@@ -1,4 +1,4 @@
-package ssg
+package anna
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/yuin/goldmark"
-    "github.com/yuin/goldmark/renderer/html"
+	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
 
@@ -217,11 +217,11 @@ func (g *Generator) parseMarkdownContent(filecontent string) (Frontmatter, strin
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
 
-    md := goldmark.New(
-        goldmark.WithRendererOptions(
-            html.WithUnsafe(),
-        ),
-    ) 
+	md := goldmark.New(
+		goldmark.WithRendererOptions(
+			html.WithUnsafe(),
+		),
+	)
 
 	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {
 		g.ErrorLogger.Fatal(err)

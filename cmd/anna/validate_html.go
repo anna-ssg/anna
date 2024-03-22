@@ -1,4 +1,4 @@
-package ssg
+package anna
 
 import (
 	"fmt"
@@ -54,7 +54,7 @@ func parseHTMLFile(path string) error {
 		return err
 	}
 
-	// checking for semantic elements
+	// Checking for semantic elements
 	semanticElements := []string{"header", "nav", "article", "footer"}
 	missingElements := make([]string, 0)
 
