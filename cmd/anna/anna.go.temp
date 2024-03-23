@@ -3,71 +3,18 @@ package anna
 import (
 	"bytes"
 	"html/template"
-	"log"
 	"os"
 	"sort"
 	"strings"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
+	"github.com/acmpesuecc/anna/pkg/parser"
 )
-
-const SiteDataPath string = "site/"
-
-type LayoutConfig struct {
-	Navbar      []string `yaml:"navbar"`
-	BaseURL     string   `yaml:"baseURL"`
-	SiteTitle   string   `yaml:"siteTitle"`
-	SiteScripts []string `yaml:"siteScripts"`
-	Author      string   `yaml:"author"`
-}
-
-type Frontmatter struct {
-	Title        string   `yaml:"title"`
-	Date         string   `yaml:"date"`
-	Draft        bool     `yaml:"draft"`
-	JSFiles      []string `yaml:"scripts"`
-	Type         string   `yaml:"type"`
-	Description  string   `yaml:"description"`
-	PreviewImage string   `yaml:"previewimage"`
-	Tags         []string `yaml:"tags"`
-}
-
-type Date int64
-
-type Generator struct {
-	// Templates stores the template data of all the pages of the site
-	// Access the data for a particular page by using the relative path to the file as the key
-	Templates    map[template.URL]TemplateData
-	Posts        []TemplateData
-	LayoutConfig LayoutConfig
-	TagsMap      map[string][]TemplateData
-
-	ErrorLogger  *log.Logger
-	mdFilesName  []string
-	mdFilesPath  []string
-	RenderDrafts bool
-}
-
-// This struct holds all of the data required to render any page of the site
-// Pass this struct without modification to ExecuteTemplate()
-type TemplateData struct {
-	URL         template.URL
-	Filename    string
-	Date        int64
-	Frontmatter Frontmatter
-	Body        template.HTML
-	Layout      LayoutConfig
-
-	// Do not use these fields to store tags!!
-	// These fields are only used by RenderTags() to pass merged tag data
-	Tags       []string
-	MergedTags []TemplateData
-}
 
 // This struct holds the data required to render posts.html
 type postsTemplateData struct {
-	Posts []TemplateData
-	TemplateData
+	Posts []parser.TemplateData
+	parser.TemplateData
 }
 
 func (g *Generator) RenderSite(addr string) {
@@ -82,9 +29,9 @@ func (g *Generator) RenderSite(addr string) {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	g.Posts = []TemplateData{}
-	g.Templates = make(map[template.URL]TemplateData)
-	g.TagsMap = make(map[string][]TemplateData)
+	g.Posts = []parser.TemplateData{}
+	g.Templates = make(map[template.URL]parser.TemplateData)
+	g.TagsMap = make(map[string][]parser.TemplateData)
 	g.parseConfig()
 	g.readMdDir(SiteDataPath + "content/")
 	g.parseRobots()
@@ -113,8 +60,8 @@ func (g *Generator) RenderSite(addr string) {
 
 	postsData := postsTemplateData{
 		Posts: g.Posts,
-		TemplateData: TemplateData{
-			Frontmatter: Frontmatter{Title: "Posts"},
+		TemplateData: parser.TemplateData{
+			Frontmatter: parser.Frontmatter{Title: "Posts"},
 			Layout:      g.LayoutConfig,
 		},
 	}
@@ -133,7 +80,7 @@ func (g *Generator) RenderSite(addr string) {
 	g.RenderTags(templ)
 }
 
-func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData, templ *template.Template, templateStart string) {
+func (g *Generator) RenderPage(pagePath template.URL, templateData parser.TemplateData, templ *template.Template, templateStart string) {
 	// Creating subdirectories if the filepath contains '/'
 	if strings.Contains(string(pagePath), "/") {
 		// Extracting the directory path from the filepath
@@ -163,7 +110,7 @@ func (g *Generator) RenderPage(pagePath template.URL, templateData TemplateData,
 	}
 }
 
-func (g *Generator) RenderTags(templ *template.Template) {
+func (g *parser.Parser) RenderTags(templ *template.Template) {
 	var tagsBuffer bytes.Buffer
 
 	// Extracting tag titles

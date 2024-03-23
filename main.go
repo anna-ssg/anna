@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/acmpesuecc/anna/cmd/anna"
+	"github.com/acmpesuecc/anna/pkg/parser"
 	"github.com/spf13/cobra"
 )
 
@@ -19,29 +19,28 @@ func main() {
 		Use:   "anna",
 		Short: "Static Site Generator",
 		Run: func(cmd *cobra.Command, args []string) {
-
-			generator := anna.Generator{
+			parser := parser.Parser{
 				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-				Templates:   make(map[template.URL]anna.TemplateData),
-				TagsMap:     make(map[string][]anna.TemplateData),
+				Templates:   make(map[template.URL]parser.TemplateData),
+				TagsMap:     make(map[string][]parser.TemplateData),
 			}
 
 			if draft {
-				generator.RenderDrafts = true
+				parser.RenderDrafts = true
 			}
 
 			if serve {
-				generator.StartLiveReload(addr)
+				// parser.StartLiveReload(addr)
 			}
 
 			if prof {
-				//TODO: To be filled later
+				// TODO: To be filled later
 			}
 
 			if validateHTML {
-				anna.ValidateHTMLContent()
+				// anna.ValidateHTMLContent()
 			}
-			generator.RenderSite("")
+			// parser.RenderSite("")
 		},
 	}
 

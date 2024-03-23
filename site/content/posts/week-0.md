@@ -3,13 +3,13 @@ title: week-0
 date: 2024-03-02
 type: post
 draft: true
-tags: 
-    - progress
+tags:
+  - progress
 ---
 
 # week-0
 
-# Anirudh’s Progress 
+# Anirudh’s Progress
 
 1. Use the 'Goldmark' library to generate HTML from markdown content
 2. Create web server to serve rendered content
@@ -23,6 +23,7 @@ tags:
 - tofill
 
 ---
+
 # Adhesh’s Progress
 
 - Migrated to [Cobra](https://cobra.dev) for better **CLI integration**.
@@ -41,6 +42,7 @@ tags:
 - Try integrating **JavaScript** in templates.
 
 ---
+
 # Hegde’s Progress
 
 - switched to automatic filename parsing
@@ -48,21 +50,21 @@ tags:
 - Complete CSS styling
 - Cleaned up unnecessary post rendering
 
-##  Whats Next:
+## Whats Next:
 
-- tofill 
+- JS inection as plugins into pages and individual posts
+- ***
 
----
 # Nathan’s Progress
 
 - Setup CI using GitHub actions which builds and deploys ssg to [gh-pages](https://ssg-test-org.github.io)
 - Setup `robots.txt` to (currently set to prevent indexing until we reach a v1.0 release)
 - Implemented `sitemap.xml` to tell search engines how our site is structured
-- Fixed `baseURL` it now, uses absolute paths from root `/` when loading stylesheets 
+- Fixed `baseURL` it now, uses absolute paths from root `/` when loading stylesheets
 
 ## What's next?
 
 - SEO optimization (verify semantic HTML generation)
 - OGP tags in page headers
----
 
+---

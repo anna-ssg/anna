@@ -13,3 +13,5 @@ serve:
 clean: 
 	@echo "bash: purging site/rendered"
 	@rm -rf site/rendered
+test:
+	@go test ./...

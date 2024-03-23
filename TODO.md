@@ -24,3 +24,6 @@ pkg
 ## Other restructuring
 
 - `main.go` will only handle flags
+
+- [ ] Split generator struct
+- [ ]
