@@ -34,7 +34,7 @@ cd anna
 go run .
 ```
 
-### The detailed documentation of the SSG can be found [here](https://anna-docs.netlify.app/)\_
+### The detailed documentation of the SSG can be found [here](https://anna-docs.netlify.app/)
 
 ---
 
