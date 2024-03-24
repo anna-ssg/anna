@@ -48,6 +48,7 @@ Flags:
   -a, --addr string     ip address to serve rendered content to (default "8000")
   -d, --draft           renders draft posts
   -h, --help            help for ssg
+      --prof            profiles the working code and shows data
   -s, --serve           serve the rendered content
   -v, --validate-html   validate semantic HTML
 ```
