@@ -73,7 +73,7 @@ func main() {
 	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "ip address to serve rendered content to")
 	rootCmd.Flags().BoolVarP(&draft, "draft", "d", false, "renders draft posts")
 	rootCmd.Flags().BoolVarP(&validateHTML, "validate-html", "v", false, "validate semantic HTML")
-	rootCmd.Flags().BoolVar(&prof, "prof", false, "enable profiling")
+	rootCmd.Flags().BoolVarP(&prof, "prof", "p", false, "enable profiling")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
