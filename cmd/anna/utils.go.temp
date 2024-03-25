@@ -2,54 +2,9 @@ package anna
 
 import (
 	"bytes"
-	"html/template"
-	"io/fs"
 	"os"
-	"strings"
 	"time"
-
-	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/renderer/html"
-	"gopkg.in/yaml.v3"
 )
-
-}
-
-func (g *Generator) parseConfig() {
-	configFile, err := os.ReadFile(SiteDataPath + "layout/config.yml")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	err = yaml.Unmarshal(configFile, &g.LayoutConfig)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
-
-func (g *Generator) parseRobots() {
-	tmpl, err := template.ParseFiles(SiteDataPath + "layout/robots.txt")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	var buffer bytes.Buffer
-	err = tmpl.Execute(&buffer, g.LayoutConfig)
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-
-	outputFile, err := os.Create(SiteDataPath + "rendered/robots.txt")
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-	defer outputFile.Close()
-
-	_, err = outputFile.Write(buffer.Bytes())
-	if err != nil {
-		g.ErrorLogger.Fatal(err)
-	}
-}
 
 func (g *Generator) generateSitemap() {
 	var buffer bytes.Buffer

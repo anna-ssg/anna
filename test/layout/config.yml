@@ -3,7 +3,7 @@ navbar:
   - docs
   - tags
   - posts
-baseURL: https://anna-docs.netlify.app
+baseURL: example.org
 siteTitle: ssg
 siteScripts:
 author: Anna

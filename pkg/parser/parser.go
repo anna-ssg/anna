@@ -184,3 +184,39 @@ func (p *Parser) DateParse(date string) time.Time {
 	}
 	return parsedTime
 }
+
+func (p *Parser) ParseConfig(inFilePath string) {
+	configFile, err := os.ReadFile(inFilePath)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+
+	err = yaml.Unmarshal(configFile, &p.LayoutConfig)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+}
+
+func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
+	tmpl, err := template.ParseFiles(inFilePath)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+
+	var buffer bytes.Buffer
+	err = tmpl.Execute(&buffer, p.LayoutConfig)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+
+	outputFile, err := os.Create(outFilePath)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+	defer outputFile.Close()
+
+	_, err = outputFile.Write(buffer.Bytes())
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+}

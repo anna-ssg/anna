@@ -33,9 +33,9 @@ func (g *Generator) RenderSite(addr string) {
 	g.Posts = []parser.TemplateData{}
 	g.Templates = make(map[template.URL]parser.TemplateData)
 	g.TagsMap = make(map[string][]parser.TemplateData)
-	g.parseConfig()
+	g.parseConfig(parser.SiteDataPath + "/layout/config.yml")
 	g.readMdDir(SiteDataPath + "content/")
-	g.parseRobots()
+	g.parseRobots(parser.SiteDataPath+"layout/robots.txt", parser.SiteDataPath+"rendered/robots.txt")
 	g.generateSitemap()
 	g.generateFeed()
 
