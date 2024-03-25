@@ -7,6 +7,7 @@ categories:
   - Programming
 scripts:
 type: post
+draft: true
 tags:
   - test-post
 ---
