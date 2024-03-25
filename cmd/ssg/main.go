@@ -115,20 +115,28 @@ func (g *Generator) RenderSite(addr string) {
 		files = append(files, string(pagePath))
 	}
 
-	for _, file := range files {
-		wg.Add(1)
-		semaphore <- struct{}{} // Acquire semaphore
+	for i := 0; i < len(files); i += concurrency {
+		end := i + concurrency
+		if end > len(files) {
+			end = len(files)
+		}
 
-		go func(file string) {
-			defer func() {
-				<-semaphore // Release semaphore
-				wg.Done()
-			}()
+		wg.Add(end - i)
 
-			pagePath := template.URL(file)
-			templateData := g.Templates[pagePath]
-			g.RenderPage(pagePath, templateData, templ, "page")
-		}(file)
+		for _, file := range files[i:end] {
+			semaphore <- struct{}{} // Acquire semaphore
+
+			go func(file string) {
+				defer func() {
+					<-semaphore // Release semaphore
+					wg.Done()
+				}()
+
+				pagePath := template.URL(file)
+				templateData := g.Templates[pagePath]
+				g.RenderPage(pagePath, templateData, templ, "page")
+			}(file)
+		}
 	}
 
 	wg.Wait()
