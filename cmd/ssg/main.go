@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -71,6 +72,21 @@ type postsTemplateData struct {
 	TemplateData
 }
 
+func getConcurrency(filesCount int) int {
+	// Get the number of available CPU cores
+	numCores := runtime.NumCPU()
+
+	// Calculate the optimal concurrency value based on the number of files and CPU cores
+	concurrency := filesCount / numCores
+
+	// Set a minimum value for concurrency to avoid excessive goroutines
+	if concurrency < 1 {
+		concurrency = 1
+	}
+
+	return concurrency
+}
+
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
 	err := os.RemoveAll(SiteDataPath + "rendered/")
@@ -107,8 +123,9 @@ func (g *Generator) RenderSite(addr string) {
 	templ := helper.ParseLayoutFiles()
 
 	var wg sync.WaitGroup
-	concurrency := 3
-	semaphore := make(chan struct{}, concurrency) // Each goroutine handles 3 files at a time
+
+	concurrency := getConcurrency(len(g.Templates))
+	semaphore := make(chan struct{}, concurrency)
 
 	files := make([]string, 0, len(g.Templates))
 	for pagePath := range g.Templates {
