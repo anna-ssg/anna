@@ -21,7 +21,7 @@ concurrency:
 defaults:
   run:
     shell: bash
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,50 +30,52 @@ jobs:
       url: ${{steps.deployment.outputs.page_url}}
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: setup go
-      uses: actions/setup-go@v4
-      with:
-        go-version-file: 'go.mod'
+      - uses: actions/checkout@v4
 
-    - name: build anna
-      run: go build
+      - name: setup go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
 
-    - name: Insert commit hash in footer
-      run: |
-        sed -i "s/COMMIT_HASH/${{ github.sha }}/g" site/layout/partials/footer.html
+      - name: test anna
+        run: go test ./...
 
-    - name: build site with anna
-      run: |
-        ./anna
+      - name: build anna
+        run: go build
 
-    - name: upload /rendered
-      uses: actions/upload-artifact@master
-      with:
-        path: 'site/rendered'
-        if-no-files-found: error
+      - name: Insert commit hash in footer
+        run: |
+          sed -i "s/COMMIT_HASH/${{ github.sha }}/g" site/layout/partials/footer.html
+
+      - name: build site with anna
+        run: |
+          ./anna
+
+      - name: upload /rendered
+        uses: actions/upload-artifact@master
+        with:
+          path: "site/rendered"
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    
+
     environment:
       name: github-pages
       url: ${{steps.deployment.outputs.page_url}}
     steps:
-    - name: download /rendered
-      uses: actions/download-artifact@master
+      - name: download /rendered
+        uses: actions/download-artifact@master
 
-    - name: setup gh-pages
-      uses: actions/configure-pages@v4
+      - name: setup gh-pages
+        uses: actions/configure-pages@v4
 
-    - name: unpack artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: 'artifact'
+      - name: unpack artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "artifact"
 
-    - name: deploy site
-      id: deployment
-      uses: actions/deploy-pages@v4
-    
+      - name: deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4

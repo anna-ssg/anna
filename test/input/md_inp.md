@@ -3,6 +3,7 @@ title: Markdown Test
 date: 2024-03-23
 description: File containing markdown to test the SSG
 type: post
+draft: false
 ---
 
 # h1 Heading

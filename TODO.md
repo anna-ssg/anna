@@ -26,4 +26,4 @@ pkg
 - `main.go` will only handle flags
 
 - [ ] Split generator struct
-- [ ]
+- [ ] Fix SEO

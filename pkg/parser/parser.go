@@ -2,10 +2,13 @@ package parser
 
 import (
 	"bytes"
+	"regexp"
+
 	"html/template"
 	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -37,12 +40,12 @@ type Frontmatter struct {
 
 // This struct holds all of the data required to render any page of the site
 type TemplateData struct {
-	URL         template.URL
-	Filename    string
-	Date        int64
-	Frontmatter Frontmatter
-	Body        template.HTML
-	Layout      LayoutConfig
+	URL                      template.URL
+	FilenameWithoutExtension string
+	Date                     int64
+	Frontmatter              Frontmatter
+	Body                     template.HTML
+	Layout                   LayoutConfig
 
 	// Do not use these fields to store tags!!
 	// These fields are populated by the ssg to store merged tag data
@@ -61,51 +64,45 @@ type Parser struct {
 	TagsMap      map[string][]TemplateData
 
 	ErrorLogger  *log.Logger
-	mdFilesName  []string
-	mdFilesPath  []string
+	MdFilesName  []string
+	MdFilesPath  []string
 	RenderDrafts bool
 }
 
 func (p *Parser) ReadMdDir(baseDirPath string, baseDirFS fs.FS) {
-	// Listing all files in the dirPath directory
-	dirEntries, err := os.ReadDir(baseDirPath)
-	if err != nil {
-		p.ErrorLogger.Fatal(err)
-	}
+	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
+		if dir.IsDir() && path != "." {
+			subDir := os.DirFS(path)
+			p.ReadMdDir(path, subDir)
+		} else {
+			if strings.HasSuffix(path, ".md") {
+				fileName := filepath.Base(path)
 
-	// Storing the markdown file names and paths
-	for _, entry := range dirEntries {
+				content, err := os.ReadFile(baseDirPath + "/" + path)
+				if err != nil {
+					p.ErrorLogger.Fatal(err)
+				}
 
-		if entry.IsDir() {
-			// p.ReadMdDir(baseDirPath + entry.Name() + "/")
-			continue
+				fronmatter, body, parseSuccess := p.ParseMarkdownContent(string(content))
+				if parseSuccess {
+					if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
+						p.AddFileAndRender(baseDirPath, fileName, fronmatter, body)
+					}
+				}
+			}
 		}
-
-		if !strings.HasSuffix(entry.Name(), ".md") {
-			continue
-		}
-
-		content, err := os.ReadFile(strings.Join([]string{baseDirPath, entry.Name()}, "/"))
-		if err != nil {
-			p.ErrorLogger.Fatal(err)
-		}
-
-		frontmatter, body := p.ParseMarkdownContent(string(content))
-
-		if (frontmatter.Draft && p.RenderDrafts) || !frontmatter.Draft {
-			p.AddFileAndRender(baseDirPath, entry, frontmatter, body)
-		}
-	}
+		return nil
+	})
 }
 
-func (p *Parser) AddFileAndRender(baseDirPath string, dirEntry fs.DirEntry, frontmatter Frontmatter, body string) {
-	p.mdFilesName = append(p.mdFilesName, dirEntry.Name())
-	filepath := baseDirPath + dirEntry.Name()
-	p.mdFilesPath = append(p.mdFilesPath, filepath)
+func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string) {
+	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
+	filepath := baseDirPath + dirEntryPath
+	p.MdFilesPath = append(p.MdFilesPath, filepath)
 
 	var date int64
 	if frontmatter.Date != "" {
-		date = p.dateParse(frontmatter.Date).Unix()
+		date = p.DateParse(frontmatter.Date).Unix()
 	} else {
 		date = 0
 	}
@@ -114,12 +111,12 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntry fs.DirEntry, fron
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
 	page := TemplateData{
-		URL:         template.URL(url),
-		Date:        date,
-		Filename:    strings.Split(dirEntry.Name(), ".")[0],
-		Frontmatter: frontmatter,
-		Body:        template.HTML(body),
-		Layout:      p.LayoutConfig,
+		URL:                      template.URL(url),
+		Date:                     date,
+		FilenameWithoutExtension: strings.Split(dirEntryPath, ".")[0],
+		Frontmatter:              frontmatter,
+		Body:                     template.HTML(body),
+		Layout:                   p.LayoutConfig,
 	}
 
 	// Adding the page to the merged map storing all site pages
@@ -135,10 +132,9 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntry fs.DirEntry, fron
 	}
 }
 
-func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string) {
+func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, bool) {
 	var parsedFrontmatter Frontmatter
 	var markdown string
-
 	/*
 	   ---
 	   frontmatter_content
@@ -149,23 +145,21 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string) 
 	*/
 	splitContents := strings.Split(filecontent, "---")
 	frontmatterSplit := ""
-	if len(splitContents) > 1 {
-		frontmatterSplit = splitContents[1]
+
+	regex := regexp.MustCompile(`title: (.*)`)
+	match := regex.FindStringSubmatch(splitContents[1])
+
+	if match == nil {
+		return Frontmatter{}, "", false
 	}
 
-	if frontmatterSplit != "" {
-		// Parsing YAML frontmatter
-		err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
-		if err != nil {
-			p.ErrorLogger.Fatal(err)
-		}
-
-		// Making sure that all filecontent is included and
-		// not ignoring the horizontal markdown splitter "---"
-		markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
-	} else {
-		markdown = filecontent
+	frontmatterSplit = splitContents[1]
+	// Parsing YAML frontmatter
+	err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
 	}
+	markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
@@ -180,10 +174,10 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string) 
 		p.ErrorLogger.Fatal(err)
 	}
 
-	return parsedFrontmatter, parsedMarkdown.String()
+	return parsedFrontmatter, parsedMarkdown.String(), true
 }
 
-func (p *Parser) dateParse(date string) time.Time {
+func (p *Parser) DateParse(date string) time.Time {
 	parsedTime, err := time.Parse("2006-01-02", date)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
