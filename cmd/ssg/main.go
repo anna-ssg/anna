@@ -3,6 +3,7 @@ package ssg
 import (
 	"bytes"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -86,6 +87,21 @@ func getConcurrency(filesCount int) int {
 
 	return concurrency
 }
+func (g *Generator) GetMarkdownFilesCount() int {
+	files, err := ioutil.ReadDir(SiteDataPath + "content/")
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	count := 0
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".md") {
+			count++
+		}
+	}
+
+	return count
+}
 
 func (g *Generator) RenderSite(addr string) {
 	// Creating the "rendered" directory if not present
@@ -123,24 +139,19 @@ func (g *Generator) RenderSite(addr string) {
 	templ := helper.ParseLayoutFiles()
 
 	var wg sync.WaitGroup
-
-	concurrency := getConcurrency(len(g.Templates))
-	semaphore := make(chan struct{}, concurrency)
+	// m := 3                                         // Number of files to process concurrently
+	n := getConcurrency(g.GetMarkdownFilesCount()) // Number of goroutines
+	m := n / 2
+	semaphore := make(chan struct{}, m*n)
 
 	files := make([]string, 0, len(g.Templates))
 	for pagePath := range g.Templates {
 		files = append(files, string(pagePath))
 	}
 
-	for i := 0; i < len(files); i += concurrency {
-		end := i + concurrency
-		if end > len(files) {
-			end = len(files)
-		}
-
-		wg.Add(end - i)
-
-		for _, file := range files[i:end] {
+	for i := 0; i < n; i++ {
+		for j := i * m; j < (i+1)*m && j < len(files); j++ {
+			wg.Add(1)
 			semaphore <- struct{}{} // Acquire semaphore
 
 			go func(file string) {
@@ -152,7 +163,7 @@ func (g *Generator) RenderSite(addr string) {
 				pagePath := template.URL(file)
 				templateData := g.Templates[pagePath]
 				g.RenderPage(pagePath, templateData, templ, "page")
-			}(file)
+			}(files[j])
 		}
 	}
 
