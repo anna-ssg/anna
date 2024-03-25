@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
 )
@@ -105,9 +106,32 @@ func (g *Generator) RenderSite(addr string) {
 
 	templ := helper.ParseLayoutFiles()
 
-	for pagePath, templateData := range g.Templates {
-		g.RenderPage(pagePath, templateData, templ, "page")
+	var wg sync.WaitGroup
+	concurrency := 3
+	semaphore := make(chan struct{}, concurrency) // Each goroutine handles 3 files at a time
+
+	files := make([]string, 0, len(g.Templates))
+	for pagePath := range g.Templates {
+		files = append(files, string(pagePath))
 	}
+
+	for _, file := range files {
+		wg.Add(1)
+		semaphore <- struct{}{} // Acquire semaphore
+
+		go func(file string) {
+			defer func() {
+				<-semaphore // Release semaphore
+				wg.Done()
+			}()
+
+			pagePath := template.URL(file)
+			templateData := g.Templates[pagePath]
+			g.RenderPage(pagePath, templateData, templ, "page")
+		}(file)
+	}
+
+	wg.Wait()
 
 	var postsBuffer bytes.Buffer
 
