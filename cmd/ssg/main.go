@@ -49,6 +49,7 @@ type Generator struct {
 	mdFilesName  []string
 	mdFilesPath  []string
 	RenderDrafts bool
+	mutex        sync.Mutex // Add a mutex to synchronize access to shared data
 }
 
 // This struct holds all of the data required to render any page of the site
@@ -87,6 +88,7 @@ func getConcurrency(filesCount int) int {
 
 	return concurrency
 }
+
 func (g *Generator) GetMarkdownFilesCount() int {
 	files, err := ioutil.ReadDir(SiteDataPath + "content/")
 	if err != nil {
@@ -110,7 +112,7 @@ func (g *Generator) RenderSite(addr string) {
 		g.ErrorLogger.Fatal(err)
 	}
 
-	err = os.MkdirAll(SiteDataPath+"rendered/", 0750)
+	err = os.MkdirAll(SiteDataPath+"rendered/posts/", 0750)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
@@ -139,33 +141,31 @@ func (g *Generator) RenderSite(addr string) {
 	templ := helper.ParseLayoutFiles()
 
 	var wg sync.WaitGroup
-	// m := 3                                         // Number of files to process concurrently
-	n := getConcurrency(g.GetMarkdownFilesCount()) // Number of goroutines
-	m := n / 2
-	semaphore := make(chan struct{}, m*n)
+	// n := getConcurrency(g.GetMarkdownFilesCount())
+	n := 30 // Number of goroutines
+	// var wg sync.WaitGroup
+	wg.Add(n)
 
-	files := make([]string, 0, len(g.Templates))
-	for pagePath := range g.Templates {
-		files = append(files, string(pagePath))
+	// Channel to hold unprocessed file paths
+	filePathChan := make(chan string, len(g.Templates))
+	for filePath := range g.Templates {
+		filePathChan <- string(filePath)
 	}
 
+	// Launch worker goroutines
 	for i := 0; i < n; i++ {
-		for j := i * m; j < (i+1)*m && j < len(files); j++ {
-			wg.Add(1)
-			semaphore <- struct{}{} // Acquire semaphore
-
-			go func(file string) {
-				defer func() {
-					<-semaphore // Release semaphore
-					wg.Done()
-				}()
-
-				pagePath := template.URL(file)
+		go func() {
+			defer wg.Done()
+			for filePath := range filePathChan {
+				pagePath := template.URL(filePath)
 				templateData := g.Templates[pagePath]
 				g.RenderPage(pagePath, templateData, templ, "page")
-			}(files[j])
-		}
+			}
+		}()
 	}
+
+	// Close the channel to signal end of tasks
+	close(filePathChan)
 
 	wg.Wait()
 
@@ -185,7 +185,7 @@ func (g *Generator) RenderSite(addr string) {
 	}
 
 	// Flushing 'posts.html' to the disk
-	err = os.WriteFile(SiteDataPath+"rendered/posts.html", postsBuffer.Bytes(), 0666)
+	err = os.WriteFile(SiteDataPath+"rendered/posts/index.html", postsBuffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
 	}
