@@ -185,6 +185,11 @@ func (g *Generator) RenderSite(addr string) {
 	}
 
 	// Flushing 'posts.html' to the disk
+	err = os.MkdirAll(SiteDataPath+"rendered/posts/", 0750)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
 	err = os.WriteFile(SiteDataPath+"rendered/posts/index.html", postsBuffer.Bytes(), 0666)
 	if err != nil {
 		g.ErrorLogger.Fatal(err)
@@ -264,5 +269,25 @@ func (g *Generator) RenderTags(templ *template.Template) {
 		}
 
 		g.RenderPage(template.URL(pagePath), templateData, templ, "tag-subpage")
+	}
+
+	// Rendering the posts.html
+	postsData := postsTemplateData{
+		Posts: g.Posts,
+		TemplateData: TemplateData{
+			Frontmatter: Frontmatter{Title: "Posts"},
+			Layout:      g.LayoutConfig,
+		},
+	}
+
+	err = templ.ExecuteTemplate(&tagsBuffer, "posts", postsData)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
+	}
+
+	// Flushing 'posts.html' to the disk
+	err = os.WriteFile(SiteDataPath+"rendered/posts.html", tagsBuffer.Bytes(), 0666)
+	if err != nil {
+		g.ErrorLogger.Fatal(err)
 	}
 }
