@@ -1,0 +1,16 @@
+{{ define "page"}}
+<html>
+<head></head>
+<body>
+<div class="tags-paceholder">
+{{range .Frontmatter.Tags}}
+<div class="tag">
+<a href="/tags/{{.}}.html">{{.}}</a>
+</div>
+{{end}}
+</div>
+{{.Body}}
+</div>
+</body>
+</html>
+{{end}}

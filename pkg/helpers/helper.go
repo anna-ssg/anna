@@ -1,11 +1,12 @@
 package helpers
 
 import (
-	"html/template"
 	"io"
 	"log"
 	"os"
 )
+
+const SiteDataPath string = "site/"
 
 type Helper struct {
 	ErrorLogger  *log.Logger
@@ -51,21 +52,4 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-}
-
-// Parse all the ".html" layout files in the layout/ directory
-func (h *Helper) ParseLayoutFiles() *template.Template {
-	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob(h.SiteDataPath + "layout/*.html")
-	if err != nil {
-		h.ErrorLogger.Fatal(err)
-	}
-
-	// Parsing all files in the partials/ dir which match the "*.html" pattern
-	templ, err = templ.ParseGlob(h.SiteDataPath + "layout/partials/*.html")
-	if err != nil {
-		h.ErrorLogger.Fatal(err)
-	}
-
-	return templ
 }

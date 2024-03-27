@@ -11,9 +11,9 @@ import (
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
 
-const TestDirPath = "../../test/"
+const TestDirPath = "../../test/parser/"
 
-func TestReadMdDir(t *testing.T) {
+func TestParseMDDir(t *testing.T) {
 	t.Run("reading markdown files and rendering without drafts", func(t *testing.T) {
 		p := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
@@ -22,8 +22,8 @@ func TestReadMdDir(t *testing.T) {
 		}
 		p.RenderDrafts = false
 
-		inpBaseDirFS := os.DirFS(TestDirPath + "input")
-		p.ReadMdDir(TestDirPath+"input", inpBaseDirFS)
+		TestDirFS := os.DirFS(TestDirPath + "input")
+		p.ParseMDDir(TestDirPath+"input/", TestDirFS)
 
 		got_parsed_files := len(p.MdFilesName)
 		want_parsed_files := 1
@@ -43,7 +43,7 @@ func TestReadMdDir(t *testing.T) {
 		p.RenderDrafts = true
 
 		inpBaseDirFS := os.DirFS(TestDirPath + "input")
-		p.ReadMdDir(TestDirPath+"input", inpBaseDirFS)
+		p.ParseMDDir(TestDirPath+"input/", inpBaseDirFS)
 
 		got_parsed_files := len(p.MdFilesName)
 		want_parsed_files := 2
@@ -68,7 +68,7 @@ func TestAddFileandRender(t *testing.T) {
 	}
 	got_parser.LayoutConfig = want_layout
 	t.Run("parsing data out of one markdown post", func(t *testing.T) {
-		inputMd, err := os.ReadFile(TestDirPath + "md_inp.md")
+		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -78,7 +78,6 @@ func TestAddFileandRender(t *testing.T) {
 			ErrorLogger: got_parser.ErrorLogger,
 		}
 		sample_frontmatter, sample_body, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
-		sample_body = "hello worl"
 		if !parseSuccess {
 			return
 		}
@@ -121,7 +120,7 @@ func TestParseMarkdownContent(t *testing.T) {
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
-		inputMd, err := os.ReadFile(TestDirPath + "md_inp.md")
+		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -130,8 +129,8 @@ func TestParseMarkdownContent(t *testing.T) {
 
 		if parseSuccess {
 
-			body_want, err := os.ReadFile(TestDirPath + "html_want_output.html")
-			if err = os.WriteFile(TestDirPath+"html_got_output.html", []byte(body_got), 0666); err != nil {
+			body_want, err := os.ReadFile(TestDirPath + "parse_md/html_want_output.html")
+			if err = os.WriteFile(TestDirPath+"parse_md/html_got_output.html", []byte(body_got), 0666); err != nil {
 				t.Errorf("%v", err)
 			}
 			if string(body_want) != body_got {
@@ -141,7 +140,7 @@ func TestParseMarkdownContent(t *testing.T) {
 	})
 
 	t.Run("parse frontmatter from markdown files", func(t *testing.T) {
-		inputMd, err := os.ReadFile(TestDirPath + "md_inp.md")
+		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -206,7 +205,7 @@ func TestParseRobots(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 		if !slices.Equal(got_robots_txt, want_robots_txt) {
-			t.Errorf("The expected and generated robots.txt can be found in test/")
+			t.Errorf("The expected and generated robots.txt can be found in test/layout/robots_txt/")
 		}
 	})
 }
