@@ -2,19 +2,19 @@
 {{ template "head" .}}
 
 <body>
-  {{template "header" .}}
+    {{template "header" .}}
 
-  <div class="body">
-    
-    <div class="tagged-posts">
-        {{range .MergedTags}}
-        <a href="/{{.URL}}">{{.Frontmatter.Title}}</a>
-        {{end}}
+    <div class="body">
+
+        <div class="tagged-posts">
+            {{range .SpecificTagTemplates}}
+            <a href="/{{.URL}}">{{.Frontmatter.Title}}</a>
+            {{end}}
+        </div>
+
     </div>
 
-  </div>
-
-  {{template "footer" .}}
+    {{template "footer" .}}
 </body>
 
 </html>

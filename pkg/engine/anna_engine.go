@@ -57,8 +57,6 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 			SpecificTagTemplates: taggedTemplates,
 		}
 
-		e.ErrorLogger.Println(fileOutPath)
-		e.ErrorLogger.Println(pagePath)
 		e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
 	}
 }

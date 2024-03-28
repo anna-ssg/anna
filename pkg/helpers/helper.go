@@ -53,3 +53,20 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 		h.ErrorLogger.Fatal(err)
 	}
 }
+
+func (h *Helper) CreateRenderedDir(fileOutPath string) {
+	err := os.RemoveAll(fileOutPath + "rendered/")
+	if err != nil {
+		h.ErrorLogger.Fatal(err)
+	}
+
+	err = os.MkdirAll(fileOutPath+"rendered/", 0750)
+	if err != nil {
+		h.ErrorLogger.Fatal(err)
+	}
+
+	err = os.MkdirAll(fileOutPath+"rendered/layout/", 0750)
+	if err != nil {
+		h.ErrorLogger.Fatal(err)
+	}
+}

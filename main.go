@@ -1,11 +1,9 @@
 package main
 
 import (
-	"html/template"
 	"log"
-	"os"
 
-	"github.com/acmpesuecc/anna/pkg/parser"
+	"github.com/acmpesuecc/anna/cmd/anna"
 	"github.com/spf13/cobra"
 )
 
@@ -19,16 +17,6 @@ func main() {
 		Use:   "anna",
 		Short: "Static Site Generator",
 		Run: func(cmd *cobra.Command, args []string) {
-			parser := parser.Parser{
-				ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-				Templates:   make(map[template.URL]parser.TemplateData),
-				TagsMap:     make(map[string][]parser.TemplateData),
-			}
-
-			if draft {
-				parser.RenderDrafts = true
-			}
-
 			if serve {
 				// parser.StartLiveReload(addr)
 			}
@@ -40,7 +28,7 @@ func main() {
 			if validateHTML {
 				// anna.ValidateHTMLContent()
 			}
-			// parser.RenderSite("")
+			anna.VanillaRender(draft)
 		},
 	}
 

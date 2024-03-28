@@ -1,3 +1,6 @@
+---
+title: Anna Documentation
+---
 # Anna
 
 ```text
@@ -148,7 +151,7 @@ author: Anna
 Once you have a directory structure, install `anna` using:
 
 ```sh
-go install github.com/acmpesuecc/anna@latest 
+go install github.com/acmpesuecc/anna@latest
 ```
 
 Or if you have git installed, clone our repository:

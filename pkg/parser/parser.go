@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bytes"
-	"regexp"
+	"fmt"
 
 	"html/template"
 	"io/fs"
@@ -81,22 +81,25 @@ type Parser struct {
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
-		if dir.IsDir() && path != "." {
-			subDir := os.DirFS(path)
-			p.ParseMDDir(path, subDir)
-		} else {
-			if filepath.Ext(path) == ".md" {
-				fileName := filepath.Base(path)
+		fmt.Println(path)
+		if path != "." {
+			if dir.IsDir() {
+				subDir := os.DirFS(path)
+				p.ParseMDDir(path, subDir)
+			} else {
+				if filepath.Ext(path) == ".md" {
+					fileName := filepath.Base(path)
 
-				content, err := os.ReadFile(baseDirPath + path)
-				if err != nil {
-					p.ErrorLogger.Fatal(err)
-				}
+					content, err := os.ReadFile(baseDirPath + path)
+					if err != nil {
+						p.ErrorLogger.Fatal(err)
+					}
 
-				fronmatter, body, parseSuccess := p.ParseMarkdownContent(string(content))
-				if parseSuccess {
-					if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
-						p.AddFileAndRender(baseDirPath, fileName, fronmatter, body)
+					fronmatter, body, parseSuccess := p.ParseMarkdownContent(string(content))
+					if parseSuccess {
+						if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
+							p.AddFileAndRender(baseDirPath, fileName, fronmatter, body)
+						}
 					}
 				}
 			}
@@ -156,10 +159,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	splitContents := strings.Split(filecontent, "---")
 	frontmatterSplit := ""
 
-	regex := regexp.MustCompile(`title: (.*)`)
-	match := regex.FindStringSubmatch(splitContents[1])
-
-	if match == nil {
+	if len(splitContents) <= 1 {
 		return Frontmatter{}, "", false
 	}
 
