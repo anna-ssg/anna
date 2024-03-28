@@ -2,8 +2,11 @@ package engine
 
 import (
 	"bytes"
+	"cmp"
 	"html/template"
 	"os"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
@@ -19,6 +22,10 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		tags = append(tags, tag)
 	}
 
+	slices.SortFunc(tags, func(a, b string) int {
+		return cmp.Compare(strings.ToLower(a), strings.ToLower(b))
+	})
+
 	tagNames := parser.TemplateData{
 		FilenameWithoutExtension: "Tags",
 		Layout:                   e.LayoutConfig,
@@ -33,7 +40,7 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	}
 
 	// Flushing 'tags.html' to the disk
-	err = os.WriteFile(helpers.SiteDataPath+"rendered/tags.html", tagsBuffer.Bytes(), 0666)
+	err = os.WriteFile(fileOutPath+"rendered/tags.html", tagsBuffer.Bytes(), 0666)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
@@ -50,6 +57,8 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 			SpecificTagTemplates: taggedTemplates,
 		}
 
+		e.ErrorLogger.Println(fileOutPath)
+		e.ErrorLogger.Println(pagePath)
 		e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
 	}
 }

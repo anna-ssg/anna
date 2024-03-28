@@ -1,7 +1,5 @@
 {{ define "all-tags"}}
-{{ template "head" . }}
 <body>
-{{ template "header" . }}
 <div class="body">
 <div class="all-tags">
 {{ range .Tags }}
@@ -9,7 +7,6 @@
 {{end}}
 </div>
 </div>
-{{ template "footer" . }}
 </body>
 </html>
 {{ end }}

@@ -58,7 +58,7 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		if slices.Equal(got_file, want_file) {
+		if !slices.Equal(got_file, want_file) {
 			t.Errorf("The expected and generated page.html can be found in test/engine/render_page/rendered/")
 		}
 	})

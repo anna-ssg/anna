@@ -1,28 +1,114 @@
 package engine_test
 
-// func TestRenderTags(t *testing.T) {
-// 	t.Run("test render tag.html and tag-subpage.html", func(t *testing.T) {
-// 		e := engine.Engine{
-// 			Templates:   make(map[template.URL]parser.TemplateData),
-// 			TagsMap:     make(map[string][]parser.TemplateData),
-// 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-// 		}
-// 		e.LayoutConfig.BaseURL = "https://example.org"
+import (
+	"html/template"
+	"log"
+	"os"
+	"slices"
+	"testing"
 
-// 		fileOutPath := "../../test/engine/render_tags/"
+	"github.com/acmpesuecc/anna/pkg/engine"
+	"github.com/acmpesuecc/anna/pkg/parser"
+)
 
-// 		e.TagsMap["blog"] = []parser.TemplateData{
-// 			parser.TemplateData{},
-// 			parser.TemplateData{},
-// 		}
+func TestRenderTags(t *testing.T) {
+	e := engine.Engine{
+		Templates:   make(map[template.URL]parser.TemplateData),
+		TagsMap:     make(map[string][]parser.TemplateData),
+		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+	}
+	e.LayoutConfig.BaseURL = "example.org"
 
-// 		templ, err := template.ParseGlob(TestDirPath + "engine/rendered_tags/*.html")
-// 		if err != nil {
-// 			t.Errorf("%v", err)
-// 		}
+	fileOutPath := "../../test/engine/render_tags/"
 
-// 	})
-// }
+	e.TagsMap["blogs"] = []parser.TemplateData{
+		{
+			URL: "posts/file1.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "file1",
+				Tags:  []string{"blogs"},
+			},
+		},
+		{
+			URL: "posts/file2.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "file2",
+				Tags:  []string{"blogs", "tech"},
+			},
+		},
+	}
+
+	e.TagsMap["tech"] = []parser.TemplateData{
+		{
+			URL: "posts/file2.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "file2",
+				Tags:  []string{"blogs", "tech"},
+			},
+		},
+		{
+			URL: "posts/file3.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "file3",
+				Tags:  []string{"tech"},
+			},
+		},
+	}
+
+	templ, err := template.ParseFiles(TestDirPath+"engine/render_tags/tags_template.html", TestDirPath+"engine/render_tags/tags_subpage_template.html")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	e.RenderTags(fileOutPath, templ)
+
+	t.Run("render tag.html", func(t *testing.T) {
+
+		got_tags_file, err := os.ReadFile(TestDirPath + "engine/render_tags/rendered/tags.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_tags_file, err := os.ReadFile(TestDirPath + "engine/render_tags/want_tags.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		if !slices.Equal(got_tags_file, want_tags_file) {
+			t.Errorf("The expected and generated tags.html can be found in test/engine/render_tags/rendered/")
+		}
+	})
+
+	t.Run("render tag-subpage.html", func(t *testing.T) {
+
+		got_blogs_file, err := os.ReadFile(TestDirPath + "engine/render_tags/rendered/tags/blogs.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_blogs_file, err := os.ReadFile(TestDirPath + "engine/render_tags/want_blogs_tags.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		if !slices.Equal(got_blogs_file, want_blogs_file) {
+			t.Errorf("The expected and generated blogs.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+		}
+
+		got_tech_file, err := os.ReadFile(TestDirPath + "engine/render_tags/rendered/tags/tech.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_tech_file, err := os.ReadFile(TestDirPath + "engine/render_tags/want_tech_tags.html")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		if !slices.Equal(got_tech_file, want_tech_file) {
+			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+		}
+	})
+}
 
 // /*
 // func TestGenerateSitemap(t *testing.T) {
