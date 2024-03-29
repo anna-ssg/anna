@@ -11,7 +11,7 @@ import (
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
 
-const TestDirPath = "../../test/"
+const TestDirPath = "../../test/engine/"
 
 func TestRenderPage(t *testing.T) {
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
@@ -41,19 +41,19 @@ func TestRenderPage(t *testing.T) {
 			},
 		}
 
-		templ, err := template.ParseFiles(TestDirPath + "engine/render_page/template_input.html")
+		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
 		engine.RenderPage(TestDirPath+"engine/render_page/", "posts/got.md", page, templ, "page")
 
-		got_file, err := os.ReadFile(TestDirPath + "engine/render_page/rendered/posts/got.html")
+		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_file, err := os.ReadFile(TestDirPath + "engine/render_page/want.html")
+		want_file, err := os.ReadFile(TestDirPath + "render_page/want.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}

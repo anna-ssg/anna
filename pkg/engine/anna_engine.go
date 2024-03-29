@@ -3,9 +3,11 @@ package engine
 import (
 	"bytes"
 	"cmp"
+	"fmt"
 	"html/template"
 	"os"
 	"slices"
+	"sort"
 	"strings"
 	"time"
 
@@ -66,13 +68,28 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 	buffer.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
 
-	// iterate over parsed markdown files
+	// Sorting templates by key
+	keys := make([]string, 0, len(e.Templates))
+	for k := range e.Templates {
+		keys = append(keys, string(k))
+	}
+	sort.Strings(keys)
+
+	tempTemplates := make(map[template.URL]parser.TemplateData)
+	for _, templateURL := range keys {
+		tempTemplates[template.URL(templateURL)] = e.Templates[template.URL(templateURL)]
+	}
+
+	e.Templates = tempTemplates
+
+	fmt.Println(e.LayoutConfig.BaseURL)
+	// Iterate over parsed markdown files
 	for _, templateData := range e.Templates {
 		url := e.LayoutConfig.BaseURL + "/" + templateData.FilenameWithoutExtension + ".html"
-		buffer.WriteString(" <url>\n")
-		buffer.WriteString("  <loc>" + url + "</loc>\n")
-		buffer.WriteString("  <lastmod>" + templateData.Frontmatter.Date + "</lastmod>\n")
-		buffer.WriteString(" </url>\n")
+		buffer.WriteString("\t<url>\n")
+		buffer.WriteString("\t\t<loc>" + url + "</loc>\n")
+		buffer.WriteString("\t\t<lastmod>" + templateData.Frontmatter.Date + "</lastmod>\n")
+		buffer.WriteString("\t</url>\n")
 	}
 	buffer.WriteString("</urlset>\n")
 	// helpers.SiteDataPath is the DirPath
