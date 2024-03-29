@@ -11,14 +11,18 @@ import (
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
 
-func VanillaRender(draft bool) {
+type Cmd struct {
+	RenderDrafts bool
+	Addr         string
+}
 
+func (cmd *Cmd) VanillaRender() {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
 		Templates:    make(map[template.URL]parser.TemplateData),
 		TagsMap:      make(map[string][]parser.TemplateData),
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		RenderDrafts: draft,
+		RenderDrafts: cmd.RenderDrafts,
 	}
 	e := engine.Engine{
 		Templates:   make(map[template.URL]parser.TemplateData),

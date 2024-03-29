@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bytes"
-	"fmt"
+	"regexp"
 
 	"html/template"
 	"io/fs"
@@ -39,7 +39,7 @@ type Frontmatter struct {
 
 // This struct holds all of the data required to render any page of the site
 type TemplateData struct {
-	URL                      template.URL
+	CompleteURL              template.URL
 	FilenameWithoutExtension string
 	Date                     int64
 	Frontmatter              Frontmatter
@@ -81,7 +81,6 @@ type Parser struct {
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
-		fmt.Println(path)
 		if path != "." {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
@@ -123,8 +122,11 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 	key, _ := strings.CutPrefix(filepath, helpers.SiteDataPath+"content/")
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
+	if frontmatter.Type == "post" {
+		url = "posts/" + url
+	}
 	page := TemplateData{
-		URL:                      template.URL(url),
+		CompleteURL:              template.URL(url),
 		Date:                     date,
 		FilenameWithoutExtension: strings.Split(dirEntryPath, ".")[0],
 		Frontmatter:              frontmatter,
@@ -160,6 +162,13 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
+		return Frontmatter{}, "", false
+	}
+
+	regex := regexp.MustCompile(`title: (.*)`)
+	match := regex.FindStringSubmatch(splitContents[1])
+
+	if match == nil {
 		return Frontmatter{}, "", false
 	}
 

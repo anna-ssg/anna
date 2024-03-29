@@ -39,7 +39,7 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, pageTempl
 	dirPath := ""
 	if strings.Contains(string(pagePath), "/") {
 		// Extracting the directory path from the page path
-		dirPath, _ := strings.CutSuffix(string(pagePath), pageTemplateData.FilenameWithoutExtension+".md")
+		dirPath, _ := strings.CutSuffix(string(pagePath), pageTemplateData.FilenameWithoutExtension)
 		dirPath = fileOutPath + "rendered/" + dirPath
 
 		err := os.MkdirAll(dirPath, 0750)

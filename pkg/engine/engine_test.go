@@ -22,7 +22,7 @@ func TestRenderPage(t *testing.T) {
 		}
 
 		page := parser.TemplateData{
-			URL:                      template.URL("got"),
+			CompleteURL:              template.URL("got"),
 			FilenameWithoutExtension: "got",
 			Frontmatter: parser.Frontmatter{
 				Title:       "Hello",

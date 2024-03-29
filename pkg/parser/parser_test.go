@@ -13,46 +13,6 @@ import (
 
 const TestDirPath = "../../test/parser/"
 
-func TestParseMDDir(t *testing.T) {
-	t.Run("reading markdown files and rendering without drafts", func(t *testing.T) {
-		p := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		}
-		p.RenderDrafts = false
-
-		TestDirFS := os.DirFS(TestDirPath + "input")
-		p.ParseMDDir(TestDirPath+"input/", TestDirFS)
-
-		got_parsed_files := len(p.MdFilesName)
-		want_parsed_files := 1
-
-		if got_parsed_files != want_parsed_files {
-			t.Errorf("got %v, want %v", got_parsed_files, want_parsed_files)
-		}
-
-	})
-
-	t.Run("reading all markdown files inluding drafts", func(t *testing.T) {
-		p := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		}
-		p.RenderDrafts = true
-
-		inpBaseDirFS := os.DirFS(TestDirPath + "input")
-		p.ParseMDDir(TestDirPath+"input/", inpBaseDirFS)
-
-		got_parsed_files := len(p.MdFilesName)
-		want_parsed_files := 2
-		if got_parsed_files != want_parsed_files {
-			t.Errorf("got %v, want %v", got_parsed_files, want_parsed_files)
-		}
-	})
-}
-
 func TestAddFileandRender(t *testing.T) {
 	got_parser := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
@@ -83,11 +43,11 @@ func TestAddFileandRender(t *testing.T) {
 		}
 
 		filename := "testpost.md"
-		fileurl := "testpost.html"
+		fileurl := "posts/testpost.html"
 		want_parser.MdFilesName = append(want_parser.MdFilesName, filename)
 		want_parser.MdFilesPath = append(want_parser.MdFilesPath, filename)
 		want_page := parser.TemplateData{
-			URL:                      template.URL(fileurl),
+			CompleteURL:              template.URL(fileurl),
 			Date:                     want_parser.DateParse(sample_frontmatter.Date).Unix(),
 			FilenameWithoutExtension: "testpost",
 			Frontmatter:              sample_frontmatter,

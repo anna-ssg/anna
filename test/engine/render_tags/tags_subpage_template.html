@@ -3,7 +3,7 @@
 <div class="body">
 <div class="tagged-posts">
 {{ range .SpecificTagTemplates }}
-<a href="/{{.URL}}">{{ .Frontmatter.Title }}</a>
+<a href="/{{.CompleteURL}}">{{ .Frontmatter.Title }}</a>
 {{ end }}
 </div>
 </div>

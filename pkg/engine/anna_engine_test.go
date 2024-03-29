@@ -23,14 +23,14 @@ func TestRenderTags(t *testing.T) {
 
 	e.TagsMap["blogs"] = []parser.TemplateData{
 		{
-			URL: "posts/file1.html",
+			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "file1",
 				Tags:  []string{"blogs"},
 			},
 		},
 		{
-			URL: "posts/file2.html",
+			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "file2",
 				Tags:  []string{"blogs", "tech"},
@@ -40,14 +40,14 @@ func TestRenderTags(t *testing.T) {
 
 	e.TagsMap["tech"] = []parser.TemplateData{
 		{
-			URL: "posts/file2.html",
+			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "file2",
 				Tags:  []string{"blogs", "tech"},
 			},
 		},
 		{
-			URL: "posts/file3.html",
+			CompleteURL: "posts/file3.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "file3",
 				Tags:  []string{"tech"},

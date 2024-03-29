@@ -1,6 +1,7 @@
 ---
 title: Anna Documentation
 ---
+
 # Anna
 
 ```text
@@ -24,45 +25,41 @@ This Project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.gi
 The ssg currently requires the following directory structure
 
 ```text
-ssg/
-|--cmd/
-|--pkg/
-|--site/ (All site data and rendered content is stored here)
-  |--content/
-  |  |--index.md (This file is necessary and cannot be omitted)
-  |  |--about.md
-  |  |--posts/
-  |     |--post1.md
-  |  ....
-  |
-  |--layout/
-  |  |--page.html (This file is necessary and cannot be omitted)
-  |  |--posts.html (This file is necessary to create a 'Posts' section)
-  |  |--partials/
-  |     |--header.html
-  |  ....
-  |  |--config.yml (This file is necessary and cannot be omitted)
-  |
-  |--static/
-  |  |--scripts/
-  |     |--light.js
-  |  |--image1.jpg
-  |  |--fonts
-  |     |--font1.ttf
-  |  |--images
-  |     |--image2.png
-  |  ....
-  |
-  |--rendered/ (This directory is created by the ssg)
-    |--index.html
-    |--about.html
-    |--posts.html
-    |--posts/
-        |--post1.html
-    |--static/
-        |--image1.jpg
-        |--fonts/
-    ....
+
+/anna
+├── /cmd
+├── /pkg
+│   ├── /engine
+│   ├── /helpers
+│   └── /parser
+├── /site
+│    ├── /content
+│    │   │   └── /posts
+│    │   │           └── sample.md
+│    │   └── index.md
+│    ├── /layout
+│    │   ├── config.yml (This file is necessary and cannot be omitted)
+│    │   ├── page.html (This file is necessary and cannot be omitted)
+│    │   ├── posts.html (This file is necessary to create a 'Posts' section)
+│    │   └─── /partials
+│    │       └── partials for page
+│    ├── /static
+│    │   ├── /fonts
+│    │   ├── /images
+│    │   ├── plane.jpg
+│    │   ├── /scripts
+│    │   └── style.css
+│    └ /rendered (This directory is created by the ssg)
+└── /test (Stores mock data required to test the SSG)
+    ├── /engine
+    │   ├── /render_engine_generated
+    │   ├── /render_page
+    │   ├── /render_tags
+    │   └── /render_user_defined
+    └── /parser
+        ├── /input
+        ├── /layout
+        └── /parse_md
 ```
 
 ## Description of the directory structure
@@ -82,11 +79,12 @@ ssg/
 
 The layout files can access the following rendered data from the markdown files:
 
-- `{{.Body}}` : Returns the markdown body rendered to HTML
-- `{{.Filename}}` : Returns the name of the current file
+- `{{.CompleteURL}}` : Returns the complete url of the given page
+- `{{.FilenameWithoutExtension}}` : Returns the name of the current file
 - `{{.Date}}` : Returns the last modified date of the current file
 - `{{.Frontmatter.[Tagname]}}` : Returns the value of the frontmatter tag
   - Example: `{{.Frontmatter.Title}}` : Returns the value of the title tag
+- `{{.Body}}` : Returns the markdown body rendered to HTML
 - `{{.Layout.[Tagname]}}`: Returns the particular configuration detail of the page
   - Example: `{{.Layout.Navbar}}` : Returns a string slice with the names of all the navbar elements
 
@@ -97,6 +95,7 @@ The layout files can access the following rendered data from the markdown files:
 2. CSS: CSS can be added in the following ways:
 
 - In an external file in the `static/` directory and linked to the layout files
+
   - To link the stylesheet, use the `baseURL` along with the relative path
 
     Example: `<link rel="stylesheet" href="{{.Layout.BaseURL}}static/style.css">`
@@ -110,9 +109,9 @@ The layout files can access the following rendered data from the markdown files:
 - `date`: The date of the current page
 - `draft`: When set to 'true', the current page is not rendered unless the '-d' flag is used
 - `type`: Sets the type of the page. Use type 'post' for posts
-- `previewimage`: Stores the preview image of the current page
 - `description`: Stores the description of the current post previewed in posts.html
-- `scripts`: Stores a slice of javascript files to be included with the current page only
+- `previewimage`: Stores the preview image of the current page
+- `tags`: Stores the tags of the particular page
 
 (**The above tags are Frontmatter tags**)
 
@@ -144,8 +143,6 @@ siteScripts:
 author: Anna
 ```
 
-
-
 ## Install
 
 Once you have a directory structure, install `anna` using:
@@ -169,7 +166,7 @@ Usage:
   anna [flags]
 
 Flags:
-  -a, --addr string     ip address to serve rendered content to (default "8000")
+  -a, --addr stringwhich sip address to serve rendered content to (default "8000")
   -d, --draft           renders draft posts
   -h, --help            help for ssg
   -s, --serve           serve the rendered content

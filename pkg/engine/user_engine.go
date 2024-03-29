@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"os"
+	"strings"
 
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
@@ -14,8 +15,9 @@ type postsTemplateData struct {
 }
 
 func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Template) {
-	for pageURL, templData := range e.Templates {
-		e.RenderPage(fileOutPath, pageURL, templData, templ, "page")
+	for _, templData := range e.Templates {
+		fileInPath, _ := strings.CutSuffix(string(templData.CompleteURL), ".html")
+		e.RenderPage(fileOutPath, template.URL(fileInPath), templData, templ, "page")
 	}
 }
 
