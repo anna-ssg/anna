@@ -15,7 +15,8 @@ func main() {
 	var renderDrafts bool
 	var validateHTML bool
 	var prof bool
-
+	anna.StartProfiling()
+	startTime := time.Now()
 	rootCmd := &cobra.Command{
 		Use:   "anna",
 		Short: "Static Site Generator",
@@ -26,14 +27,25 @@ func main() {
 			}
 
 			if serve {
+				if prof {
+					go func() {
+						for {
+							time.Sleep(1 * time.Second) //change as per needed
+							anna.PrintStats(time.Since(startTime))
+						}
+					}()
+				}
 				annaCmd.StartLiveReload()
 			}
-
-			if prof {
-
-				go anna.StartProfiling()
-				startTime := time.Now()
+			if !prof {
 				annaCmd.VanillaRender()
+			}
+			if prof {
+				annaCmd.VanillaRender()
+
+				// go anna.StartProfiling()
+				// startTime := time.Now()
+				// annaCmd.VanillaRender()
 				elapsedTime := time.Now().Sub(startTime)
 				// aPrintStats(elapsedTime)
 				go anna.PrintStats(elapsedTime)
