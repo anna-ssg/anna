@@ -11,31 +11,22 @@
 <body>
     <nav class="navbar">
         <div class="navbar-header">
-            <h1 class="navbar-title">🧙 Setup Wizard</h1>
-            <div class="progress-circle">
-                <div class="progress"></div>
-                <span class="emoji">🍚</span>
-            </div>
+            <h1 class="navbar-title">Setup Wizard 🍚</h1>
         </div>
     </nav>
 
     <div class="container">
         <div id="wizard" class="slide">
             <div class="content">
-                <h2>Setup your Anna site</h2>
-                <div class="input-group">
-                    <input type="text" id="author" required placeholder="Enter an author name" oninput="checkFormValidity()">
-                </div>
-                <div class="nav-buttons">
-                    <button onclick="nextSlide()" id="nextButton" disabled>Next</button>
-                </div>
+                <h2>Get started!</h2>
+                <div class="input-group"><input type="text" id="author" required placeholder="Enter an author name" oninput="checkFormValidity()"></div>
+                <div class="nav-buttons"><button onclick="nextSlide()" id="authorButton" disabled>Next</button></div>
             </div>
             <div class="content">
-                <h2>Name your site</h2>
-                <div class="input-group"><input type="text" id="siteTitle" required placeholder="ex: my blog" oninput="checkFormValidity()"></div>
+                <h2>Name your site</h2><div class="input-group"><input type="text" id="siteTitle" required placeholder="ex: my blog" oninput="checkFormValidity()"></div>
                 <div class="nav-buttons">
                     <button onclick="prevSlide()">&larr;</button>
-                    <button onclick="nextSlide()" id="nextButton2" disabled>Next &rarr;</button>
+                    <button onclick="nextSlide()" id="siteTitleButton" disabled>Next &rarr;</button>
                 </div>
             </div>
             <div class="content">
@@ -43,7 +34,7 @@
                 <div class="input-group"><input type="text" id="baseURL" required placeholder="ex: https://anna.github.io" oninput="checkFormValidity()"></div>
                 <div class="nav-buttons">
                     <button onclick="prevSlide()">&larr;</button>
-                    <button onclick="nextSlide()" id="nextButton3" disabled>Next &rarr;</button>
+                    <button onclick="nextSlide()" id="baseURLButton" disabled>Next &rarr;</button>
                 </div>
             </div>
             <div class="content">
@@ -67,7 +58,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script> -->
     <script src="script.js"></script>
 </body>
 

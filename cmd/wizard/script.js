@@ -1,5 +1,8 @@
-let currentSlide = 0;
 const slides = document.querySelectorAll('.content');
+let currentSlide = 0;
+
+// Declare global variables
+let author, siteTitle, baseURL, themeURL;
 
 function showSlide(index) {
     slides.forEach((slide, i) => {
@@ -18,37 +21,35 @@ function prevSlide() {
 }
 
 function checkFormValidity() {
-    var author = document.getElementById("author").value;
-    var siteTitle = document.getElementById("siteTitle").value;
-    var baseURL = document.getElementById("baseURL").value;
-    var themeURL = document.getElementById("themeURL").value;
+    author = document.getElementById("author").value;
+    siteTitle = document.getElementById("siteTitle").value;
+    baseURL = document.getElementById("baseURL").value;
+    themeURL = document.getElementById("themeURL").value;
 
-    var nextButton = document.getElementById("nextButton");
-    var nextButton2 = document.getElementById("nextButton2");
-    var nextButton3 = document.getElementById("nextButton3");
+    var nameRegex = /^[a-zA-Z0-9\s]+$/;
+    var urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*$/;
+    
+    var authorButton = document.getElementById("authorButton");
+    var siteTitleButton = document.getElementById("siteTitleButton");
+    var baseURLButton = document.getElementById("baseURLButton");
 
-    nextButton.disabled = !(author);
-    nextButton2.disabled = !(siteTitle);
-    nextButton3.disabled = !(baseURL);
+    authorButton.disabled = !(author && author.match(nameRegex));
+    siteTitleButton.disabled = !(siteTitle && siteTitle.match(nameRegex));
+    baseURLButton.disabled = !(baseURL && baseURL.match(urlRegex));
+
+    // Add or remove 'valid' class based on validity
+    document.getElementById("author").classList.toggle("valid", author && author.match(nameRegex));
+    document.getElementById("siteTitle").classList.toggle("valid", siteTitle && siteTitle.match(nameRegex));
+    document.getElementById("baseURL").classList.toggle("valid", baseURL && baseURL.match(urlRegex));
 }
 
 function submitForm() {
-    var author = document.getElementById("author").value;
-    var siteTitle = document.getElementById("siteTitle").value;
-    var baseURL = document.getElementById("baseURL").value;
-    var themeURL = document.getElementById("themeURL").value;
-
-    if (!author.trim() || !siteTitle.trim() || !baseURL.trim() || !themeURL.trim()) {
-        alert("Please fill out all fields.");
-        return;
-    }
-
     var formData = JSON.stringify({
         "author": author,
         "siteTitle": siteTitle,
         "baseURL": baseURL,
         "themeURL": themeURL,
-        "navbar": "index,about"
+        "navbar": "index"
     });
 
     showSlide(slides.length - 1);
@@ -60,7 +61,13 @@ function submitForm() {
 
     setTimeout(() => {
         window.location.href = 'http://localhost:8000';
-    }, 3000); // 3s
+    }, 3000);
 }
 
 showSlide(0);
+
+// Add event listeners to call checkFormValidity when input fields change
+document.getElementById("author").addEventListener("input", checkFormValidity);
+document.getElementById("siteTitle").addEventListener("input", checkFormValidity);
+document.getElementById("baseURL").addEventListener("input", checkFormValidity);
+document.getElementById("themeURL").addEventListener("input", checkFormValidity);
