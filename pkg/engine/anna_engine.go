@@ -7,6 +7,7 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
@@ -46,19 +47,25 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	}
 
 	// Rendering the subpages with merged tagged posts
+	var wg sync.WaitGroup
 	for tag, taggedTemplates := range e.TagsMap {
-		pagePath := "tags/" + tag
-		templateData := parser.TemplateData{
-			FilenameWithoutExtension: tag,
-			Layout:                   e.LayoutConfig,
-			Frontmatter: parser.Frontmatter{
-				Title: tag,
-			},
-			SpecificTagTemplates: taggedTemplates,
-		}
+		wg.Add(1)
+		go func(tag string, taggedTemplates []parser.TemplateData) {
+			defer wg.Done()
+			pagePath := "tags/" + tag
+			templateData := parser.TemplateData{
+				FilenameWithoutExtension: tag,
+				Layout:                   e.LayoutConfig,
+				Frontmatter: parser.Frontmatter{
+					Title: tag,
+				},
+				SpecificTagTemplates: taggedTemplates,
+			}
 
-		e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
+			e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
+		}(tag, taggedTemplates)
 	}
+	wg.Wait()
 }
 
 func (e *Engine) GenerateSitemap(outFilePath string) {
