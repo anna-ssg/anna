@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// StartProfiling()
+// func StartProfiling() {
 // startTime := time.Now()
 // if prof {
 // 	go func() {
@@ -20,21 +20,20 @@ import (
 // }
 // generator.StartLiveReload(addr)
 // }
-//
 
 // if validateHTML {
 // 				anna.ValidateHTMLContent()
 // 			}
-// 			// if prof {
+// 			if prof {
 
 // 			generator.RenderSite("")
 
-// 			// 	elapsedTimesince := time.Since(startTime) //this didn't work for some reason and was giving negitive deviation
-// 			// 	// elapsedTime := time.Now().Sub(startTime)
+// 				elapsedTimesince := time.Since(startTime) //this didn't work for some reason and was giving negitive deviation
+// 				// elapsedTime := time.Now().Sub(startTime)
 
-// // 	PrintStats(elapsedTimesince)
-// // 	// PrintStats(elapsedTime)
-// // 	defer StopProfiling()
+// 	PrintStats(elapsedTimesince)
+// 	PrintStats(elapsedTime)
+// 	defer StopProfiling()
 // // }
 
 func PrintStats(elapsedTime time.Duration) {

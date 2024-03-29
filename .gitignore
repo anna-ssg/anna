@@ -5,3 +5,5 @@ anna
 *.exe
 **/.DS_Store
 *.pprof
+ssg/
+*.txt
