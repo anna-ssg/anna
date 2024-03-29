@@ -30,9 +30,9 @@ func main() {
 			}
 
 			if prof {
-
-				go anna.StartProfiling()
 				startTime := time.Now()
+				go anna.StartProfiling()
+
 				annaCmd.VanillaRender()
 				elapsedTime := time.Now().Sub(startTime)
 				// aPrintStats(elapsedTime)
