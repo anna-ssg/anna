@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/acmpesuecc/anna/cmd/anna"
 	"github.com/spf13/cobra"
@@ -29,7 +30,14 @@ func main() {
 			}
 
 			if prof {
-				cmd.Println("TODO: To be filled later")
+
+				go anna.StartProfiling()
+				startTime := time.Now()
+				annaCmd.VanillaRender()
+				elapsedTime := time.Now().Sub(startTime)
+				// aPrintStats(elapsedTime)
+				go anna.PrintStats(elapsedTime)
+				defer anna.StopProfiling()
 			}
 
 			if validateHTML {
