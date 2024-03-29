@@ -10,6 +10,7 @@ import (
 func main() {
 	var serve bool
 	var addr string
+	var webconsole bool
 	var renderDrafts bool
 	var validateHTML bool
 	var prof bool
@@ -28,11 +29,21 @@ func main() {
 			}
 
 			if prof {
-				// TODO: To be filled later
+				cmd.Println("TODO: To be filled later")
 			}
 
 			if validateHTML {
 				// anna.ValidateHTMLContent()
+				cmd.Println("TODO: To be filled later")
+			}
+
+			if webconsole {
+				server := anna.NewWizardServer(":8080")
+				go server.Start()
+				<-anna.FormSubmittedCh // wait for response
+				server.Stop()          // stop the server
+				annaCmd.VanillaRender()
+				annaCmd.StartLiveReload()
 			}
 			annaCmd.VanillaRender()
 		},
@@ -43,6 +54,7 @@ func main() {
 	rootCmd.Flags().BoolVarP(&renderDrafts, "draft", "d", false, "renders draft posts")
 	rootCmd.Flags().BoolVarP(&validateHTML, "validate-html", "v", false, "validate semantic HTML")
 	rootCmd.Flags().BoolVarP(&prof, "prof", "p", false, "enable profiling")
+	rootCmd.Flags().BoolVarP(&webconsole, "webconsole", "w", false, "wizard to setup anna")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
