@@ -1,7 +1,6 @@
 package helpers_test
 
 import (
-	"fmt"
 	"io/fs"
 	"log"
 	"testing"
@@ -21,7 +20,6 @@ func TestCopyDirectoryContents(t *testing.T) {
 		}
 
 		fs.WalkDir(fsMock, ".", func(path string, d fs.DirEntry, err error) error {
-			fmt.Printf("%s\n", path)
 			return nil
 		})
 

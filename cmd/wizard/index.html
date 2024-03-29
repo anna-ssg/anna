@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Wizard</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-header">
+            <h1 class="navbar-title">🧙 Setup Wizard</h1>
+            <div class="progress-circle">
+                <div class="progress"></div>
+                <span class="emoji">🍚</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="wizard" class="slide">
+            <div class="content">
+                <h2>Setup your Anna site</h2>
+                <div class="input-group">
+                    <input type="text" id="author" required placeholder="Enter an author name" oninput="checkFormValidity()">
+                </div>
+                <div class="nav-buttons">
+                    <button onclick="nextSlide()" id="nextButton" disabled>Next</button>
+                </div>
+            </div>
+            <div class="content">
+                <h2>Name your site</h2>
+                <div class="input-group"><input type="text" id="siteTitle" required placeholder="ex: my blog" oninput="checkFormValidity()"></div>
+                <div class="nav-buttons">
+                    <button onclick="prevSlide()">&larr;</button>
+                    <button onclick="nextSlide()" id="nextButton2" disabled>Next &rarr;</button>
+                </div>
+            </div>
+            <div class="content">
+                <h2>Enter a domain name</h2>
+                <div class="input-group"><input type="text" id="baseURL" required placeholder="ex: https://anna.github.io" oninput="checkFormValidity()"></div>
+                <div class="nav-buttons">
+                    <button onclick="prevSlide()">&larr;</button>
+                    <button onclick="nextSlide()" id="nextButton3" disabled>Next &rarr;</button>
+                </div>
+            </div>
+            <div class="content">
+                <h2>Choose a Theme</h2>
+                <div class="input-group">
+                    <select id="themeURL" required oninput="checkFormValidity()">
+                        <option value="/static/style.css" selected>default</option>
+                        <option value="https://sudhir.live/static/style.css">Sudhir</option>
+                        <option value="https://hegde.live/static/style.css">Hegde</option>
+                        <option value="https://raw.githubusercontent.com/polarhive/sushi/main/style.css">sushi</option>
+                    </select>
+                </div>
+                <div class="nav-buttons">
+                    <button onclick="prevSlide()">&larr;</button>
+                    <button onclick="submitForm()">Submit</button>
+                </div>
+            </div>
+            <div class="content" id="final-slide">
+                <h2>Cooking your Anna site</h2>
+                <p>Your Anna site is being cooked. This page will reload...</p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,9 +1,10 @@
 navbar:
-    - index
-    - docs
-    - tags
-    - posts
-baseURL: https://ssg-test-org.github.io
+  - index
+  - docs
+  - tags
+  - posts
+baseURL: https://anna-docs.netlify.app
 siteTitle: ssg
 siteScripts:
 author: Anna
+themeURL: "/static/style.css"
