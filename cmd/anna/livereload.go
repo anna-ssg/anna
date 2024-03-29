@@ -29,7 +29,7 @@ func newLiveReload() *liveReload {
 		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		fileTimes:   make(map[string]time.Time),
 		rootDirs:    []string{helpers.SiteDataPath},
-		extensions:  []string{".go", ".md"},
+		extensions:  []string{".go", ".md", ".yml"},
 	}
 	return &lr
 }
