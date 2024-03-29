@@ -166,7 +166,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		return Frontmatter{}, "", false
 	}
 
-	regex := regexp.MustCompile(`title: (.*)`)
+	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
