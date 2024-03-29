@@ -22,9 +22,10 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 
 ## install
 
-``` text
-go install github.com/acmpesuecc/anna@latest 
+```text
+go install github.com/acmpesuecc/anna@latest
 ```
 
 ---
+
 This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)

@@ -1,5 +1,11 @@
 # Anna
 
+![Test Workflow](https://github.com/acmpesuecc/anna/actions/workflows/tests.yml/badge.svg)
+
+![Build Workflow](https://github.com/acmpesuecc/anna/actions/workflows/build.yml/badge.svg)
+
+![GitHub Repo Stars](https://img.shields.io/github/stars/acmpesuecc/Anna)
+
 ```text
     ___
    /   |  ____  ____  ____ _
@@ -34,7 +40,7 @@ cd anna
 go run .
 ```
 
-### The detailed documentation of the SSG can be found [here](https://anna-docs.netlify.app/)\_
+### The detailed documentation of the SSG can be found [here](https://anna-docs.netlify.app/)
 
 ---
 

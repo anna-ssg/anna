@@ -1,4 +1,4 @@
-package ssg
+package anna
 
 import (
 	"fmt"
@@ -7,36 +7,42 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/acmpesuecc/anna/pkg/helpers"
 )
 
 type liveReload struct {
-	errorLogger   *log.Logger
-	fileTimes     map[string]time.Time
-	rootDirs      []string
-	extensions    []string
+	errorLogger *log.Logger
+	fileTimes   map[string]time.Time
+
+	// Directories to monitor, so add or remove as needed
+	rootDirs []string
+
+	// File extensions to monitor
+	extensions []string
+
 	serverRunning bool
 }
 
-func newLiveReload(logger *log.Logger) *liveReload {
+func newLiveReload() *liveReload {
 	lr := liveReload{
-		errorLogger: logger,
+		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		fileTimes:   make(map[string]time.Time),
-		rootDirs:    []string{SiteDataPath}, // Directories to monitor, so add or remove as needed
-		extensions:  []string{".go", ".md"}, // File extensions to monitor
+		rootDirs:    []string{helpers.SiteDataPath},
+		extensions:  []string{".go", ".md"},
 	}
-
 	return &lr
 }
 
-func (g *Generator) StartLiveReload(addr string) {
+func (cmd *Cmd) StartLiveReload() {
 	fmt.Println("Live Reload is active")
-	lr := newLiveReload(g.ErrorLogger)
-	go lr.startServer(addr)
+	lr := newLiveReload()
+	go lr.startServer(cmd.Addr)
 
 	for {
 		for _, rootDir := range lr.rootDirs {
 			if lr.traverseDirectory(rootDir) {
-				g.RenderSite(addr)
+				cmd.VanillaRender()
 			}
 		}
 		if !lr.serverRunning {
@@ -91,7 +97,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 
 func (lr *liveReload) startServer(addr string) {
 	fmt.Print("Serving content at: http://localhost:", addr, "\n")
-	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir(SiteDataPath+"./rendered")))
+	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir(helpers.SiteDataPath+"./rendered")))
 	if err != nil {
 		lr.errorLogger.Fatal(err)
 	}

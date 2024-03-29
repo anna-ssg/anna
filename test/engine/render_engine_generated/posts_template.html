@@ -1,0 +1,21 @@
+{{ define "posts"}}
+<body>
+
+<div class="body">
+<div class="posts">
+{{range $PostDate, $Post := .Posts}}
+<a class="post-card" href="posts/{{$Post.FilenameWithoutExtension}}.html">
+<div class="post-card-div">
+<div class="post-card description">
+<h3>{{$Post.Frontmatter.Title}}</h3>
+<p>{{$Post.Frontmatter.Description}}</p>
+</div>
+<p>{{$Post.Frontmatter.Date}}</p>
+</div>
+</a>
+{{end}}
+</div>
+</div>
+</body>
+</html>
+{{ end}}
