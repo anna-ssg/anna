@@ -7,3 +7,4 @@ baseURL: https://anna-docs.netlify.app
 siteTitle: ssg
 siteScripts:
 author: Anna
+themeURL: "/static/style.css"
