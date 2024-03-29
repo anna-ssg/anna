@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
@@ -12,13 +13,6 @@ import (
 type postsTemplateData struct {
 	Posts []parser.TemplateData
 	parser.TemplateData
-}
-
-func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Template) {
-	for _, templData := range e.Templates {
-		fileInPath, _ := strings.CutSuffix(string(templData.CompleteURL), ".html")
-		e.RenderPage(fileOutPath, template.URL(fileInPath), templData, templ, "page")
-	}
 }
 
 func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, templ *template.Template) {
@@ -45,20 +39,19 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, templ *template.
 	}
 }
 
-/*
-func ParallelCode() {
-	// Adhesh's code
+func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Template) {
+
 	var wg sync.WaitGroup
 	concurrency := 3
 	// Each goroutine handles 3 files at a time
 	semaphore := make(chan struct{}, concurrency)
 
-	files := make([]string, 0, len(e.Templates))
-	for pagePath := range e.Templates {
-		files = append(files, string(pagePath))
+	templateURLs := make([]string, 0, len(e.Templates))
+	for templateURL := range e.Templates {
+		templateURLs = append(templateURLs, string(templateURL))
 	}
 
-	for _, file := range files {
+	for _, templateURL := range templateURLs {
 		wg.Add(1)
 		// Acquire semaphore
 		semaphore <- struct{}{}
@@ -70,11 +63,10 @@ func ParallelCode() {
 				wg.Done()
 			}()
 
-			pageURL := template.URL(file)
-			templateData := e.Templates[pageURL]
-			e.RenderPage(fileOutPath, pageURL, templateData, templ, "page")
-		}(file)
+			templData := e.Templates[template.URL(templateURL)]
+			fileInPath, _ := strings.CutSuffix(string(templData.CompleteURL), ".html")
+			e.RenderPage(fileOutPath, template.URL(fileInPath), templData, templ, "page")
+		}(templateURL)
 	}
 	wg.Wait()
 }
-*/
