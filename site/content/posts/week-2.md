@@ -38,11 +38,15 @@ tags:
 
 # Adhesh’s Progress
 
-- tofill
+- Implemented parallel rendering pipelines.
+- Improved parallel rendering and calculation of concurrency factor.
+- Cleaned and refactored code to improvise performance.
+
 
 ## What's next?
 
-- tofill
+- Split Parallel rendering pipelines for tags and content files.
+- Implement work-stealing.
 
 ---
 
