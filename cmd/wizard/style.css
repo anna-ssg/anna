@@ -135,3 +135,15 @@ select[required]:invalid::placeholder {
         width: var(--new-width);
     }
 }
+
+.nav-checkboxes input[type="checkbox"]+label {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.nav-checkboxes label {
+    font-size: 18px;
+    color: var(--text-color);
+}
