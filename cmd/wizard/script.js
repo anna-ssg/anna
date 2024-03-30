@@ -8,6 +8,11 @@ function showSlide(index) {
     slides.forEach((slide, i) => {
         slide.style.display = i === index ? 'block' : 'none';
     });
+    updateProgress()
+}
+
+function updateProgress() {
+    document.querySelector(".progress-container").style.width = ((currentSlide + 1) / slides.length) * 100 + "%";
 }
 
 function nextSlide() {
@@ -212,7 +217,8 @@ function submitForm() {
 
 
     tsParticles.load("confetti", confettiSettings);
-
+    currentSlide=currentSlide+1;
+    updateProgress()
     setTimeout(() => {
         window.location.href = 'http://localhost:8000';
     }, 3000);
@@ -230,7 +236,7 @@ document.getElementById("themeURL").addEventListener("input", checkFormValidity)
 const confettiSettings = {
     particles: {
         number: {
-            value: 50
+            value: 25
         },
         size: {
             value: 3

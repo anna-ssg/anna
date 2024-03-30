@@ -3,6 +3,7 @@
     --secondary-color: #fcfcfc;
     --text-color: #000000;
     --warning-color: #e60023;
+    --progress-color: #35db6c;
     --accent-color: #0059ff;
     --padding-size: 15px;
     --slide-padding: 20px;
@@ -115,4 +116,20 @@ select[required]:invalid::placeholder {
 
 .nav-buttons button:first-child {
     background-color: var(--primary-color);
+}
+
+.progress-container {
+    height: 2px;
+    background-color: var(--progress-color);
+    box-shadow: 0 0 5px var(--progress-color);
+}
+
+@keyframes progressAnimation {
+    from {
+        width: 0%;
+    }
+
+    to {
+        width: var(--new-width);
+    }
 }
