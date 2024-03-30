@@ -19,11 +19,14 @@
         <div id="wizard" class="slide">
             <div class="content">
                 <h2>Get started!</h2>
-                <div class="input-group"><input type="text" id="author" required placeholder="Enter an author name" oninput="checkFormValidity()"></div>
+                <div class="input-group"><input type="text" id="author" required placeholder="Enter an author name"
+                        oninput="checkFormValidity()"></div>
                 <div class="nav-buttons"><button onclick="nextSlide()" id="authorButton" disabled>Next</button></div>
             </div>
             <div class="content">
-                <h2>Name your site</h2><div class="input-group"><input type="text" id="siteTitle" required placeholder="ex: my blog" oninput="checkFormValidity()"></div>
+                <h2>Name your site</h2>
+                <div class="input-group"><input type="text" id="siteTitle" required placeholder="ex: my blog"
+                        oninput="checkFormValidity()"></div>
                 <div class="nav-buttons">
                     <button onclick="prevSlide()">&larr;</button>
                     <button onclick="nextSlide()" id="siteTitleButton" disabled>Next &rarr;</button>
@@ -31,7 +34,8 @@
             </div>
             <div class="content">
                 <h2>Enter a domain name</h2>
-                <div class="input-group"><input type="text" id="baseURL" required placeholder="ex: https://anna.github.io" oninput="checkFormValidity()"></div>
+                <div class="input-group"><input type="text" id="baseURL" required
+                        placeholder="ex: https://anna.github.io" oninput="checkFormValidity()"></div>
                 <div class="nav-buttons">
                     <button onclick="prevSlide()">&larr;</button>
                     <button onclick="nextSlide()" id="baseURLButton" disabled>Next &rarr;</button>
@@ -44,7 +48,6 @@
                         <option value="/static/style.css" selected>default</option>
                         <option value="https://sudhir.live/static/style.css">Sudhir</option>
                         <option value="https://hegde.live/static/style.css">Hegde</option>
-                        <option value="https://raw.githubusercontent.com/polarhive/sushi/main/style.css">sushi</option>
                     </select>
                 </div>
                 <div class="nav-buttons">
@@ -58,7 +61,7 @@
             </div>
         </div>
     </div>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 
