@@ -7,6 +7,8 @@
     --accent-color: #0059ff;
     --padding-size: 15px;
     --slide-padding: 20px;
+    --old-width: 0%;
+    --new-width: 0%;
     --container-border-radius: 1rem;
 }
 
@@ -126,7 +128,7 @@ select[required]:invalid::placeholder {
 
 @keyframes progressAnimation {
     from {
-        width: 0%;
+        width: var(--old-width);
     }
 
     to {

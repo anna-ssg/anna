@@ -8,11 +8,16 @@ function showSlide(index) {
     slides.forEach((slide, i) => {
         slide.style.display = i === index ? 'block' : 'none';
     });
-    updateProgress()
+    updateProgress();
 }
 
 function updateProgress() {
-    document.querySelector(".progress-container").style.width = ((currentSlide + 1) / slides.length) * 100 + "%";
+    const progressContainer = document.querySelector(".progress-container");
+    const oldWidth = window.getComputedStyle(progressContainer).getPropertyValue('--new-width');
+    const newWidth = ((currentSlide + 1) / slides.length) * 100 + "%";
+    progressContainer.style.setProperty('--old-width', oldWidth);
+    progressContainer.style.setProperty('--new-width', newWidth);
+    progressContainer.style.animation = 'progressAnimation 1s ease-in-out both';
 }
 
 function nextSlide() {
@@ -32,8 +37,8 @@ function checkFormValidity() {
     themeURL = document.getElementById("themeURL").value;
 
     var nameRegex = /^[a-zA-Z0-9\s]+$/;
-    var urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*$/;
-
+    var urlRegex = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})(\/[^\/\s]+)*$/;
+                        
     var authorButton = document.getElementById("authorButton");
     var siteTitleButton = document.getElementById("siteTitleButton");
     var baseURLButton = document.getElementById("baseURLButton");
@@ -217,11 +222,11 @@ function submitForm() {
 
 
     tsParticles.load("confetti", confettiSettings);
-    currentSlide=currentSlide+1;
+    currentSlide = currentSlide + 1;
     updateProgress()
     setTimeout(() => {
         window.location.href = 'http://localhost:8000';
-    }, 3000);
+    }, 5000);
 }
 
 showSlide(0);
@@ -236,10 +241,10 @@ document.getElementById("themeURL").addEventListener("input", checkFormValidity)
 const confettiSettings = {
     particles: {
         number: {
-            value: 25
+            value: 10
         },
         size: {
-            value: 3
+            value: 2
         },
         shape: {
             type: "circle"
