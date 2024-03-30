@@ -31,18 +31,18 @@ func TestRenderUserDefinedPages(t *testing.T) {
 
 	t.Run("render a set of user defined pages", func(t *testing.T) {
 
-		templ, err := template.ParseFiles(TestDirPath + "engine/render_user_defined/template_input.html")
+		templ, err := template.ParseFiles(TestDirPath + "render_user_defined/template_input.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
-		engine.RenderUserDefinedPages(TestDirPath+"engine/render_user_defined/", templ)
+		engine.RenderUserDefinedPages(TestDirPath+"render_user_defined/", templ)
 
-		want_index_file, err := os.ReadFile(TestDirPath + "engine/render_user_defined/want_index.html")
+		want_index_file, err := os.ReadFile(TestDirPath + "render_user_defined/want_index.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		got_index_file, err := os.ReadFile(TestDirPath + "engine/render_user_defined/rendered/index.html")
+		got_index_file, err := os.ReadFile(TestDirPath + "render_user_defined/rendered/index.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -51,12 +51,12 @@ func TestRenderUserDefinedPages(t *testing.T) {
 			t.Errorf("The expected and generated index.html can be found in test/engine/render_user_defined/rendered/")
 		}
 
-		want_post_hello, err := os.ReadFile(TestDirPath + "engine/render_user_defined/want_post_hello.html")
+		want_post_hello, err := os.ReadFile(TestDirPath + "render_user_defined/want_post_hello.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		got_post_hello, err := os.ReadFile(TestDirPath + "engine/render_user_defined/rendered/posts/hello.html")
+		got_post_hello, err := os.ReadFile(TestDirPath + "render_user_defined/rendered/posts/hello.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
