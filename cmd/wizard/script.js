@@ -38,7 +38,7 @@ function checkFormValidity() {
 
     var nameRegex = /^[a-zA-Z0-9\s]+$/;
     var urlRegex = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})(\/[^\/\s]+)*$/;
-                        
+
     var authorButton = document.getElementById("authorButton");
     var siteTitleButton = document.getElementById("siteTitleButton");
     var baseURLButton = document.getElementById("baseURLButton");
@@ -53,13 +53,19 @@ function checkFormValidity() {
     document.getElementById("baseURL").classList.toggle("valid", baseURL && baseURL.match(urlRegex));
 }
 
+
 function submitForm() {
+    var checkboxes = document.querySelectorAll('.nav-checkboxes input[type="checkbox"]');
+    var navbarOptions = Array.from(checkboxes)
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.value);
+
     var formData = JSON.stringify({
         "author": author,
         "siteTitle": siteTitle,
         "baseURL": baseURL,
         "themeURL": themeURL,
-        "navbar": "index"
+        "navbar": navbarOptions
     });
 
     showSlide(slides.length - 1);

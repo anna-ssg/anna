@@ -42,26 +42,42 @@
                 </div>
             </div>
             <div class="content">
-                <h2>Choose a Theme</h2>
-                <div class="input-group">
-                    <select id="themeURL" required oninput="checkFormValidity()">
-                        <option value="/static/style.css" selected>default</option>
-                        <option value="https://sudhir.live/static/style.css">Sudhir</option>
-                        <option value="https://hegde.live/static/style.css">Hegde</option>
-                        <option value="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">Pico CSS</option>
-                        <option value="https://cdn.simplecss.org/simple.css">Simple CSS</option>
-                    </select>
+                <h2>Pick what you'd like on the navbar</h2>
+                <div class="nav-checkboxes">
+                    <label><input type="checkbox" id="navbar-index" checked value="index">home</label><br>
+                    <label><input type="checkbox" id="navbar-about" value="about">about</label><br>
+                    <label><input type="checkbox" id="navbar-posts" value="contact">posts</label><br>
+                    <label><input type="checkbox" id="navbar-tags" value="contact">tags</label><br>
+                    <label><input type="checkbox" id="navbar-contact" value="contact">contact</label><br>
                 </div>
                 <div class="nav-buttons">
-                    <button onclick="prevSlide()">&larr;</button>
-                    <button onclick="submitForm()">Submit</button>
                 </div>
-            </div>
-            <div class="content" id="final-slide">
-                <h2>Cooking your Anna site</h2>
-                <p>Your Anna site is being cooked. This page will reload...</p>
+                <button onclick="prevSlide()">&larr;</button>
+                <button onclick="nextSlide()" id="baseURLButton">Next &rarr;</button>
             </div>
         </div>
+
+        <div class="content">
+            <h2>Choose a Theme</h2>
+            <div class="input-group">
+                <select id="themeURL" required oninput="checkFormValidity()">
+                    <option value="/static/style.css" selected>default</option>
+                    <option value="https://sudhir.live/static/style.css">Sudhir</option>
+                    <option value="https://hegde.live/static/style.css">Hegde</option>
+                    <option value="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">Pico CSS</option>
+                    <option value="https://cdn.simplecss.org/simple.css">Simple CSS</option>
+                </select>
+            </div>
+            <div class="nav-buttons">
+                <button onclick="prevSlide()">&larr;</button>
+                <button onclick="submitForm()">Submit</button>
+            </div>
+        </div>
+        <div class="content" id="final-slide">
+            <h2>Cooking your Anna site</h2>
+            <p>Your Anna site is being cooked. This page will reload...</p>
+        </div>
+    </div>
     </div>
     <script defer async src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
     <script defer src="script.js"></script>
