@@ -18,6 +18,7 @@ type Config struct {
 	SiteScripts []string `yaml:"siteScripts"`
 	Author      string   `yaml:"author"`
 	ThemeURL    string   `yaml:"themeURL"`
+	Navbar      []string `yaml:"navbar"`
 }
 
 type WizardServer struct {
