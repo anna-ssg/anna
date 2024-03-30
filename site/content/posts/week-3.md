@@ -49,10 +49,17 @@ tags:
 
 # Nathan’s Progress
 
-- tofill
+- Implemented an interactive web based wizard to help a user bootstrap their anna site
+  - The intial build wrote the json blob to disk; now it passes it as a POST request to the webserver itself over port `8080` (may conflict)
+  - So far it lets you pick a fill metadata, pick a theme and preview your site
+  - It auto validates fields using regex as you proceed
+  - Also: an animated progressbar and other easter-eggs (confetti??) 
 
 ## What's next?
 
-- tofill
+- Improve UX by dogfooding and collecting feedback from new users
+- Theme triaging and cataloging (basic hugo compatability)
+- Bootstrap `site` dir, if the user didn't already have one, using `go-git` and add basic git-submodule support for themes
+- Implement go best practices: (auto generate docs, tag releases and known bugs)
 
 ---

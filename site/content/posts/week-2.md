@@ -52,10 +52,11 @@ tags:
 
 # Nathan’s Progress
 
-- tofill
+- chore/build: Build and deploy anna using Netlify [#11, #48](https://github.com/acmpesuecc/anna/pull/48)
+- chore/build: switch to Makefile [#49](https://github.com/acmpesuecc/anna/pull/49)
 
 ## What's next?
 
-- tofill
+- Implement a gui/wizard to configure the `config.yml`
 
 ---
