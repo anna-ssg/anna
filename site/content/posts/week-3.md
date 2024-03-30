@@ -29,11 +29,21 @@ tags:
 
 # Adhesh’s Progress
 
-- tofill
+- Re-implemented cobra CLI for the restructed codebase.
+- Re-implemented Parallel rendering pipelines for redering tags and content files separately.
+- Improved profiling.
+- Refactored code to improve performance.
+- Worked on content indexing.
 
 ## What's next?
 
-- tofill
+- Implement content indexing and site wide content search.
+- Improve existing GUI:
+  - Add project directory browser.
+  - Add Theme browser.
+- Implement new flags to provide refined control on resource management.
+  - -c / --concurrency to set limit on number of goroutines.
+- Implement integration with hosting services to auto host project.
 
 ---
 
