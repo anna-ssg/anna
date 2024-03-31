@@ -2,7 +2,6 @@ package anna
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -40,8 +39,15 @@ func CreateIndex() {
 		panic(err)
 	}
 
-	// Write the JSON data to a file
-	err = ioutil.WriteFile("site\\static\\scripts\\index.json", jsonData, 0644)
+	// Open the file for writing
+	file, err := os.Create("site\\static\\scripts\\index.json")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	// Write the JSON data to the file
+	_, err = file.Write(jsonData)
 	if err != nil {
 		panic(err)
 	}
