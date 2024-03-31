@@ -16,6 +16,8 @@
         id="searchSiteInput"
         name="searchSite"
         required
+        autocomplete="off"
+
     />
 </form>
 <div id="result"></div>
@@ -28,7 +30,7 @@
             const searchValue =
                 document.getElementById("searchSiteInput").value;
 
-            const url = "static/scripts/merged.json";
+            const url = "/static/scripts/merged.json";
 
             fetch(url)
                 .then((response) => {
