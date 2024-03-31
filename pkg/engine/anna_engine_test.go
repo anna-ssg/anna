@@ -1,6 +1,7 @@
 package engine_test
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"os"
@@ -106,6 +107,47 @@ func TestRenderTags(t *testing.T) {
 
 		if !slices.Equal(got_tech_file, want_tech_file) {
 			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+		}
+	})
+}
+
+func TestGenerateMergedJson(t *testing.T) {
+	t.Run("test json creation from e.Templates", func(t *testing.T) {
+		e := engine.Engine{
+			Templates:   make(map[template.URL]parser.TemplateData),
+			TagsMap:     make(map[string][]parser.TemplateData),
+			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		}
+
+		e.Templates["docs.md"] =
+			parser.TemplateData{
+				FilenameWithoutExtension: "docs",
+				CompleteURL:              "docs.html",
+				Frontmatter: parser.Frontmatter{
+					Title: "Anna Documentation",
+				},
+			}
+
+		// use theParseJsonMerged method
+		e.GenerateMergedJson(TestDirPath + "merged_data_test")
+
+		// read off from the generated json file and want_merged.json
+
+		got_json, err := os.ReadFile(TestDirPath + "/merged_data_test/static/merged.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_json, err := os.ReadFile(TestDirPath + "/merged_data_test/want_merged.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		got_json = bytes.TrimSpace(got_json)
+		want_json = bytes.TrimSpace(want_json)
+
+		if !slices.Equal(got_json, want_json) {
+			t.Errorf("The expected and generated json can be found in test/layout/")
 		}
 	})
 }

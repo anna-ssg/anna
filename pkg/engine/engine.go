@@ -33,6 +33,14 @@ type Engine struct {
 	ErrorLogger *log.Logger
 }
 
+// This structure is solely used for the merged data json generation
+type JsonTemplateData struct {
+	CompleteURL              template.URL
+	FilenameWithoutExtension string
+	Frontmatter              parser.Frontmatter
+	Tags                     []string
+}
+
 // fileOutPath for main.go should be refering to helpers.SiteDataPath
 func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, pageTemplateData parser.TemplateData, templ *template.Template, templateStartString string) {
 	// Creating subdirectories if the filepath contains '/'

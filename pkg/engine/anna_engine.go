@@ -3,6 +3,7 @@ package engine
 import (
 	"bytes"
 	"cmp"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"os"
@@ -61,6 +62,43 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 
 		e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
 	}
+}
+
+func (e *Engine) GenerateMergedJson(outFilePath string) {
+	// This function is extracting data off of the e.Templates array that has all
+	// required data for creating the merged json file with the data from all
+	// posts and pages contained in the side. The merged.json file will be created
+	// even when the site isnt being served (part of cmd/anna/anna.go)
+	jsonFile, err := os.Create(outFilePath + "/static/merged.json")
+	if err != nil {
+		jsonFile.Close()
+		e.ErrorLogger.Fatal(err)
+	}
+
+	// Copying contents from e.Templates to new JsonMerged struct
+	jsonMergedData := make(map[template.URL]JsonTemplateData)
+	for templateURL, templateData := range e.Templates {
+		jsonMergedData[templateURL] = JsonTemplateData{
+			CompleteURL:              templateData.CompleteURL,
+			FilenameWithoutExtension: templateData.FilenameWithoutExtension,
+			Frontmatter:              templateData.Frontmatter,
+			Tags:                     templateData.Tags,
+		}
+	}
+
+	// Marshasl the contents of the jsonMergedData
+	jsonMergedMarshaledData, err := json.Marshal(jsonMergedData)
+	if err != nil {
+		jsonFile.Close()
+		e.ErrorLogger.Fatal(err)
+	}
+
+	_, err = jsonFile.Write(jsonMergedMarshaledData)
+	if err != nil {
+		jsonFile.Close()
+		e.ErrorLogger.Fatal(err)
+	}
+	jsonFile.Close()
 }
 
 func (e *Engine) GenerateSitemap(outFilePath string) {

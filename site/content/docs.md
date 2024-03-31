@@ -52,6 +52,7 @@ The ssg currently requires the following directory structure
 │    └ /rendered (This directory is created by the ssg)
 └── /test (Stores mock data required to test the SSG)
     ├── /engine
+    │   ├── /merged_data_test
     │   ├── /render_engine_generated
     │   ├── /render_page
     │   ├── /render_tags
