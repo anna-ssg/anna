@@ -11,6 +11,27 @@
             <div class="tag">
                 <a href="/tags/{{.}}.html">{{.}}</a>
             </div>
+            <label for="urlInput">Website URL:</label>
+            <input type="text" id="urlInput" placeholder="Enter website URL">
+        
+            <label for="keywordInput">Keyword:</label>
+            <input type="text" id="keywordInput" placeholder="Enter keyword">
+        
+            <button onclick="performSearch()">Search</button>
+        
+            <script>
+                function performSearch() {
+                    // Retrieve values from input fields
+                    var url = document.getElementById("urlInput").value;
+                    var keyword = document.getElementById("keywordInput").value;
+        
+                    // Call the search function passing URL and keyword
+                    var searchResult = search(url, keyword);
+        
+                    // Display search result (example: print to console)
+                    console.log("Search Result:", searchResult);
+                }
+            </script>
             {{end}}
         </div>
         {{.Body}}
