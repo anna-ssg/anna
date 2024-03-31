@@ -39,6 +39,7 @@ func main() {
 			}
 			if !prof {
 				annaCmd.VanillaRender()
+
 			}
 			if prof {
 				annaCmd.VanillaRender()
@@ -68,6 +69,7 @@ func main() {
 			annaCmd.VanillaRender()
 		},
 	}
+	go anna.CreateIndex()
 
 	rootCmd.Flags().BoolVarP(&serve, "serve", "s", false, "serve the rendered content")
 	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "ip address to serve rendered content to")
@@ -79,4 +81,5 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
+
 }
