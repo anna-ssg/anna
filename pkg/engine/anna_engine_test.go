@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/acmpesuecc/anna/pkg/engine"
@@ -110,7 +111,6 @@ func TestRenderTags(t *testing.T) {
 	})
 }
 
-/*
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		engine := engine.Engine{
@@ -160,22 +160,36 @@ func TestGenerateSitemap(t *testing.T) {
 
 		// Remove spaces and whitespace characters
 
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), " ", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), " ", ""))
-		// // Replace all tabs
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\t", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\t", ""))
+		/*
+			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), " ", ""))
+			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), " ", ""))
+			// Replace all tabs
+			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\t", ""))
+			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\t", ""))
 
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\n", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\n", ""))
-		// got_sitemap_string := string(got_sitemap)
-		// strings.TrimFunc(got_sitemap_string, func(r rune) bool {
+			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\n", ""))
+			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\n", ""))
+			got_sitemap_string := string(got_sitemap)
+			strings.TrimFunc(got_sitemap_string, func(r rune) bool {
+				return r == '\n' || r == '\t' || r == ' '
+			})
 
-		// })
+			if strings.Compare(string(got_sitemap), string(want_sitemap)) != 0 {
+				t.Errorf("The expected and generated sitemap can be found in test/layout/sitemap/")
+			}
+		*/
 
-		if strings.Compare(string(got_sitemap), string(want_sitemap)) != 0 {
+		got_sitemap_string := string(got_sitemap)
+		want_sitemap_string := string(want_sitemap)
+		got_sitemap_string = strings.TrimFunc(got_sitemap_string, func(r rune) bool {
+			return r == '\n' || r == '\t' || r == ' '
+		})
+		want_sitemap_string = strings.TrimFunc(want_sitemap_string, func(r rune) bool {
+			return r == '\n' || r == '\t' || r == ' '
+		})
+
+		if strings.Compare(got_sitemap_string, want_sitemap_string) == 0 {
 			t.Errorf("The expected and generated sitemap can be found in test/layout/sitemap/")
 		}
 	})
 }
-*/
