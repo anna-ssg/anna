@@ -266,9 +266,9 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	return templ
 }
 
-func (p *Parser) ParseJsonMerged() {
+func (p *Parser) ParseJsonMerged(fileOutPath string) {
 	// create a json file
-	jsonFile, err := os.Create(helpers.SiteDataPath + "/static/scripts/merged.json")
+	jsonFile, err := os.Create(fileOutPath + "/static/merged.json")
 	if err != nil {
 		jsonFile.Close()
 		p.ErrorLogger.Fatal(err)

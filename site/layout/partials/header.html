@@ -30,7 +30,7 @@
             const searchValue =
                 document.getElementById("searchSiteInput").value;
 
-            const url = "/static/scripts/merged.json";
+            const url = "/static/merged.json";
 
             fetch(url)
                 .then((response) => {
@@ -48,8 +48,6 @@
                             title =
                                 data[key]["Frontmatter"]["Title"].toLowerCase();
                             if (title.includes(searchValue.toLowerCase())) {
-                                console.log(data[key]["Frontmatter"]["Title"]);
-
                                 var a = document.createElement("a");
                                 a.innerHTML = data[key]["Frontmatter"]["Title"];
                                 a.href = data[key]["CompleteURL"];

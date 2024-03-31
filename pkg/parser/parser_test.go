@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"os"
@@ -166,6 +167,47 @@ func TestParseRobots(t *testing.T) {
 		}
 		if !slices.Equal(got_robots_txt, want_robots_txt) {
 			t.Errorf("The expected and generated robots.txt can be found in test/layout/robots_txt/")
+		}
+	})
+}
+
+func TestParseJsonMerged(t *testing.T) {
+	t.Run("test json creation from p.Templates", func(t *testing.T) {
+		p := parser.Parser{
+			Templates:   make(map[template.URL]parser.TemplateData),
+			TagsMap:     make(map[string][]parser.TemplateData),
+			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		}
+
+		p.Templates["docs.md"] =
+			parser.TemplateData{
+				FilenameWithoutExtension: "docs",
+				CompleteURL:              "docs.html",
+				Frontmatter: parser.Frontmatter{
+					Title: "Anna Documentation",
+				},
+			}
+
+		// use theParseJsonMerged method
+		p.ParseJsonMerged(TestDirPath)
+
+		// read off from the generated json file and want_merged.json
+
+		got_json, err := os.ReadFile(TestDirPath + "static/merged.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_json, err := os.ReadFile(TestDirPath + "static/want_merged.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		got_json = bytes.TrimSpace(got_json)
+		want_json = bytes.TrimSpace(want_json)
+
+		if !slices.Equal(got_json, want_json) {
+			t.Errorf("The expected and generated json can be found in test/layout/")
 		}
 	})
 }

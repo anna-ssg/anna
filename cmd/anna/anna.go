@@ -55,7 +55,7 @@ func (cmd *Cmd) VanillaRender() {
 
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/layout/sitemap.xml")
 	e.GenerateFeed()
-	p.ParseJsonMerged()
+	p.ParseJsonMerged(helpers.SiteDataPath)
 
 	sort.Slice(e.Posts, func(i, j int) bool {
 		return e.Posts[i].Frontmatter.Date > e.Posts[j].Frontmatter.Date
