@@ -73,6 +73,28 @@ nav {
     }
 }
 
+#searchSiteInput {
+    background: #11111a;
+    color: white;
+    border: 1px solid #5990ac;
+    border-radius: 5px;
+    margin-left: 1rem;
+    padding: 0.5rem;
+    ::placeholder {
+        color: white;
+    }
+    &:focus {
+        outline: none;
+    }
+    $:active {
+        outline: none;
+    }
+}
+
+#result {
+    margin-left: 1rem;
+}
+
 a {
     color:#5990ac;
     text-decoration: none;
@@ -177,7 +199,7 @@ iframe {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
-    
+
     & > a {
         font-size: 1.2rem;
         background-color: #1e1e1e;
@@ -186,7 +208,7 @@ iframe {
         margin: .3rem;
 
     }
-    
+
 }
 
 .tag-placeholder {
@@ -363,7 +385,7 @@ blockquote {
     nav {
         font-size: 1.05rem;
     }
-    
+
     iframe {
         width: auto;
         height: auto;
@@ -388,7 +410,7 @@ blockquote {
     margin-top: 2rem;
     margin-bottom: 2rem;
     }
-    
+
 
     .body {
         & > a,
@@ -407,7 +429,7 @@ blockquote {
         & > p,
         & > .post-card-div > p {
             font-size: .9rem;
-        } 
+        }
 
         & > h3 {
             font-size: 1.3rem;
@@ -423,5 +445,3 @@ blockquote {
         height: auto;
     }
 }
-
-
