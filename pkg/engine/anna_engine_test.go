@@ -1,6 +1,7 @@
 package engine_test
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"os"
@@ -63,7 +64,6 @@ func TestRenderTags(t *testing.T) {
 	e.RenderTags(fileOutPath, templ)
 
 	t.Run("render tag.html", func(t *testing.T) {
-
 		got_tags_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
@@ -80,7 +80,6 @@ func TestRenderTags(t *testing.T) {
 	})
 
 	t.Run("render tag-subpage.html", func(t *testing.T) {
-
 		got_blogs_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/blogs.html")
 		if err != nil {
 			t.Errorf("%v", err)
@@ -107,6 +106,44 @@ func TestRenderTags(t *testing.T) {
 
 		if !slices.Equal(got_tech_file, want_tech_file) {
 			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+		}
+	})
+}
+
+
+func TestGenerateMergedJson(t *testing.T) {
+	t.Run("test json creation from e.Templates", func(t *testing.T) {
+		e := engine.Engine{
+			Templates:   make(map[template.URL]parser.TemplateData),
+			TagsMap:     make(map[string][]parser.TemplateData),
+			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		}
+
+		e.Templates["docs.md"] = parser.TemplateData{
+			FilenameWithoutExtension: "docs",
+			CompleteURL:              "docs.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "Anna Documentation",
+			},
+		}
+
+		e.GenerateJSONIndex(TestDirPath + "merged_data_test")
+
+		got_json, err := os.ReadFile(TestDirPath + "/merged_data_test/static/index.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		want_json, err := os.ReadFile(TestDirPath + "/merged_data_test/want_index.json")
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		got_json = bytes.TrimSpace(got_json)
+		want_json = bytes.TrimSpace(want_json)
+
+		if !slices.Equal(got_json, want_json) {
+			t.Errorf("The expected and generated json can be found in test/layout/")
 		}
 	})
 }
@@ -157,27 +194,6 @@ func TestGenerateSitemap(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error in reading the contents of _sitemap.xml")
 		}
-
-		// Remove spaces and whitespace characters
-
-		/*
-			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), " ", ""))
-			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), " ", ""))
-			// Replace all tabs
-			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\t", ""))
-			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\t", ""))
-
-			got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\n", ""))
-			want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\n", ""))
-			got_sitemap_string := string(got_sitemap)
-			strings.TrimFunc(got_sitemap_string, func(r rune) bool {
-				return r == '\n' || r == '\t' || r == ' '
-			})
-
-			if strings.Compare(string(got_sitemap), string(want_sitemap)) != 0 {
-				t.Errorf("The expected and generated sitemap can be found in test/layout/sitemap/")
-			}
-		*/
 
 		got_sitemap_string := string(got_sitemap)
 		want_sitemap_string := string(want_sitemap)
