@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"archive/zip"
 	"fmt"
 	"io"
 	"log"
@@ -105,4 +106,62 @@ func (h *Helper) Bootstrap() {
 		return
 	}
 	log.Println("Downloaded successfully")
+	ext()
+}
+
+func ext() {
+	zipFilePath := "anna-repo.zip"
+
+	// Open the zip file
+	zipFile, err := zip.OpenReader(zipFilePath)
+	if err != nil {
+		fmt.Println("Error opening zip file:", err)
+		return
+	}
+	defer zipFile.Close()
+
+	// Extract each file from the zip archive
+	for _, file := range zipFile.File {
+		// Open file from zip archive
+		zippedFile, err := file.Open()
+		if err != nil {
+			fmt.Println("Error opening zipped file:", err)
+			return
+		}
+		defer zippedFile.Close()
+
+		// Create the file in the extraction directory
+		extractedFilePath := file.Name
+		if file.FileInfo().IsDir() {
+			os.MkdirAll(extractedFilePath, file.Mode())
+		} else {
+			extractedFile, err := os.OpenFile(extractedFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+			if err != nil {
+				fmt.Println("Error creating extracted file:", err)
+				return
+			}
+			defer extractedFile.Close()
+
+			_, err = io.Copy(extractedFile, zippedFile)
+			if err != nil {
+				fmt.Println("Error extracting file:", err)
+				return
+			}
+		}
+	}
+
+	helper := &Helper{
+		ErrorLogger: log.New(os.Stderr, "ERROR: ", log.LstdFlags),
+	}
+	helper.CopyDirectoryContents("anna-main/site/", "site/")
+
+	if err := os.RemoveAll("anna-main"); err != nil {
+		log.Println("Error deleting directory:", err)
+	}
+
+	if err := os.RemoveAll("anna-repo.zip"); err != nil {
+		log.Println("Error deleting zip file:", err)
+	}
+	log.Println("Bootstrapped base theme")
+
 }
