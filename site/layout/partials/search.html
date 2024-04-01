@@ -1,19 +1,10 @@
-{{define "header"}}
-<header>
-  <nav>
-    {{range .Layout.Navbar}} {{ if eq . "index" }}
-    <a href="/">[{{ $.Layout.Author }}]</a>
-    {{else}}
-    <a href="/{{.}}.html">[{{.}}]</a>
-    {{end}} {{end}}
-  </nav>
-</header>
+{{define "search"}}
 <form class="siteSearch" id="searchSite">
-  <input type="text" placeholder="Serach Site" id="searchSiteInput" name="searchSite" required autocomplete="off" />
+  <input type="text" placeholder="Search Site" id="searchSiteInput" name="searchSite" required autocomplete="off" />
 </form>
-<div id="result"></div>
+<div id="site_search_result"></div>
 <script>
-  var resultDiv = document.getElementById("result");
+  var resultDiv = document.getElementById("site_search_result");
   document
     .getElementById("searchSite")
     .addEventListener("keyup", function (e) {
@@ -21,7 +12,7 @@
       const searchValue =
         document.getElementById("searchSiteInput").value;
 
-      const url = "/static/merged.json";
+      const url = "/static/index.json";
 
       fetch(url)
         .then((response) => {
@@ -41,7 +32,7 @@
               if (title.includes(searchValue.toLowerCase())) {
                 var a = document.createElement("a");
                 a.innerHTML = data[key]["Frontmatter"]["Title"];
-                a.href = data[key]["CompleteURL"];
+                a.href = `/${data[key]["CompleteURL"]}`;
                 resultDiv.appendChild(a);
                 resultDiv.appendChild(
                   document.createElement("br"),
@@ -49,7 +40,7 @@
               }
             }
           } else {
-            document.getElementById("result").innerHTML = "";
+            document.getElementById("site_search_result").innerHTML = "";
           }
         })
         .catch((error) => {

@@ -63,7 +63,6 @@ func TestRenderTags(t *testing.T) {
 	e.RenderTags(fileOutPath, templ)
 
 	t.Run("render tag.html", func(t *testing.T) {
-
 		got_tags_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
@@ -80,7 +79,6 @@ func TestRenderTags(t *testing.T) {
 	})
 
 	t.Run("render tag-subpage.html", func(t *testing.T) {
-
 		got_blogs_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/blogs.html")
 		if err != nil {
 			t.Errorf("%v", err)
@@ -119,26 +117,22 @@ func TestGenerateMergedJson(t *testing.T) {
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
 
-		e.Templates["docs.md"] =
-			parser.TemplateData{
-				FilenameWithoutExtension: "docs",
-				CompleteURL:              "docs.html",
-				Frontmatter: parser.Frontmatter{
-					Title: "Anna Documentation",
-				},
-			}
+		e.Templates["docs.md"] = parser.TemplateData{
+			FilenameWithoutExtension: "docs",
+			CompleteURL:              "docs.html",
+			Frontmatter: parser.Frontmatter{
+				Title: "Anna Documentation",
+			},
+		}
 
-		// use theParseJsonMerged method
-		e.GenerateMergedJson(TestDirPath + "merged_data_test")
+		e.GenerateJSONIndex(TestDirPath + "merged_data_test")
 
-		// read off from the generated json file and want_merged.json
-
-		got_json, err := os.ReadFile(TestDirPath + "/merged_data_test/static/merged.json")
+		got_json, err := os.ReadFile(TestDirPath + "/merged_data_test/static/index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_json, err := os.ReadFile(TestDirPath + "/merged_data_test/want_merged.json")
+		want_json, err := os.ReadFile(TestDirPath + "/merged_data_test/want_index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
