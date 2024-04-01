@@ -4,6 +4,11 @@ date: 2024-04-01
 type: post
 tags:
   - progress
+authors:
+  - Adhesh
+  - Aditya
+  - Anirudh
+  - Nathan
 ---
 
 # Week-3

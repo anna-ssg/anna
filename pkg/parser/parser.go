@@ -2,13 +2,12 @@ package parser
 
 import (
 	"bytes"
-	"regexp"
-
 	"html/template"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -36,6 +35,7 @@ type Frontmatter struct {
 	Description  string   `yaml:"description"`
 	PreviewImage string   `yaml:"previewimage"`
 	Tags         []string `yaml:"tags"`
+	Authors      []string `yaml:"authors"`
 }
 
 // This struct holds all of the data required to render any page of the site
@@ -60,7 +60,7 @@ type Parser struct {
 	// Access the data for a particular page by using the relative path to the file as the key
 	Templates map[template.URL]TemplateData
 
-	//K-V pair storing all templates correspoding to a particular tag in the site
+	// K-V pair storing all templates correspoding to a particular tag in the site
 	TagsMap map[string][]TemplateData
 
 	// Stores data parsed from layout/config.yml

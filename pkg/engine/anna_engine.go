@@ -3,7 +3,7 @@ package engine
 import (
 	"bytes"
 	"cmp"
-	"fmt"
+	"encoding/json"
 	"html/template"
 	"os"
 	"slices"
@@ -63,6 +63,42 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	}
 }
 
+func (e *Engine) GenerateJSONIndex(outFilePath string) {
+	// This function creates an index of the site for search
+	// It extracts data from the e.Templates slice
+	// The index.json file is created during every VanillaRender()
+
+	jsonFile, err := os.Create(outFilePath + "/static/index.json")
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+	defer jsonFile.Close()
+
+	// Copying contents from e.Templates to new JsonMerged struct
+	jsonIndexTemplate := make(map[template.URL]JSONIndexTemplate)
+	for templateURL, templateData := range e.Templates {
+		jsonIndexTemplate[templateURL] = JSONIndexTemplate{
+			CompleteURL:              templateData.CompleteURL,
+			FilenameWithoutExtension: templateData.FilenameWithoutExtension,
+			Frontmatter:              templateData.Frontmatter,
+			Tags:                     templateData.Frontmatter.Tags,
+		}
+	}
+
+	e.JSONIndex = jsonIndexTemplate
+
+	// Marshal the contents of jsonMergedData
+	jsonMergedMarshaledData, err := json.Marshal(jsonIndexTemplate)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+
+	_, err = jsonFile.Write(jsonMergedMarshaledData)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+}
+
 func (e *Engine) GenerateSitemap(outFilePath string) {
 	var buffer bytes.Buffer
 	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -82,7 +118,6 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 
 	e.Templates = tempTemplates
 
-	fmt.Println(e.LayoutConfig.BaseURL)
 	// Iterate over parsed markdown files
 	for _, templateData := range e.Templates {
 		url := e.LayoutConfig.BaseURL + "/" + templateData.FilenameWithoutExtension + ".html"
