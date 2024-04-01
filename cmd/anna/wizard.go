@@ -35,7 +35,7 @@ func NewWizardServer(addr string) *WizardServer {
 
 func (ws *WizardServer) Start() {
 	http.HandleFunc("/submit", ws.handleSubmit)
-	fs := http.FileServer(http.Dir("./cmd/wizard"))
+	fs := http.FileServer(http.Dir("./site/static/wizard"))
 	http.Handle("/", fs)
 	fmt.Printf("Wizard is running at: http://localhost%s\n", ws.server.Addr)
 	if err := ws.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
