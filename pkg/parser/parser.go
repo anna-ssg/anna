@@ -208,6 +208,14 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
+	// Check if the configuration file exists
+	_, err := os.Stat(inFilePath)
+	if os.IsNotExist(err) {
+		p.Helper.Bootstrap()
+		return
+	}
+
+	// Read and parse the configuration file
 	configFile, err := os.ReadFile(inFilePath)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
@@ -245,14 +253,6 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
-	// Check if the 'site/layouts' folder exists
-	if _, err := os.Stat(helpers.SiteDataPath + "layout"); os.IsNotExist(err) {
-		// Call the function to handle repository cloning
-		if err := p.Helper.CloneRepository("https://github.com/acmpesuecc/anna.git", "site/"); err != nil {
-			log.Fatal(err)
-		}
-		log.Println("Repository cloned successfully.")
-	}
 
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")

@@ -1,11 +1,13 @@
 package helpers
 
 import (
+	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 
-	git "github.com/go-git/go-git/v5"
+	"github.com/cheggaaa/pb/v3"
 )
 
 const SiteDataPath string = "site/"
@@ -73,14 +75,34 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 	}
 }
 
-func (h *Helper) CloneRepository(repoURL, destPath string) error {
-	_, err := git.PlainClone(destPath, false, &git.CloneOptions{
-		URL:      repoURL,
-		Progress: os.Stdout,
-	})
+func (h *Helper) Bootstrap() {
+	log.Println("Downloading base theme")
+	url := "https://github.com/acmpesuecc/anna/archive/refs/heads/main.zip"
+	output, err := os.Create("anna-repo.zip")
 	if err != nil {
-		h.ErrorLogger.Fatal(err)
-		return err
+		fmt.Println("Error creating output file:", err)
+		return
 	}
-	return nil
+	defer output.Close()
+	response, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error downloading:", err)
+		return
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		fmt.Println("Error: Server returned status", response.Status)
+		return
+	}
+
+	bar := pb.Full.Start64(response.ContentLength)
+	defer bar.Finish()
+	reader := bar.NewProxyReader(response.Body)
+
+	_, err = io.Copy(output, reader)
+	if err != nil {
+		fmt.Println("Error copying:", err)
+		return
+	}
+	log.Println("Downloaded successfully")
 }
