@@ -75,18 +75,20 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	defer jsonFile.Close()
 
 	// Copying contents from e.Templates to new JsonMerged struct
-	jsonMergedData := make(map[template.URL]JsonTemplateData)
+	jsonIndexTemplate := make(map[template.URL]JSONIndexTemplate)
 	for templateURL, templateData := range e.Templates {
-		jsonMergedData[templateURL] = JsonTemplateData{
+		jsonIndexTemplate[templateURL] = JSONIndexTemplate{
 			CompleteURL:              templateData.CompleteURL,
 			FilenameWithoutExtension: templateData.FilenameWithoutExtension,
 			Frontmatter:              templateData.Frontmatter,
-			Tags:                     templateData.Tags,
+			Tags:                     templateData.Frontmatter.Tags,
 		}
 	}
 
+	e.JSONIndex = jsonIndexTemplate
+
 	// Marshal the contents of jsonMergedData
-	jsonMergedMarshaledData, err := json.Marshal(jsonMergedData)
+	jsonMergedMarshaledData, err := json.Marshal(jsonIndexTemplate)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}

@@ -15,7 +15,7 @@ type Engine struct {
 	// Access the data for a particular page by using the relative path to the file as the key
 	Templates map[template.URL]parser.TemplateData
 
-	//K-V pair storing all templates correspoding to a particular tag in the site
+	// K-V pair storing all templates correspoding to a particular tag in the site
 	TagsMap map[string][]parser.TemplateData
 
 	// Stores data parsed from layout/config.yml
@@ -23,18 +23,16 @@ type Engine struct {
 
 	// Posts contains the template data of files in the posts directory
 	Posts []parser.TemplateData
-	// MdFilesName []string
-	// MdFilesPath []string
 
-	// Stores flag value to render draft posts
-	// RenderDrafts bool
+	// Stores the index generated for search functionality
+	JSONIndex map[template.URL]JSONIndexTemplate
 
 	// Common logger for all engine functions
 	ErrorLogger *log.Logger
 }
 
-// This structure is solely used for the merged data json generation
-type JsonTemplateData struct {
+// This structure is solely used for storing the JSON index
+type JSONIndexTemplate struct {
 	CompleteURL              template.URL
 	FilenameWithoutExtension string
 	Frontmatter              parser.Frontmatter

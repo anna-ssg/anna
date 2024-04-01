@@ -246,6 +246,20 @@ iframe {
   padding: 0.3rem;
 }
 
+.authors-placeholder {
+  display: flex;
+}
+
+.author {
+  display: inline-block;
+  background-color: #1e1e1e;
+  border-radius: 2px;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  width: fit-content;
+  padding: 0.3rem;
+}
+
 .posts {
   display: flex;
   flex-direction: column;
