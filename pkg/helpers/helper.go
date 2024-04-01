@@ -4,6 +4,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	git "github.com/go-git/go-git/v5"
 )
 
 const SiteDataPath string = "site/"
@@ -69,4 +71,16 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
+}
+
+func (h *Helper) CloneRepository(repoURL, destPath string) error {
+	_, err := git.PlainClone(destPath, false, &git.CloneOptions{
+		URL:      repoURL,
+		Progress: os.Stdout,
+	})
+	if err != nil {
+		h.ErrorLogger.Fatal(err)
+		return err
+	}
+	return nil
 }

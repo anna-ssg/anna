@@ -78,6 +78,8 @@ type Parser struct {
 
 	// Common logger for all parser functions
 	ErrorLogger *log.Logger
+
+	Helper *helpers.Helper
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
@@ -243,6 +245,15 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
+	// Check if the 'site/layouts' folder exists
+	if _, err := os.Stat(helpers.SiteDataPath + "layout"); os.IsNotExist(err) {
+		// Call the function to handle repository cloning
+		if err := p.Helper.CloneRepository("https://github.com/acmpesuecc/anna.git", "site/"); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Repository cloned successfully.")
+	}
+
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {
