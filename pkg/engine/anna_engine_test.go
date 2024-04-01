@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/acmpesuecc/anna/pkg/engine"
@@ -109,6 +110,7 @@ func TestRenderTags(t *testing.T) {
 	})
 }
 
+
 func TestGenerateMergedJson(t *testing.T) {
 	t.Run("test json creation from e.Templates", func(t *testing.T) {
 		e := engine.Engine{
@@ -146,7 +148,6 @@ func TestGenerateMergedJson(t *testing.T) {
 	})
 }
 
-/*
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		engine := engine.Engine{
@@ -194,24 +195,17 @@ func TestGenerateSitemap(t *testing.T) {
 			t.Errorf("Error in reading the contents of _sitemap.xml")
 		}
 
-		// Remove spaces and whitespace characters
+		got_sitemap_string := string(got_sitemap)
+		want_sitemap_string := string(want_sitemap)
+		got_sitemap_string = strings.TrimFunc(got_sitemap_string, func(r rune) bool {
+			return r == '\n' || r == '\t' || r == ' '
+		})
+		want_sitemap_string = strings.TrimFunc(want_sitemap_string, func(r rune) bool {
+			return r == '\n' || r == '\t' || r == ' '
+		})
 
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), " ", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), " ", ""))
-		// // Replace all tabs
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\t", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\t", ""))
-
-		// got_sitemap = []byte(strings.ReplaceAll(string(got_sitemap), "\n", ""))
-		// want_sitemap = []byte(strings.ReplaceAll(string(want_sitemap), "\n", ""))
-		// got_sitemap_string := string(got_sitemap)
-		// strings.TrimFunc(got_sitemap_string, func(r rune) bool {
-
-		// })
-
-		if strings.Compare(string(got_sitemap), string(want_sitemap)) != 0 {
+		if strings.Compare(got_sitemap_string, want_sitemap_string) == 0 {
 			t.Errorf("The expected and generated sitemap can be found in test/layout/sitemap/")
 		}
 	})
 }
-*/
