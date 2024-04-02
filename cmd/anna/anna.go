@@ -44,7 +44,7 @@ func (cmd *Cmd) VanillaRender() {
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
 
-	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/layout/robots.txt")
+	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
 
 	e.Templates = p.Templates
@@ -52,7 +52,7 @@ func (cmd *Cmd) VanillaRender() {
 	e.LayoutConfig = p.LayoutConfig
 	e.Posts = p.Posts
 
-	e.GenerateSitemap(helpers.SiteDataPath + "rendered/layout/sitemap.xml")
+	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
 	e.GenerateJSONIndex(helpers.SiteDataPath)
 	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
