@@ -27,10 +27,10 @@ This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.gi
 Once you have a directory structure, install `anna` using:
 
 ```sh
-go install github.com/acmpesuecc/anna@latest
+go install github.com/acmpesuecc/anna@v1.0.0-alpha 
 ```
 
-Or if you have git installed, clone our repository:
+Alternatively, clone our repository to build the latest version of anna:
 
 ```sh
 git clone github.com/acmpesuecc/anna --depth=1; cd anna
