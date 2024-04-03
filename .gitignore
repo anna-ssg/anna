@@ -4,7 +4,7 @@ anna
 !anna/
 *.exe
 **/.DS_Store
-*.pprof
+*.prof
 ssg/
 *.txt
 dist/
