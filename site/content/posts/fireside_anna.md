@@ -5,7 +5,7 @@ type: post
 draft: false
 description:
   This page contains a post about anna, a static site generator written in Go. This team
-  project was built as part of AIEP
+  project was built as part of AIEP 2024
 tags:
   - acm
   - hsp
@@ -29,16 +29,16 @@ small bump that stops us from doing so.
 
 Maintaining your personal site is like working with your own Neovim
 configuration. Every issue fixed would lead to an entirely unrelated bug. There
-is a lot of time spent fixing things rather than getting productive work
-done.
+is a lot of time spent fixing things rather than getting productive work done.
 
 A static site generator is an immensely useful application. It can simplify the
-whole process, allowing you to spend time and energy on quality content.
+whole process: allowing you to spend time and energy on quality content.
 
 There are several amazing SSGs out there, like [Hugo](https://gohugo.io/) and
 [11ty](https://www.11ty.dev/). Building your own SSG is an amazing learning
 experience. It also motivates one to maintain and improve their personal site.
 
+---
 ## Introduction
 
 ACM-PESU ECC conducts the ACM Industrial Experience Program (AIEP), an annual program that spans six weeks.
@@ -52,10 +52,10 @@ Our AIEP team consisted of [Adhesh](https://github.com/DedLad), [Aditya](https:/
 [Nathan](https://github.com/polarhive), and [Anirudh](https://github.com/anirudhsudhir).
 
 Our mentors (cool ass senior names!) gave us some great ideas for a team of us
-four freshers. We were puzzled whether to build a distributed Postgres clone
-or a load balancer. Deep discussions over a week got us to the topic of making
-blog sites and how tiring it is to work with, which only gets worse as you write
-more and more content for your internet home.
+four freshers. We were puzzled whether to build a distributed Postgres clone or
+a load balancer. Deep discussions over a week got us to the topic of making
+blog sites and how tiring it is to work with, which only gets worse as you
+write more and more content for your internet home.
 
 This and inspirations from [Saaru](https://github.com/anirudhRowjee/saaru) and
 [Sapling](https://github.com/NavinShrinivas/sapling) pushed us to tackle this
@@ -74,17 +74,22 @@ A static site generator in Go
 
 ## The small but big decision!
 
-Anna is written in Go. We considered writing it in Rust, but that came with a
-steep learning curve. Go is a powerful language and has excellent concurrency
-support, which suited our requirements to build a performant application.
-What's in the name
+Anna is written in [Go](https://go.dev). We considered writing it in Rust, but
+that came with a steep learning curve. Go is a powerful language and has
+excellent concurrency support, which suited our requirements to build a
+performant application. 
+
+### What's in a name?
 
 Probably the first thing that us four came across when joining ACM and HSP was
 the famous Saaru repository. [Saaru](https://github.com/anirudhRowjee/saaru),
-one of the projects that inspired our ssg, is derived from a [Kannada](https://en.wikipedia.org/wiki/Kannada) 
-word. Saaru is a thin lentil soup, usually served with rice.
+one of the projects that inspired our ssg, is derived from a [Kannada](https://en.wikipedia.org/wiki/Kannada) word. 
+Saaru is a thin lentil soup, usually served with rice.
 
-In Kannada, rice is referred to as 'anna'( ಅನ್ನ) pronounced <i>/ɐnːɐ/</i>
+> In Kannada, rice is referred to as 'anna'( ಅನ್ನ) pronounced <i>/ɐnːɐ/</i>
+
+This was just a playful stunt that we played. We plan on beating Saaru at
+buildtimes, optimizing at runtime.
 
 ---
 ## Genesis
@@ -115,34 +120,31 @@ toolchain or escaping dependency hell.
 domain names. Now their anna sites live on [hegde.live] and [sudhir.live]
 
 ---
-## Goals / Benchmarks?
+## Benchmarks! Can anna lift??
 
-In simple terms, to beat Saaru's render time (P.S. we did!). Something you probably never
-notice while deploying, but it is what pushed us to spend hours on this.
+In simple terms, to beat Saaru's render time (P.S. we did!). Something you
+probably never notice while deploying, but it is what pushed us to spend hours
+on this.
 
 Adhesh was pretty excited to pick up Go and implement profiling, shaving
-milliseconds off of builds as he implemented parallel rendering using
+milliseconds off-of build times, when he implemented parallel rendering using
 goroutines.
 
-## we cook! 🍳
+> - Switched to a two goroutine system
+> - The main goroutine runs the application and renders pages
+> - The second goroutine runs the local web server
+> - Eliminated locks and restarting of application on file modification
 
-![anna-bench](/static/images/posts/fireside-anna/bench.png)
+After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing
+parallel rendering and profiling to the table
 
-> Here are some of the screenshots out of our group chats, that demonstrates the same
+## We cook! 🍳
 
----
-## Live reload
+![anna-bench](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png)
 
-### prototype
-
-- The initial proto
-
-### Improvements
-
-- Switched to a two goroutine system
-- The main goroutine runs the application and renders pages
-- The second goroutine runs the local web server
-- Eliminated locks and restarting of application on file modification
+> Here are some screenshots out of our group chats, that demonstrate build
+> times, profiling et-al when having 1000s of markdown files or in this case
+> just copy-pasting a single markdown file en-mass!
 
 ---
 ## A big rewrite (when we went for a TDD approach)
@@ -189,16 +191,21 @@ pkg
 - Wrote a benchmark for main.go that times the entire application
 
 ---
-## To search or not to search?? 🤔
+## To search or not to search? 🤔
 
-We were wondering if we’d need a search function on our site since google.com
-and any other search engine index our site anyway. If we needed to implement
-it, we had a constraint: we could not use an API. It had to be static and local
-to be user-friendly. Aditya and Anirudh implemented a JSON index generator that
-uses Deep Data Merge to index posts on our site.
+We were wondering if we’d need a search function on our site since Google and
+any other web-crawler index our site anyway. If we needed to implement it, we
+had a constraint: we could not use an API. It had to be static and local to be
+user-friendly. Aditya and Anirudh implemented a JSON index generator that uses
+Deep Data Merge to index posts on our site. This is built at runtime and works 
+without any lag or noticeable delay when searching across posts.
 
 ---
 ## JS integration as plugins
+
+Aditya added a field to our frontmatter which lets you pick and add certain JS
+based snippets to your site. This way, you get to add `highlight.js` support, analytics scripts 
+and donation page widgets, that you can source from the static/scripts folder.
 
 ---
 ## Wizard
@@ -211,9 +218,26 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-![anna-wiz](/static/images/posts/fireside-anna/wizard.png)
+![anna-wiz](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.png)
 
-## changelog
+### Raw HTML
+
+What if you'd want to add a contact form to your site? or embedd YouTube videos or iframes of your choosing?
+
+Anna let's us do that! Although, the point of a static site generator is to
+quickly get to writing and focusing on the content. You can still embedd js
+elements and iframe as needed to showcase any interesting YouTube videos or 
+to just rickroll people!
+
+## Tags
+
+You can tag posts by hand, at the start of each markdown file and you get a
+nice sub-page on your site so readers can discover similar content or browser
+by category.
+
+---
+#### changelog: showcasing important additions --- as the weeks proceeded
+
 Nathan:
 
 - feat: implement sitemap.xml by @polarhive in #17
@@ -228,10 +252,9 @@ Adhesh:
 
 Anirudh:
 
-## Tags
-
-- Organizing posts into collections based on tags
-- Reverse search for posts of a certain category
+- Tags
+ - Organizing posts into collections based on tags
+ - Reverse search for posts of a certain category
 
 Aditya:
 
@@ -239,3 +262,9 @@ Aditya:
 - feat: implement drafts by @bwaklog in #9
 - feat: chronological feed, js plugins (eg: light.js, prism.js) by @bwaklog in #32
 - feat: json generator implementation along with a site wide search bar by @bwaklog in #70
+
+---
+# Feedback?
+
+> Have any questions or feature requests you'd like to add?
+
