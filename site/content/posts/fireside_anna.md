@@ -38,7 +38,7 @@ is a lot of time spent fixing things rather than getting productive work done.
 
 > A static site generator is an immensely useful application
 
-![](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/lighthouse.png)
+![](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/lighthouse.png)
 
 It can simplify the whole process: allowing you to spend time and energy 
 on quality content. Keep reading to find out how we designed anna `v1.0.0`
@@ -149,7 +149,7 @@ Here are some screenshots out of our group chats, that demonstrate build
 times, profiling et-al when having 1000s of markdown files or in this case 
 just copy-pasting a single markdown file en-mass!
 
-![anna-bench](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png)
+![anna-bench](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png)
 
 > After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing parallel rendering and profiling to the table
 
@@ -157,7 +157,7 @@ just copy-pasting a single markdown file en-mass!
 
 Here's an SVG showing how much time each sys-call / process takes and how each block adds-up to render / build times
 
-![anna-profiling](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/cpu_prof.svg)
+![anna-profiling](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/cpu_prof.svg)
 
 You may wanna zoom-in about 3-4x times to get to see how our ssg works
 
@@ -220,7 +220,7 @@ This index is built at runtime and works without any lag or noticeable delay
 when searching across posts. We mean to re-write it using WASM if necessary 
 and if it costs us time when performing searches.
 
-![anna-search](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/search.gif)
+![anna-search](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/search.gif)
 
 ## JS integration as plugins
 
@@ -239,7 +239,7 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-![anna-search](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.gif)
+![anna-search](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.gif)
 
 ### Raw HTML
 
