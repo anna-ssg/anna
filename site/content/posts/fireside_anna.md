@@ -20,6 +20,11 @@ authors:
   - Anirudh
 ---
 
+There are several amazing SSGs out there, like [Hugo](https://gohugo.io/) and
+[11ty](https://www.11ty.dev/). Building your own SSG is an amazing learning
+experience. It also motivates one to maintain and improve their personal site.
+
+
 > Presented and written by Adhesh, Anirudh, Aditya and Nathan
 
 Building personal blogs from the ground up can be a *tedious process*. Some of us
@@ -31,12 +36,12 @@ Maintaining your personal site is like working with your own Neovim
 configuration. Every issue fixed would lead to an entirely unrelated bug. There
 is a lot of time spent fixing things rather than getting productive work done.
 
-A static site generator is an immensely useful application. It can simplify the
-whole process: allowing you to spend time and energy on quality content.
+> A static site generator is an immensely useful application
 
-There are several amazing SSGs out there, like [Hugo](https://gohugo.io/) and
-[11ty](https://www.11ty.dev/). Building your own SSG is an amazing learning
-experience. It also motivates one to maintain and improve their personal site.
+![](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/lighthouse.png)
+
+It can simplify the whole process: allowing you to spend time and energy 
+on quality content. Keep reading to find out how we designed anna `v1.0.0`
 
 ---
 ## Introduction
@@ -53,7 +58,9 @@ Our AIEP team consisted of [Adhesh](https://github.com/DedLad), [Aditya](https:/
 
 Our mentors (cool ass senior names!) gave us some great ideas for a team of us
 four freshers. We were puzzled whether to build a distributed Postgres clone or
-a load balancer. Deep discussions over a week got us to the topic of making
+a load balancer. 
+
+Deep discussions over a week got us to the topic of making
 blog sites and how tiring it is to work with, which only gets worse as you
 write more and more content for your internet home.
 
@@ -135,26 +142,35 @@ goroutines.
 > - The second goroutine runs the local web server
 > - Eliminated locks and restarting of application on file modification
 
-After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing
-parallel rendering and profiling to the table
-
+---
 ## We cook! 🍳
 
-![anna-bench](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png)
+Here are some screenshots out of our group chats, that demonstrate build
+times, profiling et-al when having 1000s of markdown files or in this case 
+just copy-pasting a single markdown file en-mass!
 
-> Here are some screenshots out of our group chats, that demonstrate build
-> times, profiling et-al when having 1000s of markdown files or in this case
-> just copy-pasting a single markdown file en-mass!
+![anna-bench](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png)
+
+> After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing parallel rendering and profiling to the table
+
+### profiling
+
+Here's an SVG showing how much time each sys-call / process takes and how each block adds-up to render / build times
+
+![anna-profiling](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/cpu_prof.svg)
+
+You may wanna zoom-in about 3-4x times to get to see how our ssg works
 
 ---
 ## A big rewrite (when we went for a TDD approach)
 
 Starting off this project, we kept adding functionality without optimization.
 We didn’t have a proper structure; PRs would keep breaking features and
-overwriting other functions. We proceeded to restructure our SSG into:
+overwriting functions written by fellow team-mates. 
 
-> modules previously part of `cmd/anna/utils.go` and `cmd/anna/main.go` were to
-> be split between `pkg/parsers/`, `pkg/engine/` and `pkg/helper`
+### A new proposed rendering system
+
+We proceeded to restructure our SSG into: modules previously part of `cmd/anna/utils.go` and `cmd/anna/main.go` were to be split between `pkg/parsers/`, `pkg/engine/` and `pkg/helper`
 
 ```text
 pkg
@@ -175,39 +191,44 @@ pkg
 	└── parser_integration_test.go
 ```
 
-### New proposed rendering system
+Currently there are two separate types of files that have to be rendered. One set includes user-defined files such as `index.md`, `docs.md` and various posts. These are specific to a user. 
 
-- Currently there are two separate types of files that have to be rendered. One set includes user-defined files such as `index.md`, `docs.md` and various posts. These are specific to a user.
-- The second set of files that are rendered include `tags.html`, `sub-tags.html` and `posts.html`
-- Now, the generator/engine has a method to render "anna specific" pages and another method to render "user defined" pages which include all the user pages and posts
+The second set of files that are rendered include `tags.html`, `sub-tags.html` and `posts.html`
+Now, the generator/engine has a method to render "anna specific" pages and another method to render "user defined" pages which include all the user pages and posts
 
-## Edit this:
+Here's some of Anirudh's work written during week-2
 
-- Refactored main.go to only handle flags
-- Wrote unit and integration tests for the parser and engine package
-- Split the rendering system to make parallelisation easier by switching to a three method system.
-- Render "user defined" pages which include all markdown files and posts (This method has been parallelised)
-- Render tags and tag-subpages separately, which could be parallelised in the future
-- Wrote a benchmark for main.go that times the entire application
+> - Refactored main.go to only handle flags
+> - Wrote unit and integration tests for the parser and engine package
+> - Split the rendering system to make parallelisation easier by switching to a three method system.
+> - Render "user defined" pages which include all markdown files and posts (This method has been parallelised)
+> - Render tags and tag-subpages separately, which could be parallelised in the future
+> - Wrote a benchmark for main.go that times the entire application
 
 ---
 ## To search or not to search? 🤔
 
+> That is the question > Is our *static site* becoming and at what cost?
+
 We were wondering if we’d need a search function on our site since Google and
 any other web-crawler index our site anyway. If we needed to implement it, we
-had a constraint: we could not use an API. It had to be static and local to be
-user-friendly. Aditya and Anirudh implemented a JSON index generator that uses
-Deep Data Merge to index posts on our site. This is built at runtime and works 
-without any lag or noticeable delay when searching across posts.
+had a constraint: we cannot use an API. It had to be static and local to be
+user-friendly to work with. Aditya and Anirudh implemented a JSON index generator 
+that uses "Deep Data Merge" to index posts on our site. 
 
----
+This index is built at runtime and works without any lag or noticeable delay 
+when searching across posts. We mean to re-write it using WASM if necessary 
+and if it costs us time when performing searches.
+
+![anna-search](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/search.gif)
+
 ## JS integration as plugins
 
 Aditya added a field to our frontmatter which lets you pick and add certain JS
 based snippets to your site. This way, you get to add `highlight.js` support, analytics scripts 
-and donation page widgets, that you can source from the static/scripts folder.
+and donation page widgets; that you can source from the `static/scripts` folder and toggle as 
+needed per-markdown page.
 
----
 ## Wizard
 
 Nathan proceeded to work on a GUI; a web-based wizard that let's a new user
@@ -218,7 +239,7 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-![anna-wiz](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.png)
+![anna-search](/https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.gif)
 
 ### Raw HTML
 
@@ -264,7 +285,20 @@ Aditya:
 - feat: json generator implementation along with a site wide search bar by @bwaklog in #70
 
 ---
-# Feedback?
+## Feedback? / Learnings
 
-> Have any questions or feature requests you'd like to add?
+We are at week: 3/6 and have a lot of things in store and bugs to squash! 
 
+> Feel free to ask any questions / send feature requests you'd like to see?
+
+This blog post misses out of many not-so well documented features and learnings that 
+we got during midnight calls and the patches we kept sending each other fixing trivial but
+interesting issues. Have a look at our [GitHub](https://github.com/acmpesuecc/anna/issues), for
+more
+
+---
+Today [anna](https://github.com/acmpesuecc/anna/releases/latest) is tagged at v1.0.0 and we use it on our personal sites:
+[hegde.live](https://hegde.live) // [sudhir.live](https://sudhir.live) // [polarhive.net](https://polarhive.net)
+
+---
+01100001 01101110 01101110 01100001
