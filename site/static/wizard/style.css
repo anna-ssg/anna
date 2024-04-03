@@ -1,0 +1,151 @@
+@import url(https://rsms.me/inter/inter.css);
+
+:root {
+    --primary-color: #1e92ff;
+    --secondary-color: #fcfcfc;
+    --text-color: #000000;
+    --warning-color: #e60023;
+    --progress-color: #35db6c;
+    --accent-color: #0059ff;
+    --padding-size: 15px;
+    --slide-padding: 20px;
+    --old-width: 0%;
+    --new-width: 0%;
+    --container-border-radius: 1rem;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter Display', sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.navbar {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: var(--padding-size) 30px;
+}
+
+.navbar-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+.container {
+    border-radius: var(--container-border-radius);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    padding: var(--slide-padding);
+    width: 80%;
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+.content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+input[type="text"],
+select,
+button {
+    width: calc(100% - 20px);
+    padding: var(--padding-size);
+    margin: 10px 0;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 16px;
+    font-weight: bold;
+    max-width: 80%;
+    background-color: #f8f8f8;
+    box-shadow: inset 0 0 0 0.1rem rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"]::placeholder {
+    color: #999;
+}
+
+/* Modify placeholder color only when input is invalid */
+input[type="text"]:not(.valid)::placeholder {
+    color: #999;
+}
+
+/* Modify input background only when input is invalid */
+input[type="text"]:not(.valid) {
+    color: var(--warning-color);
+}
+
+select {
+    background-color: #f8f8f8;
+    background-position: right 10px top 50%;
+    background-size: 8px auto;
+    padding: var(--padding-size) 30px var(--padding-size) 10px;
+}
+
+button {
+    cursor: pointer;
+    padding: var(--padding-size);
+    color: #fff;
+    background-color: var(--primary-color);
+    transition: background-color 0.3s ease;
+    border: none;
+    font-size: 18px;
+}
+
+button:hover {
+    background-color: var(--accent-color);
+}
+
+button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+input[type="text"][required]:invalid,
+select[required]:invalid {
+    border: 1px solid var(--warning-color);
+    box-shadow: none;
+    outline: none;
+}
+
+input[type="text"][required]:invalid::placeholder,
+select[required]:invalid::placeholder {
+    color: var(--warning-color);
+}
+
+.nav-buttons button:first-child {
+    background-color: var(--primary-color);
+}
+
+.progress-container {
+    height: 2px;
+    background-color: var(--progress-color);
+    box-shadow: 0 0 5px var(--progress-color);
+}
+
+@keyframes progressAnimation {
+    from {
+        width: var(--old-width);
+    }
+
+    to {
+        width: var(--new-width);
+    }
+}
+
+.nav-checkboxes input[type="checkbox"]+label {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.nav-checkboxes label {
+    font-size: 18px;
+    color: var(--text-color);
+}

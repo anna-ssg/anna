@@ -18,6 +18,7 @@ type Config struct {
 	SiteScripts []string `yaml:"siteScripts"`
 	Author      string   `yaml:"author"`
 	ThemeURL    string   `yaml:"themeURL"`
+	Navbar      []string `yaml:"navbar"`
 }
 
 type WizardServer struct {
@@ -34,7 +35,7 @@ func NewWizardServer(addr string) *WizardServer {
 
 func (ws *WizardServer) Start() {
 	http.HandleFunc("/submit", ws.handleSubmit)
-	fs := http.FileServer(http.Dir("./cmd/wizard"))
+	fs := http.FileServer(http.Dir("./site/static/wizard"))
 	http.Handle("/", fs)
 	fmt.Printf("Wizard is running at: http://localhost%s\n", ws.server.Addr)
 	if err := ws.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

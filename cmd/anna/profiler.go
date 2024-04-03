@@ -8,34 +8,6 @@ import (
 	"time"
 )
 
-// func StartProfiling() {
-// startTime := time.Now()
-// if prof {
-// 	go func() {
-// 		for {
-// 			time.Sleep(5 * time.Second) //change as per needed
-// 			PrintStats(time.Since(startTime))
-// 		}
-// 	}()
-// }
-// generator.StartLiveReload(addr)
-// }
-
-// if validateHTML {
-// 				anna.ValidateHTMLContent()
-// 			}
-// 			if prof {
-
-// 			generator.RenderSite("")
-
-// 				elapsedTimesince := time.Since(startTime) //this didn't work for some reason and was giving negitive deviation
-// 				// elapsedTime := time.Now().Sub(startTime)
-
-// 	PrintStats(elapsedTimesince)
-// 	PrintStats(elapsedTime)
-// 	defer StopProfiling()
-// // }
-
 func PrintStats(elapsedTime time.Duration) {
 	memStats := new(runtime.MemStats)
 	runtime.ReadMemStats(memStats)
@@ -43,7 +15,6 @@ func PrintStats(elapsedTime time.Duration) {
 	log.Printf("Time Elapsed: %s", elapsedTime)
 	cpuUsage := runtime.NumCPU()
 	threads := runtime.GOMAXPROCS(0)
-	// memStats := new(runtime.MemStats)
 	runtime.ReadMemStats(memStats)
 
 	log.Printf("Threads: %d", threads)

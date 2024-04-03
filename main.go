@@ -48,7 +48,6 @@ func main() {
 				// startTime := time.Now()
 				// annaCmd.VanillaRender()
 				elapsedTime := time.Now().Sub(startTime)
-				// aPrintStats(elapsedTime)
 				go anna.PrintStats(elapsedTime)
 				defer anna.StopProfiling()
 			}

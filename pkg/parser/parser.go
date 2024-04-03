@@ -2,13 +2,12 @@ package parser
 
 import (
 	"bytes"
-	"regexp"
-
 	"html/template"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -36,6 +35,7 @@ type Frontmatter struct {
 	Description  string   `yaml:"description"`
 	PreviewImage string   `yaml:"previewimage"`
 	Tags         []string `yaml:"tags"`
+	Authors      []string `yaml:"authors"`
 }
 
 // This struct holds all of the data required to render any page of the site
@@ -60,7 +60,7 @@ type Parser struct {
 	// Access the data for a particular page by using the relative path to the file as the key
 	Templates map[template.URL]TemplateData
 
-	//K-V pair storing all templates correspoding to a particular tag in the site
+	// K-V pair storing all templates correspoding to a particular tag in the site
 	TagsMap map[string][]TemplateData
 
 	// Stores data parsed from layout/config.yml
@@ -78,6 +78,8 @@ type Parser struct {
 
 	// Common logger for all parser functions
 	ErrorLogger *log.Logger
+
+	Helper *helpers.Helper
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
@@ -206,6 +208,14 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
+	// Check if the configuration file exists
+	_, err := os.Stat(inFilePath)
+	if os.IsNotExist(err) {
+		p.Helper.Bootstrap()
+		return
+	}
+
+	// Read and parse the configuration file
 	configFile, err := os.ReadFile(inFilePath)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
@@ -243,6 +253,7 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
+
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {

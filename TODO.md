@@ -50,3 +50,6 @@ pkg
   - [ ] tests for `main.go`
 - [x] Add status checks for PRs and fix netlify deploy preview
 - [ ] Minimum test coverage of 60% for all packages
+  - [ ] Minimum test coverage of 60% for `engine`
+  - [ ] Minimum test coverage of 60% for `helper`
+  - [x] Minimum test coverage of 60% for `parser`

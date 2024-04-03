@@ -38,14 +38,13 @@ func (cmd *Cmd) VanillaRender() {
 	helper.CreateRenderedDir(helper.SiteDataPath)
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
 	p.ParseConfig(helpers.SiteDataPath + "layout/config.yml")
 
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
 
-	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/layout/robots.txt")
+	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
 
 	e.Templates = p.Templates
@@ -53,8 +52,10 @@ func (cmd *Cmd) VanillaRender() {
 	e.LayoutConfig = p.LayoutConfig
 	e.Posts = p.Posts
 
-	e.GenerateSitemap(helpers.SiteDataPath + "rendered/layout/sitemap.xml")
+	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
+	e.GenerateJSONIndex(helpers.SiteDataPath)
+	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
 	sort.Slice(e.Posts, func(i, j int) bool {
 		return e.Posts[i].Frontmatter.Date > e.Posts[j].Frontmatter.Date
