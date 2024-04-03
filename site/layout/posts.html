@@ -10,10 +10,8 @@
             {{range $PostDate, $Post := .Posts}}
             <a class="post-card" href="posts/{{$Post.FilenameWithoutExtension}}.html">
                 <div class="post-card-div">
-                    <div class="post-card description">
-                        <h3>{{$Post.Frontmatter.Title}}</h3>
-                        <p>{{$Post.Frontmatter.Description}}</p>
-                    </div>
+                    <h3>{{$Post.Frontmatter.Title}}</h3>
+                    <p>{{$Post.Frontmatter.Description}}</p>
                     <p>{{$Post.Frontmatter.Date}}</p>
                 </div>
             </a>

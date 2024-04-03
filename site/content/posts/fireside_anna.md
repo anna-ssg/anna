@@ -11,9 +11,12 @@ tags:
   - tech
   - talk
   - aiep
+authors:
+ - Adhesh
+ - Aditya
+ - Anirudh
+ - Nathan
 ---
-
-*Presented and written by Adhesh, Anirudh, Aditya and Nathan*
 
 Building personal blogs from the ground up can be a tedious process. Some of us have had our hands deep in vanilla HTML and CSS, which isn't fun to maintain.We all want to get to the point and share our thoughts on the web. But, there is a small bump that stops us from doing so
 
@@ -25,11 +28,11 @@ There are several amazing SSGs out there, like [Hugo](https://gohugo.io/) and [1
 
 ## Introduction
 
-ACM-PESU ECC conducts the ACM Industrial Experience Program(AIEP), an annual program that spans six weeks. 
+ACM-PESU ECC conducts the ACM Industrial Experience Program(AIEP), an annual program that spans six weeks.
 
 > It involves students working as a team to develop an industrial level project. AIEP intends to give students hands-on experience with real-world projects. It is an excellent opportunity to interact with like-minded individuals.
 
-Our AIEP team consisted of [Adhesh](https://github.com/DedLad), [Aditya](https://github.com/bwaklog), [Nathan](https://github.com/polarhive) and Anirudh. 
+Our AIEP team consisted of [Adhesh](https://github.com/DedLad), [Aditya](https://github.com/bwaklog), [Nathan](https://github.com/polarhive) and Anirudh.
 
 Our mentors (cool ass senior names!) gave us some great ideas for a team of us four freshers. We were puzzled whether to build a distributed postgres clone, or a load balancer. Deep discussions over a week got us to the topic of making blog sites and how tiring it is to work with which only gets worse as you write more and more content for your internet home.
 
@@ -118,5 +121,3 @@ We were wondering if we’d need a search function on our site, since google.com
 Nathan proceeded to work on a GUI; a web-based wizard that let's a new user setup anna along with a couple of easter eggs along the way 🍚
 
 The wizard lets a user pick a theme, enter your name, pick navbar elements, and validates fields using regex checks so you don’t need to worry about relative paths in baseURLs, canonical links, and sitemaps. After successfully completing the setup the wizard launches a live preview of your site in a new tab.
-
-
