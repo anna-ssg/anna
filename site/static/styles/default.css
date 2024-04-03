@@ -1,3 +1,4 @@
+/* Font Faces */
 @font-face {
     font-family: agave;
     src: url(../fonts/mono/Agave-Regular.ttf);
@@ -8,6 +9,7 @@
     src: url(../fonts/VictorMono/victormono_italics.ttf);
 }
 
+/* Color Scheme */
 @media (prefers-color-scheme: dark) {
     :root {
         --color-primary: #5990ac;
@@ -30,35 +32,23 @@
     }
 }
 
+/* Body Styles */
 body {
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     line-height: 1.6;
-
     background-color: var(--color-background);
     color: var(--color-text);
-
     display: flex;
     flex-direction: column;
-    text-align: justify;
+    text-align: left;
     height: 100vh;
-
     margin: auto;
     margin-inline: 27%;
-
     transition: margin 0.3s ease-in-out;
 }
 
+
+/* Header and Footer */
 header {
     flex: 0;
 }
@@ -66,29 +56,27 @@ header {
 footer {
     width: 100%;
     flex: 0;
-
     font-size: 0.9rem;
     align-self: center;
     padding: 1rem 0;
-
     text-align: center;
 }
 
+/* Navigation */
 nav {
     font-size: 1.1rem;
-
     margin: auto;
     padding: 1rem;
-
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 
-    & > a {
+    &>a {
         word-wrap: break-word;
     }
 }
 
+/* Search Input */
 #searchSiteInput {
     background: var(--color-background);
     color: var(--color-text);
@@ -124,9 +112,7 @@ a {
 }
 
 /* Thank you, @kepano! */
-a:not(.plain):not(.tag):not(.internal-link):not(.footnote):not(
-        .reversefootnote
-    ):not(.post-card) {
+a:not(.plain):not(.tag):not(.internal-link):not(.footnote):not(.reversefootnote):not(.post-card) {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='gray' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25' /%3E%3C/svg%3E%0A");
     background-position: right 33%;
     background-repeat: no-repeat;
@@ -144,6 +130,7 @@ a:active {
     text-decoration: none;
 }
 
+/* Headings */
 h1,
 h2,
 h3,
@@ -157,7 +144,6 @@ h6 {
     margin-bottom: 0.5rem;
     text-align: left;
     word-break: break-word;
-
     color: var(--color-primary);
 }
 
@@ -177,31 +163,31 @@ h4 {
     font-size: 1.5rem;
 }
 
+/* Paragraphs and Body Text */
 .body {
     padding: 1rem;
-
     flex: 1 0 auto;
 
-    & > a,
-    & > ul > li > a,
-    & > ol > li > a,
-    & > ul > li > p > a,
-    & > ol > li > p > a,
-    & > p > a {
+    &>a,
+    &>ul>li>a,
+    &>ol>li>a,
+    &>ul>li>p>a,
+    &>ol>li>p>a,
+    &>p>a {
         color: #5990ac;
     }
 
-    & > p {
-        margin: 0;
-        padding: 0;
+    &>p {
+        margin: 1;
+        padding: 1;
     }
 
-    & > a,
-    & > p,
-    & > ul > li,
-    & > ol > li,
-    & > ul > li > a,
-    & > ol > li > a {
+    &>a,
+    &>p,
+    &>ul>li,
+    &>ol>li,
+    &>ul>li>a,
+    &>ol>li>a {
         font-size: 1.1rem;
     }
 }
@@ -214,8 +200,6 @@ img {
 
 img {
     width: 80%;
-    /* width: 100%;
-          height: auto; */
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -224,6 +208,11 @@ img {
     border-radius: 9px;
 }
 
+img:hover {
+    opacity: 0.85;
+}
+
+/* Embedded Content */
 iframe {
     display: block;
     margin-left: auto;
@@ -237,7 +226,7 @@ iframe {
     align-items: center;
     flex-wrap: wrap;
 
-    & > a {
+    &>a {
         font-size: 1.2rem;
         background-color: #1e1e1e;
         border-radius: 5px;
@@ -264,7 +253,8 @@ iframe {
 
 .authors-paceholder {
     display: flex;
-    & > p {
+
+    &>p {
         margin: 0;
         margin-bottom: 0.8rem;
     }
@@ -286,7 +276,7 @@ iframe {
     /* align-items: center; */
     margin: auto;
 
-    & > a {
+    &>a {
         background-color: var(--color-background);
         color: var(--color-text);
         border-radius: 5px;
@@ -300,11 +290,11 @@ iframe {
             scale 0.1s ease-in-out;
     }
 
-    & > a:hover {
+    &>a:hover {
         background-color: var(--color-background-dim);
     }
 
-    & > a:active {
+    &>a:active {
         scale: 0.9;
     }
 }
@@ -318,10 +308,11 @@ iframe {
     color: var(--color-text-dim);
     display: grid;
 
-    & > * {
+    &>* {
         padding-inline: 1rem;
     }
-    & > p {
+
+    &>p {
         margin: 0;
         padding: 0;
         padding-inline: 1rem;
@@ -329,12 +320,12 @@ iframe {
         font-size: 1.1rem;
     }
 
-    & > h3 {
+    &>h3 {
         margin: 0;
     }
 }
 
-.body > img {
+.body>img {
     /* center the image wrt the screen*/
     display: block;
     margin-left: auto;
@@ -376,10 +367,10 @@ pre code.hljs {
     background: #1e1e2d;
 }
 
-p > code,
-li > code,
-dd > code,
-td > code {
+p>code,
+li>code,
+dd>code,
+td>code {
     font-family: agave, monospace;
     background: #41414193;
     color: white;
@@ -393,7 +384,7 @@ td > code {
 }
 
 blockquote {
-    & > p {
+    &>p {
         font-family: VictorMonoItalics;
         font-size: 1.1rem;
         margin-left: 1rem;
@@ -447,7 +438,6 @@ blockquote {
     }
 }
 
-/* styling for viewports width < 600px */
 @media (max-width: 650px) {
     nav {
         font-size: 1.05rem;
@@ -467,8 +457,6 @@ blockquote {
     }
 
     img {
-        /* height: 35rem;
-      width: auto; */
         width: 90%;
         height: auto;
         display: block;
@@ -479,31 +467,33 @@ blockquote {
     }
 
     .body {
-        & > a,
-        & > p,
-        & > ul > li,
-        & > ol > li,
-        & > ul > li > a,
-        & > ol > li > a {
+
+        &>a,
+        &>p,
+        &>ul>li,
+        &>ol>li,
+        &>ul>li>a,
+        &>ol>li>a {
             font-size: 1rem;
         }
 
-        & > h1 {
+        &>h1 {
             font-size: 1.8rem;
         }
 
-        & > h2 {
+        &>h2 {
             font-size: 1.5rem;
         }
     }
 
     .post-card {
-        & > p,
-        & > .post-card-div > p {
+
+        &>p,
+        &>.post-card-div>p {
             font-size: 0.9rem;
         }
 
-        & > h3 {
+        &>h3 {
             font-size: 1.3rem;
         }
     }
