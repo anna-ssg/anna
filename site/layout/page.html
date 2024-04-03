@@ -6,30 +6,33 @@
     {{template "header" .}}
 
     <div class="body">
-        {{ if eq .Frontmatter.Type "post" }}
-        <div class="post-description">
-            <h1>{{ .Frontmatter.Title }}</h1>
-            <div class="authors-paceholder">
-                <p>
-                    Published on {{.Frontmatter.Date}}
-                    <!-- if lenght of frontmatter authors is 0 -->
-                    {{ if eq (len .Frontmatter.Authors) 0 }}
-                    {{$.Layout.Author}}
-                    {{ else }}
-                    {{range .Frontmatter.Authors }}
-                    {{ . }},
-                    {{ end }}
-                    {{ end }}
-
-                </p>
+        <div class="tags-paceholder">
+            {{range .Frontmatter.Tags}}
+            <div class="tag">
+                <a href="/tags/{{.}}.html">{{.}}</a>
             </div>
-            <div class="tags-paceholder">
-                {{range .Frontmatter.Tags}}
-                <div class="tag">
-                    <a href="/tags/{{.}}.html">{{.}}</a>
-                </div>
-                {{end}}
-            </div>
+            <label for="urlInput">Website URL:</label>
+            <input type="text" id="urlInput" placeholder="Enter website URL">
+        
+            <label for="keywordInput">Keyword:</label>
+            <input type="text" id="keywordInput" placeholder="Enter keyword">
+        
+            <button onclick="performSearch()">Search</button>
+        
+            <script>
+                function performSearch() {
+                    // Retrieve values from input fields
+                    var url = document.getElementById("urlInput").value;
+                    var keyword = document.getElementById("keywordInput").value;
+        
+                    // Call the search function passing URL and keyword
+                    var searchResult = search(url, keyword);
+        
+                    // Display search result (example: print to console)
+                    console.log("Search Result:", searchResult);
+                }
+            </script>
+            {{end}}
         </div>
         {{ else }}
         {{ end }}

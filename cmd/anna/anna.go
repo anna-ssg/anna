@@ -54,8 +54,6 @@ func (cmd *Cmd) VanillaRender() {
 
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
-	e.GenerateJSONIndex(helpers.SiteDataPath)
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
 	sort.Slice(e.Posts, func(i, j int) bool {
 		return e.Posts[i].Frontmatter.Date > e.Posts[j].Frontmatter.Date

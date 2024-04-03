@@ -2,6 +2,9 @@ package parser
 
 import (
 	"bytes"
+	"encoding/json"
+	"regexp"
+
 	"html/template"
 	"io/fs"
 	"log"
@@ -51,6 +54,13 @@ type TemplateData struct {
 	// These fields are populated by the ssg to store merged tag data
 	Tags                 []string
 	SpecificTagTemplates []TemplateData
+}
+
+type JsonTemplate struct {
+	CompleteURL              template.URL
+	FilenameWithoutExtension string
+	Frontmatter              Frontmatter
+	Tags                     []string
 }
 
 type Date int64
@@ -267,4 +277,40 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	}
 
 	return templ
+}
+
+func (p *Parser) ParseJsonMerged(fileOutPath string) {
+	// create a json file
+	jsonFile, err := os.Create(fileOutPath + "/static/merged.json")
+	if err != nil {
+		jsonFile.Close()
+		p.ErrorLogger.Fatal(err)
+	}
+
+	// copy data from p.Templates to new JsonTemplate
+	jsonMergedTemplate := make(map[template.URL]JsonTemplate)
+	for key, value := range p.Templates {
+		// copy the values
+		jsonMergedTemplate[key] = JsonTemplate{
+			CompleteURL:              value.CompleteURL,
+			FilenameWithoutExtension: value.FilenameWithoutExtension,
+			Frontmatter:              value.Frontmatter,
+			Tags:                     value.Tags,
+		}
+	}
+
+	// marshal the new JsonTemplate
+	jsonMerged, err := json.Marshal(jsonMergedTemplate)
+	if err != nil {
+		jsonFile.Close()
+		p.ErrorLogger.Fatal(err)
+	}
+
+	// write the new JsonTemplate to the json file
+	_, err = jsonFile.Write(jsonMerged)
+	if err != nil {
+		jsonFile.Close()
+		p.ErrorLogger.Fatal(err)
+	}
+	jsonFile.Close()
 }
