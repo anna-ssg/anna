@@ -6,27 +6,38 @@
     {{template "header" .}}
 
     <div class="body">
-        <div class="tags-paceholder">
-            {{range .Frontmatter.Tags}}
-            <div class="tag">
-                <a href="/tags/{{.}}.html">{{.}}</a>
+        {{ if eq .Frontmatter.Type "post" }}
+        <div class="post-description">
+            <h1>{{ .Frontmatter.Title }}</h1>
+            <div class="authors-paceholder">
+                <p>
+                    Published on {{.Frontmatter.Date}}
+                    <!-- if lenght of frontmatter authors is 0 -->
+                    {{ if eq (len .Frontmatter.Authors) 0 }}
+                    {{$.Layout.Author}}
+                    {{ else }}
+                    {{range .Frontmatter.Authors }}
+                    {{ . }},
+                    {{ end }}
+                    {{ end }}
+
+                </p>
             </div>
-            {{end}}
-        </div>
-        <div class="authors-paceholder">
-            {{range .Frontmatter.Authors}}
-            <div class="author">
-                {{.}}
+            <div class="tags-paceholder">
+                {{range .Frontmatter.Tags}}
+                <div class="tag">
+                    <a href="/tags/{{.}}.html">{{.}}</a>
+                </div>
+                {{end}}
             </div>
-            {{end}}
         </div>
+        {{ else }}
+        {{ end }}
         {{.Body}}
     </div>
 
 
     {{template "footer" .}}
-
-    <script>hljs.highlightAll();</script>
 
 </body>
 
