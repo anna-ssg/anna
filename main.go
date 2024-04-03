@@ -31,12 +31,11 @@ func main() {
 
 			if prof {
 				startTime := time.Now()
-				go anna.StartProfiling()
+				anna.StartProfiling(&annaCmd)
 
-				annaCmd.VanillaRender()
-				elapsedTime := time.Now().Sub(startTime)
+				elapsedTime := time.Since(startTime)
 				go anna.PrintStats(elapsedTime)
-				defer anna.StopProfiling()
+				anna.RunProfilingServer()
 			}
 
 			if validateHTML {
