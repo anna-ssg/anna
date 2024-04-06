@@ -4,7 +4,7 @@ navbar:
   - tags
   - posts
 baseURL: https://anna-docs.netlify.app
-siteTitle: ssg
+siteTitle: "anna-docs"
 siteScripts:
-author: Anna
+author: anna
 themeURL: "/static/style.css"

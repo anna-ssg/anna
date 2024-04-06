@@ -24,10 +24,8 @@ This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.gi
 ---
 ## Install
 
-Once you have a directory structure, install `anna` using:
-
 ```sh
-go install github.com/acmpesuecc/anna@v1.0.0-alpha 
+go run github.com/acmpesuecc/anna@v1.0.0-alpha
 ```
 
 Alternatively, clone our repository to build the latest version of anna:
@@ -52,6 +50,5 @@ Flags:
   -h, --help            help for anna
   -p, --prof            enable profiling
   -s, --serve           serve the rendered content
-  -v, --validate-html   validate semantic HTML
   -w, --webconsole      wizard to setup anna
 ```

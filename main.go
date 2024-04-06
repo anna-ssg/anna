@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/acmpesuecc/anna/cmd/anna"
@@ -13,7 +16,7 @@ func main() {
 	var addr string
 	var webconsole bool
 	var renderDrafts bool
-	var validateHTML bool
+	var version bool
 	var prof bool
 
 	rootCmd := &cobra.Command{
@@ -38,9 +41,10 @@ func main() {
 				anna.RunProfilingServer()
 			}
 
-			if validateHTML {
-				// anna.ValidateHTMLContent()
-				cmd.Println("TODO: To be filled later")
+			if version, err := exec.Command("git", "describe", "--tags").Output(); err == nil {
+				fmt.Println("Current version:", strings.TrimSpace(string(version)))
+			} else {
+				fmt.Println("Error:", err)
 			}
 
 			if webconsole {
@@ -58,7 +62,7 @@ func main() {
 	rootCmd.Flags().BoolVarP(&serve, "serve", "s", false, "serve the rendered content")
 	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "ip address to serve rendered content to")
 	rootCmd.Flags().BoolVarP(&renderDrafts, "draft", "d", false, "renders draft posts")
-	rootCmd.Flags().BoolVarP(&validateHTML, "validate-html", "v", false, "validate semantic HTML")
+	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "prints current version number")
 	rootCmd.Flags().BoolVarP(&prof, "prof", "p", false, "enable profiling")
 	rootCmd.Flags().BoolVarP(&webconsole, "webconsole", "w", false, "wizard to setup anna")
 
