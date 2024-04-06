@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/acmpesuecc/anna/cmd/anna"
@@ -18,6 +16,7 @@ func main() {
 	var renderDrafts bool
 	var version bool
 	var prof bool
+	var Version string = "v1.0.0-alpha-15-g1eb8e48" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",
@@ -41,10 +40,8 @@ func main() {
 				anna.RunProfilingServer()
 			}
 
-			if version, err := exec.Command("git", "describe", "--tags").Output(); err == nil {
-				fmt.Println("Current version:", strings.TrimSpace(string(version)))
-			} else {
-				fmt.Println("Error:", err)
+			if version {
+				fmt.Println("Current version:", Version)
 			}
 
 			if webconsole {
