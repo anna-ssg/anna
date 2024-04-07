@@ -1,5 +1,5 @@
 ---
-title: Presenting anna at fireside
+title: Building anna
 date: 2024-04-04
 type: post
 draft: false
@@ -37,8 +37,7 @@ is a lot of time spent fixing things rather than getting productive work done.
 
 > A static site generator is an immensely useful application
 
-<!-- ![Lighthouse scores of the anna-docs page](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/lighthouse.png) -->
-![Lighthouse scores of the anna-docs page](/static/images/posts/fireside-anna/lighthouse.png)
+![Lighthouse scores of the anna-docs page](/static/images/posts/building-anna/lighthouse.png)
 
 It can simplify the whole process: allowing you to spend time and energy
 on quality content. Keep reading to find out how we designed anna `v1.0.0`
@@ -88,15 +87,16 @@ Go is a powerful language and has excellent concurrency support, which suited ou
 
 ### What's in a name?
 
-Probably the first thing that us four came across when joining ACM and HSP was the famous Saaru repository.
+Probably the first thing that the four of us came across when joining ACM and HSP was the famous Saaru repository.
 [Saaru](https://github.com/anirudhRowjee/saaru),
-one of the projects that inspired our ssg, is derived from a [Kannada](https://en.wikipedia.org/wiki/Kannada) word.
+one of the projects that inspired our ssg,
+is derived from a [Kannada](https://en.wikipedia.org/wiki/Kannada) word.
 Saaru is a thin lentil soup, usually served with rice.
 
 > In Kannada, rice is referred to as 'anna'(ಅನ್ನ) pronounced <i>/ɐnːɐ/</i>
 
-This was just a playful stunt that we played. We plan on beating Saaru at
-build times, optimizing at runtime.
+This was just a playful stunt that we engaged in. We planned on beating Saaru at
+site render times, optimizing at runtime.
 
 ---
 
@@ -137,10 +137,39 @@ probably never notice while deploying, but it is what pushed us to spend hours
 on this.
 
 Adhesh was pretty excited to pick up Go and implement profiling, shaving
-milliseconds off-of build times, when he implemented parallel rendering using
+milliseconds off build times, when he implemented parallel rendering using
 goroutines.
 
-## Prototype
+### We cook! 🍳
+
+Here are some screenshots out of our group chats, that demonstrate build times, profiling et-al when having thousands of markdown files or in this case
+just copy-pasting a single markdown file en-mass!
+
+![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](/static/images/posts/building-anna/bench.png)
+
+> After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing parallel rendering and profiling to the table
+
+---
+
+## Profiling (WIP)
+
+For those who love to get technical, anna has a profiling flag.
+This flag prints the render profile data to stdout.
+It also writes a cpu.prof and mem.prof file, which can be analysed and visualised using [pprof](https://pkg.go.dev/runtime/pprof)
+
+Here,s the CPU profile generated while rendering this site.
+This is an SVG showing how much time each function call takes, the number of times it ran in a given test sample and various other useful information.
+
+![CPU profile of an anna render generated using pprof](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/building-anna/cpu_prof.svg)
+<!-- ![CPU profile of an anna render generated using pprof](/static/images/posts/building-anna/cpu_prof.svg) -->
+
+You may wanna zoom-in about 3-4x times to get to see how our ssg works
+
+---
+
+## Live Reload
+
+### Prototype
 
 The initial prototype built by Adhesh consisted of a multi-goroutine system.
 A new goroutine would be spawned to walk the required directories.
@@ -155,14 +184,14 @@ The previous mod time of the file would then be retrieved from a map holding the
 The new function checks if a child process is running:
 
 - For the first render, when a process has not been created, a new process is created that runs anna ("go run main.go --serve")
-- For successive renders, the existing process is killed and a new process is spawned once again that runs anna. 
+- For successive renders, the existing process is killed and a new process is spawned once again that runs anna.
 
 This prototype was not very efficient as it created and killed processes for every change.
 It had multiple goroutines attempting to walk the directories at the same time.
 It also used multiple mutual exclusion locks to prevent data races.
 Integrating this into the project also proved to be challenging.
 
-## Improved version
+### Improved version
 
 The live reload feature was improved by Anirudh.
 The updated version utilised two goroutines.
@@ -177,38 +206,24 @@ This eliminated all locks and avoided the creation and destruction of any child 
 
 ---
 
-## We cook! 🍳
-
-Here are some screenshots out of our group chats, that demonstrate build times, profiling et-al when having thousands of markdown files or in this case
-just copy-pasting a single markdown file en-mass!
-
-<!-- ![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/bench.png) -->
-![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](/static/images/posts/fireside-anna/bench.png)
-
-> After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing parallel rendering and profiling to the table
-
-### Profiling
-
-Heres the CPU profile of anna, generated using pprof.
-This profile was generated while rendering this site.
-
-Here's an SVG showing how much time each sys-call / process takes and how each block adds-up to render / build times
-
-![CPU profile of an anna render generated using pprof](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/cpu_prof.svg)
-<!-- ![CPU profile of an anna render generated using pprof](/static/images/posts/fireside-anna/cpu_prof.svg) -->
-
-You may wanna zoom-in about 3-4x times to get to see how our ssg works
-
----
-
-## A big rewrite (when we went for a TDD approach)
+## A big rewrite (when we went for a TDD approach) (WIP)
 
 Starting off this project, we kept adding functionality without optimization.
-We didn’t have a proper structure; PRs would keep breaking features and overwriting functions written by fellow team-mates.
+We didn’t have a proper structure; PRs would keep breaking features and overwriting functions written by team-mates.
+
+Anirudh and Aditya dived into the codebase to rebuild the application following a TDD-approach.
 
 ### A new proposed rendering system
 
-We proceeded to restructure our SSG into: modules previously part of `cmd/anna/utils.go` and `cmd/anna/main.go` were to be split between `pkg/parsers/`, `pkg/engine/` and `pkg/helper`
+#### main.go
+
+Firstly, we refactored main.go to only handle flags.
+The rest of the program logic was moved to other packages.
+A benchmark for main.go was also written to time the entire application.
+
+#### pkg/ modules
+
+Modules previously part of `cmd/anna/utils.go` and `cmd/anna/main.go` were to be split between `pkg/parsers/`, `pkg/engine/` and `pkg/helper`
 
 ```text
 pkg
@@ -229,43 +244,67 @@ pkg
 	└── parser_integration_test.go
 ```
 
-Currently there are two separate types of files that have to be rendered. One set includes user-defined files such as `index.md`, `docs.md` and various posts. These are specific to a user.
-
-The second set of files that are rendered include `tags.html`, `sub-tags.html` and `posts.html`
-Now, the generator/engine has a method to render "anna specific" pages and another method to render "user defined" pages which include all the user pages and posts
-
-Here's some of Anirudh's work written during week-2
-
-> - Refactored main.go to only handle flags
 > - Wrote unit and integration tests for the parser and engine package
+
+#### Splitting the render pipeline
+
+Currently, there are three kinds of files that have to be rendered.
+One set includes user-defined files such as `index.md`, `docs.md` and various posts. These are specific to a user.
+
+The second set of files that are rendered include `tags.html` and `posts.html`, which are present on every site rendered by anna.
+
+The third set of files included the tag-sub pages.
+For every tag, there would be a corresponding sub-page containing all of the posts with the same tag.
+
 > - Split the rendering system to make parallelisation easier by switching to a three method system.
-> - Render "user defined" pages which include all markdown files and posts (This method has been parallelised)
-> - Render tags and tag-sub pages separately, which could be parallelised in the future
-> - Wrote a benchmark for main.go that times the entire application
+
+> - Render "user defined" pages which include all markdown files and posts (This method has been parallelised, Render tags and tag-sub pages separately, which could be parallelised in the future
+
+---
+
+## Tags (WIP)
+
+You can tag posts by hand, at the start of each markdown file and you get a
+nice sub-page on your site so readers can discover similar content or browser
+by category.
+
+- Organizing posts into collections based on tags
+- Reverse search for posts of a certain category
 
 ---
 
 ## To search or not to search? 🤔
 
-> That is the question > Is our *static site* becoming and at what cost?
+> That is the question > Is our *static site* becoming dynamic and at what cost?
 
 We were wondering if we’d need a search function on our site since Google and
-any other web-crawler index our site anyway. If we needed to implement it, we
-had a constraint: we cannot use an API. It had to be static and local to be
-user-friendly to work with.
+any other web-crawler index our site anyway.
+If we needed to implement it, we had a constraint: do not use an API.
+It had to be static and local to be user-friendly to work with.
 Aditya and Anirudh implemented a JSON index generator that uses "Deep Data Merge" to index posts on our site.
 
-This index is built at runtime and works without any lag or noticeable delay when searching across posts.
-We mean to re-write it using WASM if necessary and if it costs us time when performing searches.
+This index is generated during the site render and functions without any lag or noticeable delay when searching across posts.
+We mean to re-write it using WASM if necessary.
 
-<!-- ![anna-search](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/search.gif) -->
-![Demonstration of the search feature in anna](/static/images/posts/fireside-anna/search.gif)
+Here's a gif demonstrating search
+
+![Demonstration of the search feature in anna](/static/images/posts/building-anna/search.gif)
 
 ## JS integration as plugins
 
 Aditya added a field to our frontmatter which lets you pick and add certain JS
 based snippets to your site.
 This way, you get to add `highlight.js` support, analytics scripts and donation page widgets; that you can source from the `static/scripts` folder and toggle as needed per-markdown page.
+
+### Raw HTML
+
+What if you'd want to add a contact form to your site? or embed YouTube videos or iframes of your choosing?
+
+Anna let's us do that! Although, the point of a static site generator is to
+quickly get to writing and focusing on the content.
+You can still embed js elements and iframe as needed to showcase any interesting YouTube videos or to just rickroll people!
+
+---
 
 ## Wizard
 
@@ -277,26 +316,11 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-<!-- ![anna-search](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/fireside-anna/wizard.gif) -->
-![Demonstration of the GUI wizard in anna](/static/images/posts/fireside-anna/wizard.gif)
-
-### Raw HTML
-
-What if you'd want to add a contact form to your site? or embed YouTube videos or iframes of your choosing?
-
-Anna let's us do that! Although, the point of a static site generator is to
-quickly get to writing and focusing on the content.
-You can still embed js elements and iframe as needed to showcase any interesting YouTube videos or to just rickroll people!
-
-## Tags
-
-You can tag posts by hand, at the start of each markdown file and you get a
-nice sub-page on your site so readers can discover similar content or browser
-by category.
+![Demonstration of the GUI wizard in anna](/static/images/posts/building-anna/wizard.gif)
 
 ---
 
-### changelog: showcasing important additions --- as the weeks proceeded
+### changelog: showcasing important additions, which are yet to be added to this blog
 
 Nathan:
 
@@ -304,41 +328,29 @@ Nathan:
 - feat: ogp tags and atom feed by @polarhive in #33
 - feat: bootstrap site and import stylesheets by @polarhive in #73
 
-Adhesh:
-
-- feat: cobra (cli), yaml rewrite for baseURL by @DedLad in #2
-- feat: profiling (--prof) by @DedLad in #44
-- feat: live-reload and file watch by @DedLad #27
-
-Anirudh:
-
-- Tags
- - Organizing posts into collections based on tags
- - Reverse search for posts of a certain category
-
 Aditya:
 
-- fix: enable unsafeHTML by @bwaklog in #45
 - feat: implement drafts by @bwaklog in #9
 - feat: chronological feed, js plugins (eg: light.js, prism.js) by @bwaklog in #32
-- feat: json generator implementation along with a site wide search bar by @bwaklog in #70
 
 ---
 
 ## Feedback? / Learnings
 
-We are at week: 3/6 and have a lot of things in store and bugs to squash!
+We are at week: 4/6 and have a lot of things in store and bugs to squash!
 
 > Feel free to ask any questions / send feature requests you'd like to see?
 
-This blog post misses out of many not-so well documented features and learnings that 
-we got during midnight calls and the patches we kept sending each other fixing trivial but
-interesting issues. Have a look at our [GitHub](https://github.com/acmpesuecc/anna/issues), for
-more
+This blog post misses out of many not-so well documented features and learnings that
+ we got during midnight calls and the patches we kept sending each other fixing trivial but
+interesting issues.
+Have a look at our [GitHub](https://github.com/acmpesuecc/anna/issues), for more
 
 ---
+
 Today [anna](https://github.com/acmpesuecc/anna/releases/latest) is tagged at v1.0.0 and we use it on our personal sites:
 [hegde.live](https://hegde.live) // [sudhir.live](https://sudhir.live) // [polarhive.net](https://polarhive.net)
 
 ---
+
 01100001 01101110 01101110 01100001
