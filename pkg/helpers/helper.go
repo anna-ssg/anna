@@ -69,11 +69,6 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-
-	err = os.MkdirAll(fileOutPath+"rendered/layout/", 0750)
-	if err != nil {
-		h.ErrorLogger.Fatal(err)
-	}
 }
 
 func (h *Helper) Bootstrap() {

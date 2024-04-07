@@ -8,10 +8,11 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/acmpesuecc/anna/pkg/helpers"
 )
 
-func ValidateHTMLContent() {
-	root, err := filepath.Abs(SiteDataPath + "rendered")
+func (cmd *Cmd) ValidateHTMLContent() {
+	root, err := filepath.Abs(helpers.SiteDataPath + "rendered")
 	if err != nil {
 		log.Fatalf("Error getting absolute path: %v", err)
 	}

@@ -58,6 +58,12 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 	semaphore := make(chan struct{}, concurrency)
 
 	for _, templateURL := range templateURLs {
+		templData := e.Templates[template.URL(templateURL)]
+		fileInPath := strings.TrimSuffix(string(templData.CompleteURL), ".html")
+		if fileInPath == "" {
+			continue
+		}
+
 		wg.Add(1)
 		semaphore <- struct{}{}
 
@@ -67,8 +73,6 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 				wg.Done()
 			}()
 
-			templData := e.Templates[template.URL(templateURL)]
-			fileInPath := strings.TrimSuffix(string(templData.CompleteURL), ".html")
 			e.RenderPage(fileOutPath, template.URL(fileInPath), templData, templ, "page")
 		}(templateURL)
 	}

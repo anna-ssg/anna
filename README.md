@@ -22,6 +22,7 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
 
 ---
+
 ## Install
 
 ```sh
@@ -38,6 +39,7 @@ go run .
 ### Detailed documentation of our SSG can be found [here](https://anna-docs.netlify.app/)
 
 ---
+
 ## Flags
 
 ```text
@@ -45,10 +47,12 @@ Usage:
   anna [flags]
 
 Flags:
-  -a, --addr string     ip address to serve rendered content to (default "8000")
-  -d, --draft           renders draft posts
-  -h, --help            help for anna
-  -p, --prof            enable profiling
-  -s, --serve           serve the rendered content
-  -w, --webconsole      wizard to setup anna
+  -a, --addr string   ip address to serve rendered content to (default "8000")
+  -d, --draft         renders draft posts
+  -h, --help          help for anna
+  -l, --layout        validates html layouts
+  -p, --prof          enable profiling
+  -s, --serve         serve the rendered content
+  -v, --version       prints current version number
+  -w, --webconsole    wizard to setup anna
 ```
