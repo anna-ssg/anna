@@ -14,6 +14,7 @@ import (
 type Cmd struct {
 	RenderDrafts bool
 	Addr         string
+	LiveReload   bool
 }
 
 func (cmd *Cmd) VanillaRender() {
@@ -23,6 +24,7 @@ func (cmd *Cmd) VanillaRender() {
 		TagsMap:      make(map[string][]parser.TemplateData),
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts: cmd.RenderDrafts,
+		LiveReload:   cmd.LiveReload,
 	}
 	e := engine.Engine{
 		Templates:   make(map[template.URL]parser.TemplateData),

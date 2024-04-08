@@ -13,11 +13,27 @@
     <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
     <link rel="alternate" type="application/atom+xml" title="feed" href="/feed.atom" />
 
+
+    {{ if .LiveReload }}
+    <script>
+        const eventSource = new EventSource('http://localhost:8000/events');
+        eventSource.onmessage = function (event) {
+            location.reload()
+        };
+        window.onbeforeunload = function(event)
+        {
+               return confirm("Confirm refresh");
+        };
+    </script>
+    {{ end }}
+
+
     {{range .Frontmatter.JSFiles}}
     <script src="/script/{{.}}" defer></script>
     {{end}} {{range .Layout.SiteScripts}}
     <script src="/script/{{.}}" defer></script>
     {{end}}
+
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="{{ .Frontmatter.Title }}" />
