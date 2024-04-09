@@ -9,6 +9,7 @@ import (
 	"slices"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
@@ -47,20 +48,31 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		e.ErrorLogger.Fatal(err)
 	}
 
+	// Create a wait group to wait for all goroutines to finish
+	var wg sync.WaitGroup
+
 	// Rendering the subpages with merged tagged posts
 	for tag, taggedTemplates := range e.TagsMap {
-		pagePath := "tags/" + tag
-		templateData := parser.TemplateData{
-			FilenameWithoutExtension: tag,
-			Layout:                   e.LayoutConfig,
-			Frontmatter: parser.Frontmatter{
-				Title: tag,
-			},
-			SpecificTagTemplates: taggedTemplates,
-		}
+		wg.Add(1)
+		go func(tag string, taggedTemplates []parser.TemplateData) {
+			defer wg.Done()
 
-		e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
+			pagePath := "tags/" + tag
+			templateData := parser.TemplateData{
+				FilenameWithoutExtension: tag,
+				Layout:                   e.LayoutConfig,
+				Frontmatter: parser.Frontmatter{
+					Title: tag,
+				},
+				SpecificTagTemplates: taggedTemplates,
+			}
+
+			e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
+		}(tag, taggedTemplates)
 	}
+
+	// Wait for all goroutines to finish
+	wg.Wait()
 }
 
 func (e *Engine) GenerateJSONIndex(outFilePath string) {
