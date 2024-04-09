@@ -3,17 +3,17 @@
 
 <body>
     {{template "header" .}}
-
     <div class="body">
-
-        <div class="all-tags">
-            {{range .Tags}}
-            <a href="tags/{{.}}.html">{{.}}</a>
-            {{end}}
-        </div>
-
+        <article>
+            <section class="posts">
+                <div class="all-tags">
+                    {{range .Tags}}
+                    <a href="tags/{{.}}.html">{{.}}</a>
+                    {{end}}
+                </div>
+            </section>
+        </article>
     </div>
-
     {{template "footer" .}}
 </body>
 

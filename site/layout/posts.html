@@ -3,21 +3,20 @@
 
 <body>
     {{template "header" .}}
-
     <div class="body">
-
-        <div class="posts">
-            {{range $PostDate, $Post := .Posts}}
-            <a class="post-card" href="posts/{{$Post.FilenameWithoutExtension}}.html">
-                <div class="post-card-div">
-                    <h3>{{$Post.Frontmatter.Title}}</h3>
-                    <p>{{$Post.Frontmatter.Description}}</p>
-                    <p>{{$Post.Frontmatter.Date}}</p>
-                </div>
-            </a>
-            {{end}}
-        </div>
-
+        <article>
+            <section class="posts">
+                {{range $PostDate, $Post := .Posts}}
+                <a class="post-card" href="posts/{{$Post.FilenameWithoutExtension}}.html">
+                    <div class="post-card-div">
+                        <h3>{{$Post.Frontmatter.Title}}</h3>
+                        <p>{{$Post.Frontmatter.Description}}</p>
+                        <p>{{$Post.Frontmatter.Date}}</p>
+                    </div>
+                </a>
+                {{end}}
+            </section>
+        </article>
     </div>
 
     {{template "footer" .}}
