@@ -27,14 +27,16 @@ function setupSimulation(nodes, links) {
 
 function drawLinks(links) {
     svg.append("g").selectAll("line").data(links).enter().append("line")
-        .attr("stroke", "#999").attr("stroke-opacity", 1)
+        .attr("class", "link") // Apply class for links from parent theme
+        .attr("stroke", "var(--color-text-dim)").attr("stroke-opacity", 1)
         .attr("stroke-width", d => Math.sqrt(d.value));
 }
 
 function drawNodes(nodes) {
     const node = svg.append("g").selectAll("circle").data(nodes).enter().append("circle")
-        .attr("r", 10).attr("fill", d => d.group === 0 ? "red" : color(d.group))
-        .attr("stroke", "#fff").attr("stroke-width", 2)
+        .attr("r", 10).attr("class", d => d.group === 0 ? "root-node" : "child-node") // Apply classes for nodes from parent theme
+        .attr("fill", d => d.group === 0 ? "var(--color-primary)" : color(d.group))
+        .attr("stroke", "var(--color-text)").attr("stroke-width", 2)
         .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
         .on("click", onClick);
 
@@ -43,7 +45,9 @@ function drawNodes(nodes) {
 
 function drawLabels(nodes) {
     const label = svg.append("g").selectAll("text").data(nodes).enter().append("text")
-        .text(d => d.id).style("font-size", "12px").attr("dx", 12).attr("dy", ".35em").attr("fill", "white");
+        .text(d => d.id).style("font-size", "12px")
+        .attr("class", "node-label") // Apply class for labels from parent theme
+        .attr("dx", 12).attr("dy", ".35em").attr("fill", "var(--color-text)");
 
     label.append("title").text(d => d.id);
 }
@@ -128,7 +132,7 @@ async function drawGraph(data, str) {
         nodes = Object.values(nodesMap);
     }
 
-    svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
+    svg = d3.select("#chart").append("svg").attr("class", "chart").style("font-family", "agave, monospace").attr("width", width).attr("height", height);
     setupSimulation(nodes, links);
     drawLinks(links);
     drawNodes(nodes);
