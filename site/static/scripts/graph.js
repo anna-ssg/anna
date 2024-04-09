@@ -1,13 +1,9 @@
-let width;
-let height;
-let color;
-let svg;
-let simulation;
+let width, height, color, svg, simulation;
 
 async function fetchData() {
     try {
         const response = await fetch('/static/index.json');
-        if (!response.ok) { throw new Error('Failed to fetch data'); }
+        if (!response.ok) throw new Error('Failed to fetch data');
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
@@ -17,8 +13,7 @@ async function fetchData() {
 
 function setupGraph() {
     d3.select("#chart").html("");
-    width = 400;
-    height = 400;
+    width = height = 400;
     color = d3.scaleOrdinal(d3.schemeCategory10);
 }
 
@@ -31,64 +26,34 @@ function setupSimulation(nodes, links) {
 }
 
 function drawLinks(links) {
-    svg.append("g")
-        .selectAll("line")
-        .data(links)
-        .enter().append("line")
-        .attr("stroke", "#999")
-        .attr("stroke-opacity", 1)
+    svg.append("g").selectAll("line").data(links).enter().append("line")
+        .attr("stroke", "#999").attr("stroke-opacity", 1)
         .attr("stroke-width", d => Math.sqrt(d.value));
 }
 
 function drawNodes(nodes) {
-    const node = svg.append("g")
-        .selectAll("circle")
-        .data(nodes)
-        .enter().append("circle")
-        .attr("r", 10)
-        .attr("fill", d => d.group === 0 ? "red" : color(d.group))
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2)
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        )
+    const node = svg.append("g").selectAll("circle").data(nodes).enter().append("circle")
+        .attr("r", 10).attr("fill", d => d.group === 0 ? "red" : color(d.group))
+        .attr("stroke", "#fff").attr("stroke-width", 2)
+        .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
         .on("click", onClick);
 
-    node.append("title")
-        .text(d => d.id);
+    node.append("title").text(d => d.id);
 }
 
 function drawLabels(nodes) {
-    const label = svg.append("g")
-        .selectAll("text")
-        .data(nodes)
-        .enter().append("text")
-        .text(d => d.id)
-        .style("font-size", "12px")
-        .attr("dx", 12)
-        .attr("dy", ".35em")
-        .attr("fill", "white");
+    const label = svg.append("g").selectAll("text").data(nodes).enter().append("text")
+        .text(d => d.id).style("font-size", "12px").attr("dx", 12).attr("dy", ".35em").attr("fill", "white");
 
-    label.append("title")
-        .text(d => d.id);
+    label.append("title").text(d => d.id);
 }
 
 function ticked() {
-    svg.selectAll("line")
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
+    svg.selectAll("line").attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
 
-    svg.selectAll("circle")
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y);
-
-    svg.selectAll("text")
-        .attr("x", d => d.x)
-        .attr("y", d => d.y);
+    svg.selectAll("circle").attr("cx", d => d.x).attr("cy", d => d.y);
+    svg.selectAll("text").attr("x", d => d.x).attr("y", d => d.y);
 }
 
 function dragstarted(event) {
@@ -109,9 +74,17 @@ function dragended(event) {
 }
 
 async function onClick(event, d) {
+    const data = await fetchData();
+    const tag = d.id;
     svg.selectAll("*").remove();
-    const url = `/tags/${d.id}.html`;
-    window.location.href = url;
+
+    // fish out common posts based on a tag
+    const commonPosts = Object.entries(data)
+        .filter(([key, post]) => post.Tags && post.Tags.includes(tag))
+        .map(([key, post]) => ({ filename: key, title: post.Frontmatter.Title }));
+
+    setupGraph();
+    drawGraph(commonPosts, tag);
 }
 
 async function init() {
@@ -124,33 +97,33 @@ async function init() {
 
 async function drawGraph(data, str) {
     const links = [];
-    const nodesMap = {};
+    let nodes;
 
-    // Iterate through each post to create nodes and links
-    Object.keys(data).forEach(key => {
-        const post = data[key];
-        const tags = post.Tags;
-        if (tags) {
-            tags.forEach(tag => {
-                nodesMap[tag] = { id: tag, group: 1 };
-                const linkId = `Center-${tag}`;
-                const existingLink = links.find(d => d.id === linkId);
-                if (!existingLink) {
-                    links.push({ source: str, target: tag, id: linkId, value: 1 });
-                } else {
-                    existingLink.value++;
-                }
-            });
-        }
-    });
+    if (Array.isArray(data)) {
+        links.push(...data.map(post => ({
+            source: str, target: post.filename, id: `${str}-${post.filename}`, value: 1
+        })));
+        nodes = [{ id: str, group: 0 }, ...data.map(post => ({ id: post.filename, group: 1 }))];
+    } else {
+        const nodesMap = {};
+        Object.keys(data).forEach(key => {
+            const post = data[key];
+            const tags = post.Tags;
+            if (tags) {
+                tags.forEach(tag => {
+                    nodesMap[tag] = { id: tag, group: 1 };
+                    const linkId = `Center-${tag}`;
+                    const existingLink = links.find(d => d.id === linkId);
+                    if (!existingLink) links.push({ source: str, target: tag, id: linkId, value: 1 });
+                    else existingLink.value++;
+                });
+            }
+        });
+        nodesMap[str] = { id: str, group: 0 };
+        nodes = Object.values(nodesMap);
+    }
 
-    nodesMap[str] = { id: str, group: 0 };
-    const nodes = Object.values(nodesMap);
-
-    svg = d3.select("#chart").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
+    svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
     setupSimulation(nodes, links);
     drawLinks(links);
     drawNodes(nodes);
