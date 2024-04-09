@@ -57,7 +57,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.html", TestDirPath+"render_tags/tags_subpage_template.html")
+	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.layout", TestDirPath+"render_tags/tags_subpage_template.layout")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -105,7 +105,7 @@ func TestRenderTags(t *testing.T) {
 		}
 
 		if !slices.Equal(got_tech_file, want_tech_file) {
-			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+		t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
 		}
 	})
 }

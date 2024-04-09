@@ -31,7 +31,7 @@ func TestRenderUserDefinedPages(t *testing.T) {
 
 	t.Run("render a set of user defined pages", func(t *testing.T) {
 
-		templ, err := template.ParseFiles(TestDirPath + "render_user_defined/template_input.html")
+		templ, err := template.ParseFiles(TestDirPath + "render_user_defined/template_input.layout")
 		if err != nil {
 			t.Errorf("%v", err)
 		}

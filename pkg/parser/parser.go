@@ -255,13 +255,13 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 func (p *Parser) ParseLayoutFiles() *template.Template {
 
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
+	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.layout")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
 
 	// Parsing all files in the partials/ dir which match the "*.html" pattern
-	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.html")
+	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.layout")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}

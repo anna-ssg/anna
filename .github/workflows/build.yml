@@ -45,7 +45,7 @@ jobs:
 
       - name: Insert commit hash in footer
         run: |
-          sed -i "s/COMMIT_HASH/${{ github.sha }}/g" site/layout/partials/footer.html
+          sed -i "s/COMMIT_HASH/${{ github.sha }}/g" site/layout/partials/footer.layout
 
       - name: build site with anna
         run: |

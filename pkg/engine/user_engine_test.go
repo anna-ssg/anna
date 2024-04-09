@@ -48,7 +48,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 	}
 
 	t.Run("test rendering of post.html", func(t *testing.T) {
-		templ, err := template.ParseFiles(TestDirPath + "render_engine_generated/posts_template.html")
+		templ, err := template.ParseFiles(TestDirPath + "render_engine_generated/posts_template.layout")
 		if err != nil {
 			t.Errorf("%v", err)
 		}

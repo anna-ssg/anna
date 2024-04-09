@@ -61,12 +61,12 @@ func (cmd *Cmd) VanillaRender() {
 		return e.Posts[i].Frontmatter.Date > e.Posts[j].Frontmatter.Date
 	})
 
-	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
+	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.layout")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
 
-	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.html")
+	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.layout")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}

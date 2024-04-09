@@ -41,7 +41,7 @@ func TestRenderPage(t *testing.T) {
 			},
 		}
 
-		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.html")
+		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.layout")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
