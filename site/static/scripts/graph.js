@@ -83,8 +83,13 @@ async function onClick(event, d) {
         .filter(([key, post]) => post.Tags && post.Tags.includes(tag))
         .map(([key, post]) => ({ filename: key, title: post.Frontmatter.Title }));
 
-    setupGraph();
-    drawGraph(commonPosts, tag);
+    if (commonPosts.length === 0 && d.group === 0) {
+        const nodeName = d.id.replace(/\.md$/, ""); // Remove the ".md" extension from the node name (eh)
+        window.location.href = `/posts/${nodeName}.html`;
+    } else {
+        setupGraph();
+        drawGraph(commonPosts, tag);
+    }
 }
 
 async function init() {
