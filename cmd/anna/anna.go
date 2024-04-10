@@ -74,4 +74,5 @@ func (cmd *Cmd) VanillaRender() {
 	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
 
 	e.RenderTags(helpers.SiteDataPath, templ)
+	cmd.VanillaNoteRender(p.LayoutConfig)
 }

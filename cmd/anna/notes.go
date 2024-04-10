@@ -6,11 +6,12 @@ import (
 	"os"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
+	"github.com/acmpesuecc/anna/pkg/parser"
 	zettel_engine "github.com/acmpesuecc/anna/pkg/zettel/engine"
 	zettel_parser "github.com/acmpesuecc/anna/pkg/zettel/parser"
 )
 
-func (cmd *Cmd) VanillaNoteRender() {
+func (cmd *Cmd) VanillaNoteRender(LayoutConfig parser.LayoutConfig) {
 	p := zettel_parser.Parser{
 		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
@@ -18,6 +19,7 @@ func (cmd *Cmd) VanillaNoteRender() {
 	p.NotesMergedData.LinkStore = make(map[template.URL][]*zettel_parser.Note)
 
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/notes")
+	p.Layout = LayoutConfig
 	p.ParseNotesDir(helpers.SiteDataPath+"content/notes/", fileSystem)
 
 	e := zettel_engine.Engine{
@@ -38,5 +40,6 @@ func (cmd *Cmd) VanillaNoteRender() {
 	}
 
 	e.GenerateLinkStore()
-	e.RenderUserNotes()
+	e.RenderUserNotes(helpers.SiteDataPath, templ)
+	e.GenerateRootNote(helpers.SiteDataPath, templ)
 }

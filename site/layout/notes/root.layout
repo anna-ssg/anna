@@ -1,0 +1,25 @@
+{{ define "root" }}
+
+<html>
+<head>
+    <link rel="preload stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+    <div class="container">
+      <div class="posts">
+      {{ range $templateURL, $Note := . }}
+        <a href="{{ $templateURL }}" class="post-card">
+          {{ $templateURL }}
+        </a>
+      {{ end }}
+      <div class="head-note">
+      </div>
+      </div>
+    </div>
+    {{template "footer" .}}
+</body>
+
+</html>
+
+{{ end}}

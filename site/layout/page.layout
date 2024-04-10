@@ -1,4 +1,4 @@
-{{ define "page"}}
+{{ define "page" }}
 {{ template "head" .}}
 
 <body>
@@ -23,11 +23,11 @@
                     </p>
                 </div>
                 <div class="tags-paceholder">
-                    {{range .Frontmatter.Tags}}
+                    <!--{{range .Frontmatter.Tags}}
                     <div class="tag">
                         <a href="/tags/{{.}}.html">{{.}}</a>
                     </div>
-                    {{end}}
+                    {{end}}-->
                 </div>
             </div>
             {{ else }}

@@ -2,6 +2,7 @@ package zettel_parser
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
@@ -33,12 +34,14 @@ type Note struct {
 	Frontmatter              Frontmatter
 	Body                     template.HTML
 	LinkedNoteTitles         []string
-	LayoutConfig             parser.LayoutConfig
+	Layout                   parser.LayoutConfig
 }
 
 type Parser struct {
 	// Holds the data of all of the notes
 	NotesMergedData NotesMerged
+
+	Layout parser.LayoutConfig
 
 	// Common logger for all parser functions
 	ErrorLogger *log.Logger
@@ -70,19 +73,21 @@ func (p *Parser) ParseNotesDir(baseDirPath string, baseDirFS fs.FS) {
 						p.ErrorLogger.Fatal(err)
 					}
 
-					fronmatter, body, parseSuccess := p.ParseNoteMarkdownContent(string(content))
+					fronmatter, body, linkedNoteTitles, parseSuccess := p.ParseNoteMarkdownContent(string(content))
 					if parseSuccess {
 						// ISSUE
-						p.AddNote(baseDirPath, fileName, fronmatter, body)
+						p.AddNote(baseDirPath, fileName, fronmatter, body, linkedNoteTitles)
+						// fmt.Println(fileName, linkedNoteTitles)
 					}
 				}
 			}
 		}
 		return nil
 	})
+	p.ValidateNoteReferences()
 }
 
-func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, string, bool) {
+func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, string, []string, bool) {
 	var parsedFrontmatter Frontmatter
 	var markdown string
 	/*
@@ -97,14 +102,14 @@ func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, stri
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", []string{}, false
 	}
 
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", []string{}, false
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -118,6 +123,50 @@ func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, stri
 	// TODO:
 	// This section must replace the callouts with
 	// the html url references
+	/*
+		REGEX:
+		using regex we need to identify for the references to other
+		notes of the following pattern
+
+		[Note Title Name](/note/somefilename)
+	*/
+
+	// DONT DELETE: re := regexp.MustCompile(`\[[^\]]*\]\(/notes/[^\]]*\.html\)`)
+	re := regexp.MustCompile(`\[\[[^\]]*\]\]`)
+
+	re_sub := regexp.MustCompile(`\[.*\]`)
+	matches := re.FindAllString(markdown, -1)
+	fmt.Printf("%s : ", parsedFrontmatter.Title)
+
+	linkedNoteTitles := []string{}
+	fmt.Printf("%s\n", matches)
+
+	for _, match := range matches {
+		/*
+									Extracting the file "Titles" from the first match
+									ex: [[Nunc ullamcorper]]
+									will extract out "Nunc ullamcorper"
+
+						      We will change the reference to use
+						      [[Nunc ullamcorper]] => [Nunc ullamcorper](<Nunc ullamcorper.html>)
+
+			            NOTE: This is temoprary and will have to make it such that
+			            it could be present in any file name. Hence this method
+			            will have to move to another function
+		*/
+		sub_match := re_sub.FindString(match)
+		sub_match = strings.Trim(sub_match, "[]")
+		fmt.Printf("\t%s\n", sub_match)
+
+		linkedNoteTitles = append(linkedNoteTitles, sub_match)
+
+		note_name := strings.Join([]string{sub_match, "html"}, ".")
+
+		// replacing reference with a markdown reference
+		new_reference := fmt.Sprintf("[%s](</notes/%s>)", sub_match, note_name)
+		markdown = strings.ReplaceAll(markdown, match, new_reference)
+		fmt.Printf("%s => %s\n", match, fmt.Sprintf("[%s](</notes/%s>)", sub_match, note_name))
+	}
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
@@ -132,10 +181,10 @@ func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, stri
 		p.ErrorLogger.Fatal(err)
 	}
 
-	return parsedFrontmatter, parsedMarkdown.String(), true
+	return parsedFrontmatter, parsedMarkdown.String(), linkedNoteTitles, true
 }
 
-func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string) {
+func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string, linkedNoteTitles []string) {
 	filepath := baseDirPath + dirEntryPath
 
 	var date int64
@@ -160,48 +209,38 @@ func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter Fr
 		FilenameWithoutExtension: strings.Split(dirEntryPath, ".")[0],
 		Frontmatter:              frontmatter,
 		Body:                     template.HTML(body),
-		LinkedNoteTitles:         []string{},
-		// Layout:                   p.LayoutConfig,
+		LinkedNoteTitles:         linkedNoteTitles,
+		Layout:                   p.Layout,
 	}
 
-	p.NotesMergedData.Notes[template.URL(key)] = note
+	p.NotesMergedData.Notes[note.CompleteURL] = note
+	//fmt.Println(note.Layout)
+}
 
-	/*
-		REGEX:
-		using regex we need to identify for the references to other
-		notes of the following pattern
-
-		[Note Title Name](/note/somefilename)
-	*/
-
-	re := regexp.MustCompile(`\[.*\]\((\/notes\/).*(.md)\)`)
-	re_sub := regexp.MustCompile(`\[.*\]`)
-	matches := re.FindAllString(string(note.Body), -1)
-
-	for _, match := range matches {
-		/*
-			Extracting the file "Titles" from the first match
-			ex: [Nunc ullamcorper](/notes/2021-09-01-nunc-ullamcorper.md)
-			will extract out "[Nunc ullamcorper]"
-		*/
-		sub_match := re_sub.FindString(match)
-		sub_match = strings.Trim(sub_match, "[]")
-
-		note.LinkedNoteTitles = append(note.LinkedNoteTitles, sub_match)
+func (p *Parser) ValidateNoteTitle(ReferenceNoteTitle string) bool {
+	for _, Note := range p.NotesMergedData.Notes {
+		if Note.Frontmatter.Title == ReferenceNoteTitle {
+			return true
+		}
 	}
+	return false
 }
 
 func (p *Parser) ValidateNoteReferences() {
 	/*
-	This function is going to validate whether all the
-	references in the notes have a valid link to another
-	note
+		This function is going to validate whether all the
+		references in the notes have a valid link to another
+		note
 
-	Example: for `[Nunc ullamcorper](/notes/1234.md)` to be
-	a valid reference, the title part of the frontmatter
-	of the note `/note/1234.md` must have "Nunc ullamcorper"
+		Example: for `[Nunc ullamcorper](/notes/1234.md)` to be
+		a valid reference, the title part of the frontmatter
+		of the note `/note/1234.md` must have "Nunc ullamcorper"
 	*/
-
-
-
+	for _, Note := range p.NotesMergedData.Notes {
+		for _, ReferenceNoteTitle := range Note.LinkedNoteTitles {
+			if !p.ValidateNoteTitle(ReferenceNoteTitle) {
+				p.ErrorLogger.Fatalf("ERR: Referenced note title (%s) doesnt have an existing note", ReferenceNoteTitle)
+			}
+		}
+	}
 }

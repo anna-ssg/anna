@@ -84,7 +84,7 @@ type Parser struct {
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
-		if path != "." {
+		if path != "." && !strings.Contains(path, "notes") {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
 				p.ParseMDDir(path, subDir)
