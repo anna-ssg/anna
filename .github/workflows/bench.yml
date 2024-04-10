@@ -1,10 +1,8 @@
-name: benchmark
+# Benchmark anna v/s other SSGs
+name: Benchmark
 
 on:
-  push:
-    branches:
-      - 'prof-bench.sh'
-      workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   benchmark:
