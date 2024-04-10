@@ -154,6 +154,7 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 func (e *Engine) GenerateFeed() {
 	var buffer bytes.Buffer
 	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	buffer.WriteString("<?xml-stylesheet href=\"/static/styles/feed.xsl\" type=\"text/xsl\"?>\n")
 	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
 	buffer.WriteString("    <title>" + e.LayoutConfig.SiteTitle + "</title>\n")
 	buffer.WriteString("    <link href=\"" + e.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
@@ -162,10 +163,10 @@ func (e *Engine) GenerateFeed() {
 	// iterate over parsed markdown files that are non-draft posts
 	for _, templateData := range e.Templates {
 		if !templateData.Frontmatter.Draft {
-			buffer.WriteString("    <entry>\n")
+			buffer.WriteString("<entry>\n")
 			buffer.WriteString("        <title>" + templateData.Frontmatter.Title + "</title>\n")
 			buffer.WriteString("        <link href=\"" + e.LayoutConfig.BaseURL + "/posts/" + templateData.FilenameWithoutExtension + ".html\"/>\n")
-			buffer.WriteString("        <id>" + e.LayoutConfig.BaseURL + "/" + templateData.FilenameWithoutExtension + ".html</id>\n")
+			buffer.WriteString("        <id>" + e.LayoutConfig.BaseURL + "/posts/" + templateData.FilenameWithoutExtension + ".html</id>\n")
 			buffer.WriteString("        <updated>" + time.Unix(templateData.Date, 0).Format(time.RFC3339) + "</updated>\n")
 			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(templateData.Body) + "]]></content>\n")
 			buffer.WriteString("    </entry>\n")
@@ -173,7 +174,7 @@ func (e *Engine) GenerateFeed() {
 	}
 
 	buffer.WriteString("</feed>\n")
-	outputFile, err := os.Create(helpers.SiteDataPath + "rendered/feed.atom")
+	outputFile, err := os.Create(helpers.SiteDataPath + "rendered/feed.xml")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}

@@ -72,6 +72,13 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 }
 
 func (h *Helper) Bootstrap() {
+	fmt.Println("Are you sure you want to proceed with the bootstrap process? (y/n)")
+	var confirm string
+	fmt.Scanln(&confirm)
+	if confirm != "y" {
+		fmt.Println("Bootstrap process cancelled.")
+		return
+	}
 	log.Println("Downloading base theme")
 	url := "https://github.com/acmpesuecc/anna/archive/refs/heads/main.zip"
 	output, err := os.Create("anna-repo.zip")

@@ -1,4 +1,5 @@
 ---
+date: 2024-04-10
 title: Anna Documentation
 ---
 
@@ -20,12 +21,12 @@ Pronounced: `/ɐnːɐ/` which means rice in Kannada 🍚
 
 This Project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
 
+---
 ## Directory structure
 
 The ssg currently requires the following directory structure
 
 ```text
-
 /anna
 ├── /cmd
 ├── /pkg
@@ -134,8 +135,7 @@ navbar:
   - posts
 
 baseURL: http://localhost:8000/
-# Replace this with the actual canonical-url of your site.
-
+# Replace this with the actual canonical-url of your site
 # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet.
 # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site.
 
@@ -143,33 +143,35 @@ siteTitle: anna
 siteScripts:
 author: Anna
 ```
-
-## Install
-
-Once you have a directory structure, install `anna` using:
+---
+## Run locally
 
 ```sh
-go install github.com/acmpesuecc/anna@latest
+go run github.com/acmpesuecc/anna@v1.0.0-alpha
 ```
+> If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
-Or if you have git installed, clone our repository:
+## Contributing to Anna
+
+Detailed documentation for our SSG can be found: [here](https://anna-docs.netlify.app/)
+
+If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/acmpesuecc/anna --depth=1
-cd anna
-go run .
+git clone github.com/acmpesuecc/anna; cd anna 
+go build
 ```
-
-## Flags
-
 ```text
 Usage:
   anna [flags]
 
 Flags:
-  -a, --addr stringwhich sip address to serve rendered content to (default "8000")
-  -d, --draft           renders draft posts
-  -h, --help            help for ssg
-  -s, --serve           serve the rendered content
-  -v, --validate-html   validate semantic HTML
+  -a, --addr string   ip address to serve rendered content to (default "8000")
+  -d, --draft         renders draft posts
+  -h, --help          help for anna
+  -l, --layout        validates html layouts
+  -p, --prof          enable profiling
+  -s, --serve         serve the rendered content
+  -v, --version       prints current version number
+  -w, --webconsole    wizard to setup anna
 ```
