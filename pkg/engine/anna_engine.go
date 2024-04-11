@@ -118,6 +118,7 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 		jsonIndexTemplate[templateURL] = JSONIndexTemplate{
 			CompleteURL: templateData.CompleteURL,
 			Frontmatter: templateData.Frontmatter,
+			Tags:        templateData.Frontmatter.Tags,
 		}
 	}
 

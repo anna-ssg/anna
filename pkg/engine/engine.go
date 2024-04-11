@@ -50,6 +50,7 @@ type PageData struct {
 type JSONIndexTemplate struct {
 	CompleteURL template.URL
 	Frontmatter parser.Frontmatter
+	Tags        []string
 }
 
 /*

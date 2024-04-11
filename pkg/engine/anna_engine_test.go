@@ -57,7 +57,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.layout", TestDirPath+"render_tags/tags_subpage_template.layout")
+	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.html", TestDirPath+"render_tags/tags_subpage_template.html")
 	if err != nil {
 		t.Errorf("%v", err)
 	}

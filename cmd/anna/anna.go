@@ -62,12 +62,12 @@ func (cmd *Cmd) VanillaRender() {
 		return e.DeepDataMerge.Posts[i].Frontmatter.Date > e.DeepDataMerge.Posts[j].Frontmatter.Date
 	})
 
-	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.layout")
+	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
 
-	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.layout")
+	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.html")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
