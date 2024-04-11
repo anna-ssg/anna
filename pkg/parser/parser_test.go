@@ -65,7 +65,7 @@ func TestAddFileandRender(t *testing.T) {
 			want_parser.Posts = append(want_parser.Posts, want_page)
 		}
 
-		got_parser.AddFileAndRender("", filename, sample_frontmatter, sample_body)
+		got_parser.AddFile("", filename, sample_frontmatter, sample_body)
 
 		if !reflect.DeepEqual(got_parser, want_parser) {
 			t.Errorf("want %v; \ngot %v", want_parser, got_parser)

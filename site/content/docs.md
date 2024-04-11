@@ -1,6 +1,7 @@
 ---
 date: 2024-04-10
 title: Anna Documentation
+type: page
 ---
 
 # Anna

@@ -14,48 +14,20 @@ import (
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
 	"github.com/acmpesuecc/anna/pkg/parser"
+	"github.com/acmpesuecc/anna/pkg/zettel"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
 
-type NotesMerged struct {
-	//Stores all the notes
-	Notes map[template.URL]Note
-
-	//Stores the links of each note to other notes
-	LinkStore map[template.URL][]*Note
-}
-
-type Note struct {
-	CompleteURL              template.URL
-	FilenameWithoutExtension string
-	Date                     int64
-	Frontmatter              Frontmatter
-	Body                     template.HTML
-	LinkedNoteTitles         []string
-	Layout                   parser.LayoutConfig
-}
-
 type Parser struct {
 	// Holds the data of all of the notes
-	NotesMergedData NotesMerged
+	NotesMergedData zettel.NotesMerged
 
 	Layout parser.LayoutConfig
 
 	// Common logger for all parser functions
 	ErrorLogger *log.Logger
-}
-
-type Frontmatter struct {
-	Title        string   `yaml:"title"`
-	Date         string   `yaml:"date"`
-	JSFiles      []string `yaml:"scripts"`
-	Type         string   `yaml:"type"`
-	Description  string   `yaml:"description"`
-	PreviewImage string   `yaml:"previewimage"`
-	Head         bool     `yaml:"head"`
-	// Tags         []string `yaml:"tags"`
 }
 
 func (p *Parser) ParseNotesDir(baseDirPath string, baseDirFS fs.FS) {
@@ -77,18 +49,18 @@ func (p *Parser) ParseNotesDir(baseDirPath string, baseDirFS fs.FS) {
 					if parseSuccess {
 						// ISSUE
 						p.AddNote(baseDirPath, fileName, fronmatter, body, linkedNoteTitles)
-						// fmt.Println(fileName, linkedNoteTitles)
+						fmt.Println(fileName, linkedNoteTitles)
 					}
 				}
 			}
 		}
 		return nil
 	})
-	p.ValidateNoteReferences()
+	// p.ValidateNoteReferences()
 }
 
-func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, string, []string, bool) {
-	var parsedFrontmatter Frontmatter
+func (p *Parser) ParseNoteMarkdownContent(filecontent string) (parser.Frontmatter, string, []string, bool) {
+	var parsedFrontmatter parser.Frontmatter
 	var markdown string
 	/*
 	   ---
@@ -102,14 +74,14 @@ func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, stri
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		return Frontmatter{}, "", []string{}, false
+		return parser.Frontmatter{}, "", []string{}, false
 	}
 
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
-		return Frontmatter{}, "", []string{}, false
+		return parser.Frontmatter{}, "", []string{}, false
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -184,7 +156,7 @@ func (p *Parser) ParseNoteMarkdownContent(filecontent string) (Frontmatter, stri
 	return parsedFrontmatter, parsedMarkdown.String(), linkedNoteTitles, true
 }
 
-func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string, linkedNoteTitles []string) {
+func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter parser.Frontmatter, body string, linkedNoteTitles []string) {
 	filepath := baseDirPath + dirEntryPath
 
 	var date int64
@@ -203,14 +175,12 @@ func (p *Parser) AddNote(baseDirPath string, dirEntryPath string, frontmatter Fr
 		url = "posts/" + url
 	}
 
-	note := Note{
-		CompleteURL:              template.URL(url),
-		Date:                     date,
-		FilenameWithoutExtension: strings.Split(dirEntryPath, ".")[0],
-		Frontmatter:              frontmatter,
-		Body:                     template.HTML(body),
-		LinkedNoteTitles:         linkedNoteTitles,
-		Layout:                   p.Layout,
+	note := zettel.Note{
+		CompleteURL:      template.URL(url),
+		Date:             date,
+		Frontmatter:      frontmatter,
+		Body:             template.HTML(body),
+		LinkedNoteTitles: linkedNoteTitles,
 	}
 
 	p.NotesMergedData.Notes[note.CompleteURL] = note

@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"os"
 	"runtime"
-	"strings"
 	"sync"
 
 	"github.com/acmpesuecc/anna/pkg/parser"
@@ -28,14 +27,6 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *templa
 		DeepDataMerge: e.DeepDataMerge,
 		PageURL: "posts.html",
 	}
-	// e.DeepDataMerge.Templates["posts.html"] = parser.TemplateData{
-	// 	Frontmatter: parser.Frontmatter{Title: "Posts"},
-	// }
-
-	// pageData := PageData{
-	// 	DeepDataMerge: e.DeepDataMerge,
-	// 	PageURL: "posts.html",
-	// }
 
 	err := template.ExecuteTemplate(&postsBuffer, "posts", postsData)
 	if err != nil {
@@ -67,8 +58,7 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 	semaphore := make(chan struct{}, concurrency)
 
 	for _, templateURL := range templateURLs {
-		fileInPath := strings.TrimSuffix(templateURL, ".html")
-		if fileInPath == ".html" {
+		if templateURL == ".html" {
 			continue
 		}
 

@@ -89,7 +89,7 @@ async function onClick(event, d) {
 
     if (commonPosts.length === 0 && d.group !== 0) {
         const nodeName = d.id.replace(/\.md$/, ""); // Remove the ".md" extension from the node name (eh)
-        window.location.href = `/posts/${nodeName}.html`; // If it's a leaf node, automatically redirect
+        window.location.href = `/${nodeName}`; // If it's a leaf node, automatically redirect
     }
     else {
         setupGraph();

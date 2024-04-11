@@ -1,7 +1,7 @@
 ---
 date: 2024-02-24
 title: Home
-scripts:
+type: page
 previewimage: "/static/plane.jpg"
 description: "homepage for our ssg"
 ---

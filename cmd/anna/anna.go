@@ -1,6 +1,7 @@
 package anna
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -20,8 +21,8 @@ type Cmd struct {
 func (cmd *Cmd) VanillaRender() {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
-		Templates:    make(map[template.URL]parser.TemplateData),
-		TagsMap:      make(map[template.URL][]parser.TemplateData),
+		Templates:    make(map[template.URL]parser.TemplateData, 10),
+		TagsMap:      make(map[template.URL][]parser.TemplateData, 10),
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts: cmd.RenderDrafts,
 		LiveReload:   cmd.LiveReload,
@@ -30,8 +31,10 @@ func (cmd *Cmd) VanillaRender() {
 	e := engine.Engine{
 		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
+	e.DeepDataMerge.Notes = make(map[template.URL]parser.Note, 10)
+	e.DeepDataMerge.LinkStore = make(map[template.URL][]*parser.Note, 10)
 
 	helper := helpers.Helper{
 		ErrorLogger:  e.ErrorLogger,
@@ -45,7 +48,9 @@ func (cmd *Cmd) VanillaRender() {
 	p.ParseConfig(helpers.SiteDataPath + "layout/config.yml")
 
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
+	p.Notes = make(map[template.URL]parser.Note, 10)
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
+	p.BackLinkParser()
 
 	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
@@ -77,5 +82,11 @@ func (cmd *Cmd) VanillaRender() {
 	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
 
 	e.RenderTags(helpers.SiteDataPath, templ)
-	cmd.VanillaNoteRender(p.LayoutConfig)
+
+	// Zettel engine functionality
+	e.DeepDataMerge.Notes = p.Notes
+
+	e.GenerateLinkStore()
+	fmt.Println(e.DeepDataMerge.LinkStore)
+	e.RenderNotes(helpers.SiteDataPath, templ)
 }
