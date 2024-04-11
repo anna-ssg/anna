@@ -40,17 +40,11 @@ type Frontmatter struct {
 
 // This struct holds all of the data required to render any page of the site
 type TemplateData struct {
-	CompleteURL              template.URL
-	FilenameWithoutExtension string
-	Date                     int64
-	Frontmatter              Frontmatter
-	Body                     template.HTML
-	Layout                   LayoutConfig
-
-	// Do not use these fields to store tags!!
-	// These fields are populated by the ssg to store merged tag data
-	Tags                 []string
-	SpecificTagTemplates []TemplateData
+	CompleteURL template.URL
+	Date        int64
+	Frontmatter Frontmatter
+	Body        template.HTML
+	Layout      LayoutConfig
 }
 
 type Date int64
@@ -61,7 +55,7 @@ type Parser struct {
 	Templates map[template.URL]TemplateData
 
 	// K-V pair storing all templates correspoding to a particular tag in the site
-	TagsMap map[string][]TemplateData
+	TagsMap map[template.URL][]TemplateData
 
 	// Stores data parsed from layout/config.yml
 	LayoutConfig LayoutConfig
@@ -128,13 +122,13 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 	if frontmatter.Type == "post" {
 		url = "posts/" + url
 	}
+
 	page := TemplateData{
-		CompleteURL:              template.URL(url),
-		Date:                     date,
-		FilenameWithoutExtension: strings.Split(dirEntryPath, ".")[0],
-		Frontmatter:              frontmatter,
-		Body:                     template.HTML(body),
-		Layout:                   p.LayoutConfig,
+		CompleteURL: template.URL(url),
+		Date:        date,
+		Frontmatter: frontmatter,
+		Body:        template.HTML(body),
+		Layout:      p.LayoutConfig,
 	}
 
 	// Adding the page to the merged map storing all site pages
@@ -142,11 +136,12 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 		p.Posts = append(p.Posts, page)
 	}
 
-	p.Templates[template.URL(key)] = page
+	p.Templates[template.URL(url)] = page
 
 	// Adding the page to the tags map with the corresponding tags
 	for _, tag := range page.Frontmatter.Tags {
-		p.TagsMap[tag] = append(p.TagsMap[tag], page)
+		tagsMapKey := "tags/" + tag + ".html"
+		p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
 	}
 }
 

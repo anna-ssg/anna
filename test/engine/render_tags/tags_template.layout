@@ -1,12 +1,25 @@
 {{ define "all-tags"}}
+{{$PageData := .TagTemplateData}}
+
 <body>
-<div class="body">
-<div class="all-tags">
-{{ range .Tags }}
-<a href="tags/{{.}}.html">{{.}}</a>
-{{end}}
-</div>
-</div>
+    <div class="body">
+        <article>
+            <section class="posts">
+                <div class="all-tags">
+                    {{range .TagNames}}
+                    <a href="/tags/{{.}}.html">{{.}}</a>
+                    {{end}}
+                </div>
+            </section>
+        </article>
+    </div>
+
+    <div id="chart"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/static/scripts/graph.js"></script>
+
 </body>
+
 </html>
-{{ end }}
+
+{{ end}}

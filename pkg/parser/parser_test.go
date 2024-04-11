@@ -16,7 +16,7 @@ const TestDirPath = "../../test/parser/"
 func TestAddFileandRender(t *testing.T) {
 	got_parser := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
+		TagsMap:     make(map[template.URL][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 
@@ -34,10 +34,11 @@ func TestAddFileandRender(t *testing.T) {
 		}
 		want_parser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
+			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: got_parser.ErrorLogger,
 		}
-		sample_frontmatter, sample_body, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
+		sample_frontmatter, _, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
+		sample_body := "sample_body"
 		if !parseSuccess {
 			return
 		}
@@ -47,18 +48,17 @@ func TestAddFileandRender(t *testing.T) {
 		want_parser.MdFilesName = append(want_parser.MdFilesName, filename)
 		want_parser.MdFilesPath = append(want_parser.MdFilesPath, filename)
 		want_page := parser.TemplateData{
-			CompleteURL:              template.URL(fileurl),
-			Date:                     want_parser.DateParse(sample_frontmatter.Date).Unix(),
-			FilenameWithoutExtension: "testpost",
-			Frontmatter:              sample_frontmatter,
-			Body:                     template.HTML(sample_body),
-			Layout:                   want_layout,
+			CompleteURL: template.URL(fileurl),
+			Date:        want_parser.DateParse(sample_frontmatter.Date).Unix(),
+			Frontmatter: sample_frontmatter,
+			Body:        template.HTML(sample_body),
+			Layout:      want_layout,
 		}
 		want_parser.LayoutConfig = want_layout
 
-		want_parser.Templates[template.URL("testpost.md")] = want_page
+		want_parser.Templates[template.URL("posts/testpost.html")] = want_page
 		for _, tag := range sample_frontmatter.Tags {
-			want_parser.TagsMap[tag] = append(want_parser.TagsMap[tag], want_page)
+			want_parser.TagsMap[template.URL(tag)] = append(want_parser.TagsMap[template.URL(tag)], want_page)
 		}
 
 		if sample_frontmatter.Type == "post" {
@@ -69,6 +69,7 @@ func TestAddFileandRender(t *testing.T) {
 
 		if !reflect.DeepEqual(got_parser, want_parser) {
 			t.Errorf("want %v; \ngot %v", want_parser, got_parser)
+			// t.Errorf("please see the files yourself")
 		}
 	})
 }
@@ -76,7 +77,7 @@ func TestAddFileandRender(t *testing.T) {
 func TestParseMarkdownContent(t *testing.T) {
 	p := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
+		TagsMap:     make(map[template.URL][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
@@ -126,7 +127,7 @@ func TestParseConfig(t *testing.T) {
 	t.Run("unmarshal `config.yml` to LayoutConfig", func(t *testing.T) {
 		got_parser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
+			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
 
@@ -149,7 +150,7 @@ func TestParseRobots(t *testing.T) {
 	t.Run("parse and render `robots.txt`", func(t *testing.T) {
 		parser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
+			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
 		parser.LayoutConfig.BaseURL = "example.org"

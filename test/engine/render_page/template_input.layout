@@ -1,15 +1,39 @@
 {{ define "page"}}
-<html>
-<head></head>
+{{$PageData := index .DeepDataMerge.Templates .PageURL}}
+
 <body>
-<div class="tags-paceholder">
-{{range .Frontmatter.Tags}}
-<div class="tag">
-<a href="/tags/{{.}}.html">{{.}}</a>
-</div>
-{{end}}
-</div>
-{{.Body}}
+
+    <article>
+        <section class="body">
+            {{ if eq $PageData.Frontmatter.Type "post" }}
+            <div class="post-description">
+                <h1>{{ $PageData.Frontmatter.Title }}</h1>
+                <div class="authors-paceholder">
+                    <p>
+                        Published on {{$PageData.Frontmatter.Date}}
+                        <!-- if length of frontmatter authors is 0 -->
+                        {{ if eq (len $PageData.Frontmatter.Authors) 0 }}
+                        {{.DeepDataMerge.LayoutConfig.Author}}
+                        {{ else }}
+                        {{range $PageData.Frontmatter.Authors }}
+                        {{ . }},
+                        {{ end }}
+                        {{ end }}
+                    </p>
+                </div>
+                <div class="tags-paceholder">
+                    {{range $PageData.Frontmatter.Tags}}
+                    <div class="tag">
+                        <a href="/tags/{{.}}.html">{{.}}</a>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+            {{ else }}
+            {{ end }}
+            {{$PageData.Body}}
+        </section>
+    </article>
 </body>
-</html>
-{{end}}
+
+{{ end}}

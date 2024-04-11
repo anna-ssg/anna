@@ -11,13 +11,16 @@ import (
 )
 
 // This struct holds all of the ssg data
-type MergedSiteData struct {
+type DeepDataMerge struct {
 	// Templates stores the template data of all the pages of the site
 	// Access the data for a particular page by using the relative path to the file as the key
 	Templates map[template.URL]parser.TemplateData
 
-	// K-V pair storing all templates correspoding to a particular tag in the site
-	TagsMap map[string][]parser.TemplateData
+	// Templates stores the template data of all tag sub-pages of the site
+	Tags map[template.URL]parser.TemplateData
+
+	// K-V pair storing all templates corresponding to a particular tag in the site
+	TagsMap map[template.URL][]parser.TemplateData
 
 	// Stores data parsed from layout/config.yml
 	LayoutConfig parser.LayoutConfig
@@ -31,18 +34,22 @@ type MergedSiteData struct {
 
 type Engine struct {
 	// Stores the merged ssg data
-	DeepDataMerge MergedSiteData
+	DeepDataMerge DeepDataMerge
 
 	// Common logger for all engine functions
 	ErrorLogger *log.Logger
 }
 
+type PageData struct {
+	DeepDataMerge DeepDataMerge
+
+	PageURL template.URL
+}
+
 // This structure is solely used for storing the JSON index
 type JSONIndexTemplate struct {
-	CompleteURL              template.URL
-	FilenameWithoutExtension string
-	Frontmatter              parser.Frontmatter
-	Tags                     []string
+	CompleteURL template.URL
+	Frontmatter parser.Frontmatter
 }
 
 /*
@@ -51,13 +58,11 @@ fileOutPath - stores the parent directory to store rendered files, usually `site
 pagePath - stores the path to write the given page without the prefix directory
 Eg: site/content/posts/file1.html to be passed as posts/file1.html
 
-pageTemplateData - an interface that accepts any type of data to be passed to ExecuteTemplate()
-
 template - stores the HTML templates parsed from the layout/ directory
 
 templateStartString - stores the name of the template to be passed to ExecuteTemplate()
 */
-func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, pageTemplateData interface{}, template *template.Template, templateStartString string) {
+func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template *template.Template, templateStartString string) {
 	// Creating subdirectories if the filepath contains '/'
 	if strings.Contains(string(pagePath), "/") {
 		// Extracting the directory path from the page path
@@ -74,8 +79,12 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, pageTempl
 	filepath := fileOutPath + "rendered/" + string(pagePath)
 	var buffer bytes.Buffer
 
+	pageData := PageData{
+		DeepDataMerge: e.DeepDataMerge,
+		PageURL:       pagePath,
+	}
 	// Storing the rendered HTML file to a buffer
-	err := template.ExecuteTemplate(&buffer, templateStartString, pageTemplateData)
+	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}

@@ -16,19 +16,17 @@ func TestRenderUserDefinedPages(t *testing.T) {
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	engine.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
+	engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-	engine.DeepDataMerge.Templates["index.md"] =
+	engine.DeepDataMerge.Templates["index.html"] =
 		parser.TemplateData{
-			FilenameWithoutExtension: "index",
-			Body:                     template.HTML("<h1>Index Page</h1>"),
-			CompleteURL:              "index.html",
+			Body:        template.HTML("<h1>Index Page</h1>"),
+			CompleteURL: "index.html",
 		}
 
-	engine.DeepDataMerge.Templates["posts/hello.md"] = parser.TemplateData{
-		FilenameWithoutExtension: "hello",
-		Body:                     template.HTML("<h1>Hello World</h1>"),
-		CompleteURL:              "posts/hello.html",
+	engine.DeepDataMerge.Templates["posts/hello.html"] = parser.TemplateData{
+		Body:        template.HTML("<h1>Hello World</h1>"),
+		CompleteURL: "posts/hello.html",
 	}
 
 	if err := os.MkdirAll(TestDirPath+"render_user_defined/rendered", 0750); err != nil {
@@ -73,7 +71,4 @@ func TestRenderUserDefinedPages(t *testing.T) {
 		}
 	})
 
-	if err := os.RemoveAll(TestDirPath + "render_user_defined/rendered"); err != nil {
-		t.Errorf("%v", err)
-	}
 }

@@ -17,11 +17,11 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	engine.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
+	engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
 	engine.DeepDataMerge.Posts = []parser.TemplateData{
 		{
-			FilenameWithoutExtension: "file1",
+			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
 				Title:       "file1",
 				Description: "Description of file 1",
@@ -30,7 +30,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 		},
 
 		{
-			FilenameWithoutExtension: "file2",
+			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
 				Title:       "file2",
 				Description: "Description of file 2",
@@ -39,7 +39,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 		},
 
 		{
-			FilenameWithoutExtension: "file3",
+			CompleteURL: "posts/file3.html",
 			Frontmatter: parser.Frontmatter{
 				Title:       "file3",
 				Description: "Description of file 3",
@@ -74,8 +74,4 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 			t.Errorf("The expected and generated posts.html can be found in test/engine/render_engine_generated/rendered/")
 		}
 	})
-
-	if err := os.RemoveAll(TestDirPath + "render_engine_generated/rendered"); err != nil {
-		t.Errorf("%v", err)
-	}
 }

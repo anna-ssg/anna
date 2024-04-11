@@ -23,11 +23,10 @@ func TestRenderPage(t *testing.T) {
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
 		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		engine.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
+		engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-		page := parser.TemplateData{
-			CompleteURL:              template.URL("got"),
-			FilenameWithoutExtension: "got",
+		engine.DeepDataMerge.Templates["posts/got.html"] = parser.TemplateData{
+			CompleteURL: template.URL("got.html"),
 			Frontmatter: parser.Frontmatter{
 				Title:       "Hello",
 				Date:        "2024-03-28",
@@ -50,7 +49,7 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderPage(TestDirPath+"render_page/", "posts/got.html", page, templ, "page")
+		engine.RenderPage(TestDirPath+"render_page/", "posts/got.html", templ, "page")
 
 		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {
@@ -67,7 +66,4 @@ func TestRenderPage(t *testing.T) {
 		}
 	})
 
-	if err := os.RemoveAll(TestDirPath + "render_page/rendered"); err != nil {
-		t.Errorf("%v", err)
-	}
 }

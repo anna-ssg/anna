@@ -7,7 +7,7 @@
         <article>
             <section class="posts">
                 {{range $PostDate, $Post := .Posts}}
-                <a class="post-card" href="posts/{{$Post.FilenameWithoutExtension}}.html">
+                <a class="post-card" href="{{$Post.CompleteURL}}">
                     <div class="post-card-div">
                         <h3>{{$Post.Frontmatter.Title}}</h3>
                         <p>{{$Post.Frontmatter.Description}}</p>

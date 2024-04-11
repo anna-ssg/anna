@@ -20,16 +20,16 @@ func (cmd *Cmd) VanillaRender() {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
 		Templates:    make(map[template.URL]parser.TemplateData),
-		TagsMap:      make(map[string][]parser.TemplateData),
+		TagsMap:      make(map[template.URL][]parser.TemplateData),
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts: cmd.RenderDrafts,
 	}
 
 	e := engine.Engine{
-		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	e.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
 	helper := helpers.Helper{
 		ErrorLogger:  e.ErrorLogger,
