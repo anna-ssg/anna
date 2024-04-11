@@ -6,10 +6,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
 )
+
+var reloadPage = make(chan struct{})
+
+var countRequests atomic.Int32
 
 type liveReload struct {
 	errorLogger *log.Logger
@@ -43,6 +48,7 @@ func (cmd *Cmd) StartLiveReload() {
 		for _, rootDir := range lr.rootDirs {
 			if lr.traverseDirectory(rootDir) {
 				cmd.VanillaRender()
+				reloadPage <- struct{}{}
 			}
 		}
 		if !lr.serverRunning {
@@ -97,8 +103,35 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 
 func (lr *liveReload) startServer(addr string) {
 	fmt.Print("Serving content at: http://localhost:", addr, "\n")
-	err := http.ListenAndServe(":"+addr, http.FileServer(http.Dir(helpers.SiteDataPath+"./rendered")))
+	http.Handle("/", http.FileServer(http.Dir(helpers.SiteDataPath+"./rendered")))
+	http.HandleFunc("/events", eventsHandler)
+	err := http.ListenAndServe(":"+addr, nil)
 	if err != nil {
 		lr.errorLogger.Fatal(err)
 	}
+}
+
+func eventsHandler(w http.ResponseWriter, r *http.Request) {
+	countRequests.Add(1)
+
+	// Set CORS headers to allow all origins.
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Expose-Headers", "Content-Type")
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	if countRequests.Load() == 1 {
+		<-reloadPage
+	} else {
+		countRequests.Store(countRequests.Load() - 1)
+		return
+	}
+
+	event := "event:\ndata:\n\n"
+	w.Write([]byte(event))
+	w.(http.Flusher).Flush()
+
+	countRequests.Store(countRequests.Load() - 1)
 }

@@ -45,6 +45,7 @@ type TemplateData struct {
 	Frontmatter Frontmatter
 	Body        template.HTML
 	Layout      LayoutConfig
+	LiveReload  bool
 }
 
 type Date int64
@@ -74,6 +75,9 @@ type Parser struct {
 	ErrorLogger *log.Logger
 
 	Helper *helpers.Helper
+
+	// Determines the injection of Live Reload JS in HTML
+	LiveReload bool
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
@@ -129,6 +133,7 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 		Frontmatter: frontmatter,
 		Body:        template.HTML(body),
 		Layout:      p.LayoutConfig,
+		LiveReload:  p.LiveReload,
 	}
 
 	// Adding the page to the merged map storing all site pages
@@ -248,7 +253,6 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
-
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {
