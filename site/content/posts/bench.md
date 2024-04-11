@@ -2,7 +2,7 @@
 title: benchmark
 template: post.jinja
 author: John Doe
-date: 2024-02-23
+date: 2024-01-01
 categories:
   - Technology
   - Programming

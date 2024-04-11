@@ -1,5 +1,3 @@
-!rendered/
-site/rendered/
 anna
 !anna/
 *.exe
@@ -8,3 +6,8 @@ anna
 ssg/
 *.txt
 dist/
+
+#Test directories
+**/rendered/
+test/**/static/
+test/**/got_sitemap.xml

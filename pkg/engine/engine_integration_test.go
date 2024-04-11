@@ -13,28 +13,33 @@ import (
 
 func TestRenderUserDefinedPages(t *testing.T) {
 	engine := engine.Engine{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
+	engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+	engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-	engine.Templates["index.md"] =
+	engine.DeepDataMerge.Templates["index.html"] =
 		parser.TemplateData{
-			FilenameWithoutExtension: "index",
-			Body:                     template.HTML("<h1>Index Page</h1>"),
+			Body:        template.HTML("<h1>Index Page</h1>"),
+			CompleteURL: "index.html",
 		}
 
-	engine.Templates["posts/hello.md"] = parser.TemplateData{
-		FilenameWithoutExtension: "hello",
-		Body:                     template.HTML("<h1>Hello World</h1>"),
+	engine.DeepDataMerge.Templates["posts/hello.html"] = parser.TemplateData{
+		Body:        template.HTML("<h1>Hello World</h1>"),
+		CompleteURL: "posts/hello.html",
+	}
+
+	if err := os.MkdirAll(TestDirPath+"render_user_defined/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
 	}
 
 	t.Run("render a set of user defined pages", func(t *testing.T) {
 
-		templ, err := template.ParseFiles(TestDirPath + "render_user_defined/template_input.layout")
+		templ, err := template.ParseFiles(TestDirPath + "render_user_defined/template_input.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
+
 		engine.RenderUserDefinedPages(TestDirPath+"render_user_defined/", templ)
 
 		want_index_file, err := os.ReadFile(TestDirPath + "render_user_defined/want_index.html")
@@ -65,4 +70,5 @@ func TestRenderUserDefinedPages(t *testing.T) {
 			t.Errorf("The expected and generated post/hello.html can be found in test/engine/render_user_defined/rendered/posts/")
 		}
 	})
+
 }

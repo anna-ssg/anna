@@ -1,0 +1,45 @@
+# Benchmark anna v/s other SSGs
+name: Benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Hyperfine
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y hyperfine
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
+          
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y curl git
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup default stable
+          rustup update
+          rustc --version
+          cargo --version
+          go version
+
+      - name: Run Benchmark
+        run: |
+          chmod +x test/bench.sh
+          ./test/bench.sh

@@ -1,6 +1,6 @@
 module github.com/acmpesuecc/anna
 
-go 1.22.0
+go 1.22.2
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.1
@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rogpeppe/go-internal v1.11.0 // indirect
+	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect

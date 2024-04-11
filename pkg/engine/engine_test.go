@@ -14,16 +14,19 @@ import (
 const TestDirPath = "../../test/engine/"
 
 func TestRenderPage(t *testing.T) {
+	if err := os.MkdirAll(TestDirPath+"render_page/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
+	}
+
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
 		engine := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-		page := parser.TemplateData{
-			CompleteURL:              template.URL("got"),
-			FilenameWithoutExtension: "got",
+		engine.DeepDataMerge.Templates["posts/got.html"] = parser.TemplateData{
+			CompleteURL: template.URL("got.html"),
 			Frontmatter: parser.Frontmatter{
 				Title:       "Hello",
 				Date:        "2024-03-28",
@@ -33,20 +36,20 @@ func TestRenderPage(t *testing.T) {
 				Tags:        []string{"blog", "thoughts"},
 			},
 			Body: template.HTML("<h1>Hello World</h1>"),
-			Layout: parser.LayoutConfig{
-				Navbar:    []string{"index", "posts"},
-				BaseURL:   "https://example.org",
-				SiteTitle: "Anna",
-				Author:    "anna",
-			},
+			// Layout: parser.LayoutConfig{
+			// 	Navbar:    []string{"index", "posts"},
+			// 	BaseURL:   "https://example.org",
+			// 	SiteTitle: "Anna",
+			// 	Author:    "anna",
+			// },
 		}
 
-		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.layout")
+		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderPage(TestDirPath+"engine/render_page/", "posts/got.md", page, templ, "page")
+		engine.RenderPage(TestDirPath+"render_page/", "posts/got.html", templ, "page")
 
 		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {
@@ -62,4 +65,5 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("The expected and generated page.html can be found in test/engine/render_page/rendered/")
 		}
 	})
+
 }

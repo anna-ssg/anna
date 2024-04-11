@@ -17,31 +17,28 @@ A static site generator in go
 
 Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowjee/saaru), this static site generator aims to take performance to the next level with parallel rendering, live reload and so much more, all in Go.
 
-> Pronounced: `/ɐnːɐ/` which means rice in Kannada 🍚
+Pronounced: `/ɐnːɐ/` which means rice 🍚 in Kannada
 
-This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
+> This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
 
 ---
-
-## Install
+## Get Started
 
 ```sh
 go run github.com/acmpesuecc/anna@v1.0.0-alpha
 ```
+> If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
-Alternatively, clone our repository to build the latest version of anna:
+## Contributing to Anna
+
+Detailed documentation for our SSG can be found: [here](https://anna-docs.netlify.app/)
+
+If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/acmpesuecc/anna --depth=1; cd anna
-go run .
+git clone github.com/acmpesuecc/anna; cd anna 
+go build
 ```
-
-### Detailed documentation of our SSG can be found [here](https://anna-docs.netlify.app/)
-
----
-
-## Flags
-
 ```text
 Usage:
   anna [flags]
