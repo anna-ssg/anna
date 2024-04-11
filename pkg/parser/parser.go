@@ -44,7 +44,6 @@ type TemplateData struct {
 	Date        int64
 	Frontmatter Frontmatter
 	Body        template.HTML
-	Layout      LayoutConfig
 	LiveReload  bool
 }
 
@@ -132,7 +131,6 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 		Date:        date,
 		Frontmatter: frontmatter,
 		Body:        template.HTML(body),
-		Layout:      p.LayoutConfig,
 		LiveReload:  p.LiveReload,
 	}
 

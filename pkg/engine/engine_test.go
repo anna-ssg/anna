@@ -36,12 +36,12 @@ func TestRenderPage(t *testing.T) {
 				Tags:        []string{"blog", "thoughts"},
 			},
 			Body: template.HTML("<h1>Hello World</h1>"),
-			Layout: parser.LayoutConfig{
-				Navbar:    []string{"index", "posts"},
-				BaseURL:   "https://example.org",
-				SiteTitle: "Anna",
-				Author:    "anna",
-			},
+			// Layout: parser.LayoutConfig{
+			// 	Navbar:    []string{"index", "posts"},
+			// 	BaseURL:   "https://example.org",
+			// 	SiteTitle: "Anna",
+			// 	Author:    "anna",
+			// },
 		}
 
 		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.html")

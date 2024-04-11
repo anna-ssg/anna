@@ -90,6 +90,8 @@ To access the data for a particular page, use Go templating syntax:
 {{$PageData.CompleteURL}}
 ```
 
+To access the page data for `posts.html`, `tags.html` and partials, set {{$PageData := .TemplateData}}
+
 All of the following page data fields can be accessed in the above manner:
 
 - `{{$PageData.CompleteURL}}` : Returns the complete url of the given page
@@ -182,7 +184,7 @@ Detailed documentation for our SSG can be found: [here](https://anna-docs.netlif
 If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/acmpesuecc/anna; cd anna 
+git clone github.com/acmpesuecc/anna; cd anna
 go build
 ```
 

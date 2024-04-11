@@ -3,7 +3,7 @@
 
 <div class="body">
 <div class="posts">
-{{range $PostDate, $Post := .Posts}}
+{{range $PostDate, $Post := .DeepDataMerge.Posts}}
 <a class="post-card" href="{{$Post.CompleteURL}}">
 <div class="post-card-div">
 <div class="post-card description">

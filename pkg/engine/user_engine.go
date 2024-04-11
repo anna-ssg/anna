@@ -12,8 +12,9 @@ import (
 )
 
 type postsTemplateData struct {
-	Posts []parser.TemplateData
-	parser.TemplateData
+	DeepDataMerge DeepDataMerge
+	PageURL      template.URL
+	TemplateData  parser.TemplateData
 }
 
 func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *template.Template) {
@@ -21,11 +22,11 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *templa
 	var postsBuffer bytes.Buffer
 
 	postsData := postsTemplateData{
-		Posts: e.DeepDataMerge.Posts,
 		TemplateData: parser.TemplateData{
 			Frontmatter: parser.Frontmatter{Title: "Posts"},
-			Layout:      e.DeepDataMerge.LayoutConfig,
 		},
+		DeepDataMerge: e.DeepDataMerge,
+		PageURL: "posts.html",
 	}
 	// e.DeepDataMerge.Templates["posts.html"] = parser.TemplateData{
 	// 	Frontmatter: parser.Frontmatter{Title: "Posts"},

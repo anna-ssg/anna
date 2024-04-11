@@ -17,10 +17,10 @@ import (
 )
 
 type TagRootTemplateData struct {
-	DeepDataMerge   DeepDataMerge
-	PagePath        template.URL
-	TagTemplateData parser.TemplateData
-	TagNames        []string
+	DeepDataMerge DeepDataMerge
+	PageURL      template.URL
+	TemplateData  parser.TemplateData
+	TagNames      []string
 }
 
 func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
@@ -46,15 +46,14 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	}
 
 	tagRootTemplataData := parser.TemplateData{
-		Layout:      e.DeepDataMerge.LayoutConfig,
 		Frontmatter: parser.Frontmatter{Title: "Tags"},
 	}
 
 	tagTemplateData := TagRootTemplateData{
-		DeepDataMerge:   e.DeepDataMerge,
-		PagePath:        "tags.html",
-		TagTemplateData: tagRootTemplataData,
-		TagNames:        tagNames,
+		DeepDataMerge: e.DeepDataMerge,
+		PageURL:      "tags.html",
+		TemplateData:  tagRootTemplataData,
+		TagNames:      tagNames,
 	}
 
 	// Rendering the page displaying all tags
@@ -80,7 +79,6 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		tagString, _ = strings.CutSuffix(tagString, ".html")
 
 		e.DeepDataMerge.Tags[tag] = parser.TemplateData{
-			Layout: e.DeepDataMerge.LayoutConfig,
 			Frontmatter: parser.Frontmatter{
 				Title: tagString,
 			},

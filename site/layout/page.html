@@ -1,10 +1,10 @@
 {{ define "page"}}
 {{$PageData := index .DeepDataMerge.Templates .PageURL}}
-{{ template "head" $PageData}}
+{{ template "head" .}}
 
 <body>
 
-    {{template "header" $PageData}}
+    {{template "header" .}}
     <article>
         <section class="body">
             {{ if eq $PageData.Frontmatter.Type "post" }}
@@ -36,7 +36,7 @@
             {{$PageData.Body}}
         </section>
     </article>
-    {{template "footer" $PageData}}
+    {{template "footer" .}}
 </body>
 
 </html>

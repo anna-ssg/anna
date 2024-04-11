@@ -1,9 +1,9 @@
 {{ define "all-tags"}}
-{{$PageData := .TagTemplateData}}
-{{ template "head" $PageData}}
+{{$PageData := .TemplateData}}
+{{ template "head" .}}
 
 <body>
-{{template "header" $PageData}}
+{{template "header" .}}
     <div class="body">
         <article>
             <section class="posts">
@@ -20,7 +20,8 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="/static/scripts/graph.js"></script>
 
-    {{template "footer" $PageData}}
+    {{template "footer" .}}
+
 </body>
 
 </html>

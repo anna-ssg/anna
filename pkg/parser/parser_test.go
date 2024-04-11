@@ -52,7 +52,7 @@ func TestAddFileandRender(t *testing.T) {
 			Date:        want_parser.DateParse(sample_frontmatter.Date).Unix(),
 			Frontmatter: sample_frontmatter,
 			Body:        template.HTML(sample_body),
-			Layout:      want_layout,
+			// Layout:      want_layout,
 		}
 		want_parser.LayoutConfig = want_layout
 

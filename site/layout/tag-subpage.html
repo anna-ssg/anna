@@ -1,9 +1,9 @@
 {{ define "tag-subpage"}}
 {{$PageData := index .DeepDataMerge.Tags .PageURL}}
-{{ template "head" $PageData}}
+{{ template "head" .}}
 
 <body>
-    {{template "header" $PageData}}
+    {{template "header" .}}
 
     <div class="body">
         <article>
@@ -16,7 +16,7 @@
         </article>
     </div>
 
-    {{template "footer" $PageData}}
+    {{template "footer" .}}
 </body>
 
 </html>
