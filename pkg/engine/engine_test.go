@@ -14,6 +14,10 @@ import (
 const TestDirPath = "../../test/engine/"
 
 func TestRenderPage(t *testing.T) {
+	if err := os.MkdirAll(TestDirPath+"render_page/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
+	}
+
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
 		engine := engine.Engine{
 			Templates:   make(map[template.URL]parser.TemplateData),
@@ -46,7 +50,7 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderPage(TestDirPath+"engine/render_page/", "posts/got.md", page, templ, "page")
+		engine.RenderPage(TestDirPath+"render_page/", "posts/got.md", page, templ, "page")
 
 		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {
@@ -62,4 +66,8 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("The expected and generated page.html can be found in test/engine/render_page/rendered/")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "render_page/rendered"); err != nil {
+		t.Errorf("%v", err)
+	}
 }
