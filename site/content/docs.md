@@ -77,18 +77,37 @@ The ssg currently requires the following directory structure
   - The `posts.html` file defines the layout of a page displaying all the posts of the site
   - The layout files can be composed of smaller html files which are stored in the `partials/` folder
 
-#### Layout
+## Building layouts
 
-The layout files can access the following rendered data from the markdown files:
+Each layout file(except `posts.html` and `tags.html`) can access any data from the entire ssg
 
-- `{{.CompleteURL}}` : Returns the complete url of the given page
-- `{{.FilenameWithoutExtension}}` : Returns the name of the current file
-- `{{.Date}}` : Returns the last modified date of the current file
-- `{{.Frontmatter.[Tagname]}}` : Returns the value of the frontmatter tag
-  - Example: `{{.Frontmatter.Title}}` : Returns the value of the title tag
-- `{{.Body}}` : Returns the markdown body rendered to HTML
-- `{{.Layout.[Tagname]}}`: Returns the particular configuration detail of the page
-  - Example: `{{.Layout.Navbar}}` : Returns a string slice with the names of all the navbar elements
+The URL for the current page can be accessed using `{{.PageURL}}`
+
+To access the data for a particular page, use Go templating syntax:
+
+```html
+{{$PageData := index .DeepDataMerge.Templates .PageURL}}
+{{$PageData.CompleteURL}}
+```
+
+All of the following page data fields can be accessed in the above manner:
+
+- `{{$PageData.CompleteURL}}` : Returns the complete url of the given page
+- `{{$PageData.Date}}` : Returns the last modified date of the current file
+- `{{$PageData.Frontmatter.[Tagname]}}` : Returns the value of the frontmatter tag
+  - Example: `{{$PageData.Frontmatter.Title}}` : Returns the value of the title tag
+- `{{$PageData.Body}}` : Returns the markdown body rendered to HTML
+- `{{$PageData.Layout.[Tagname]}}`: Returns the particular configuration detail of the page
+  - Example: `{{$PageData.Layout.Navbar}}` : Returns a string slice with the names of all the navbar elements
+
+In addition to page data, the following fields can be accessed:
+
+- `{{.DeepDataMerge.Tags}}` - A map that stores the template of the tag sub-pages for a particular tag url
+- `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all posts for a particular tag url
+- `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.yml`
+- `{{.DeepDataMerge.Posts}}` - Stores a slice of templates of all posts
+- `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site
+(primarily used for search and graphing of tags)
 
 ## Notes
 
@@ -110,10 +129,12 @@ The layout files can access the following rendered data from the markdown files:
 - `title` : The title of the current page
 - `date`: The date of the current page
 - `draft`: When set to 'true', the current page is not rendered unless the '-d' flag is used
+- `scripts`: Stores the page-level scripts to be added
 - `type`: Sets the type of the page. Use type 'post' for posts
 - `description`: Stores the description of the current post previewed in posts.html
 - `previewimage`: Stores the preview image of the current page
 - `tags`: Stores the tags of the particular page
+- `authors`: Stores (multiple) author/s of a particular page
 
 (**The above tags are Frontmatter tags**)
 
@@ -143,12 +164,15 @@ siteTitle: anna
 siteScripts:
 author: Anna
 ```
+
 ---
+
 ## Run locally
 
 ```sh
 go run github.com/acmpesuecc/anna@v1.0.0-alpha
 ```
+
 > If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
 ## Contributing to Anna
@@ -161,6 +185,7 @@ If you have git installed, clone our repository and build against the latest com
 git clone github.com/acmpesuecc/anna; cd anna 
 go build
 ```
+
 ```text
 Usage:
   anna [flags]
