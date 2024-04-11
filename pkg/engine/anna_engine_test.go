@@ -15,15 +15,15 @@ import (
 
 func TestRenderTags(t *testing.T) {
 	e := engine.Engine{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-	e.LayoutConfig.BaseURL = "example.org"
+	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+	e.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
 
 	fileOutPath := "../../test/engine/render_tags/"
 
-	e.TagsMap["blogs"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["tags/blogs.html"] = []parser.TemplateData{
 		{
 			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
@@ -40,7 +40,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	e.TagsMap["tech"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["tags/tech.html"] = []parser.TemplateData{
 		{
 			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
@@ -57,7 +57,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.layout", TestDirPath+"render_tags/tags_subpage_template.layout")
+	templ, err := template.ParseFiles(TestDirPath+"render_tags/tags_template.html", TestDirPath+"render_tags/tags_subpage_template.html")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -112,9 +112,6 @@ func TestRenderTags(t *testing.T) {
 		}
 	})
 
-	if err := os.RemoveAll(TestDirPath + "render_tags/rendered"); err != nil {
-		t.Errorf("%v", err)
-	}
 }
 
 func TestGenerateMergedJson(t *testing.T) {
@@ -124,14 +121,13 @@ func TestGenerateMergedJson(t *testing.T) {
 
 	t.Run("test json creation for the search index", func(t *testing.T) {
 		e := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-		e.Templates["docs.md"] = parser.TemplateData{
-			FilenameWithoutExtension: "docs",
-			CompleteURL:              "docs.html",
+		e.DeepDataMerge.Templates["docs.md"] = parser.TemplateData{
+			CompleteURL: "docs.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "Anna Documentation",
 			},
@@ -157,45 +153,42 @@ func TestGenerateMergedJson(t *testing.T) {
 		}
 	})
 
-	if err := os.RemoveAll(TestDirPath + "json_index_test/static"); err != nil {
-		t.Errorf("%v", err)
-	}
 }
 
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		engine := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
 		t1 := parser.TemplateData{
-			FilenameWithoutExtension: "index",
+			CompleteURL: "index.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
 		t2 := parser.TemplateData{
-			FilenameWithoutExtension: "about",
+			CompleteURL: "about.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
 		t3 := parser.TemplateData{
-			FilenameWithoutExtension: "research",
+			CompleteURL: "research.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
-		engine.LayoutConfig.BaseURL = "example.org"
+		engine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
 		// setting up engine
-		engine.Templates["index"] = t1
-		engine.Templates["about"] = t2
-		engine.Templates["research"] = t3
+		engine.DeepDataMerge.Templates["index"] = t1
+		engine.DeepDataMerge.Templates["about"] = t2
+		engine.DeepDataMerge.Templates["research"] = t3
 
 		engine.GenerateSitemap(TestDirPath + "sitemap/got_sitemap.xml")
 
@@ -223,7 +216,4 @@ func TestGenerateSitemap(t *testing.T) {
 		}
 	})
 
-	if err := os.RemoveAll(TestDirPath + "sitemap/got_sitemap.xml"); err != nil {
-		t.Errorf("%v", err)
-	}
 }

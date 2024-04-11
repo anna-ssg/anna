@@ -16,28 +16,48 @@ import (
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
 
+type TagRootTemplateData struct {
+	DeepDataMerge DeepDataMerge
+	PageURL      template.URL
+	TemplateData  parser.TemplateData
+	TagNames      []string
+}
+
 func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	var tagsBuffer bytes.Buffer
 
 	// Extracting tag titles
-	tags := make([]string, 0, len(e.TagsMap))
-	for tag := range e.TagsMap {
+	tags := make([]template.URL, 0, len(e.DeepDataMerge.TagsMap))
+	for tag := range e.DeepDataMerge.TagsMap {
 		tags = append(tags, tag)
 	}
 
-	slices.SortFunc(tags, func(a, b string) int {
-		return cmp.Compare(strings.ToLower(a), strings.ToLower(b))
+	slices.SortFunc(tags, func(a, b template.URL) int {
+		return cmp.Compare(strings.ToLower(string(a)), strings.ToLower(string(b)))
 	})
 
-	tagNames := parser.TemplateData{
-		FilenameWithoutExtension: "Tags",
-		Layout:                   e.LayoutConfig,
-		Frontmatter:              parser.Frontmatter{Title: "Tags"},
-		Tags:                     tags,
+	tagNames := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		tagString := string(tag)
+		tagString, _ = strings.CutPrefix(tagString, "tags/")
+		tagString, _ = strings.CutSuffix(tagString, ".html")
+
+		tagNames = append(tagNames, tagString)
+	}
+
+	tagRootTemplataData := parser.TemplateData{
+		Frontmatter: parser.Frontmatter{Title: "Tags"},
+	}
+
+	tagTemplateData := TagRootTemplateData{
+		DeepDataMerge: e.DeepDataMerge,
+		PageURL:      "tags.html",
+		TemplateData:  tagRootTemplataData,
+		TagNames:      tagNames,
 	}
 
 	// Rendering the page displaying all tags
-	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagNames)
+	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagTemplateData)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
@@ -51,23 +71,27 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	// Create a wait group to wait for all goroutines to finish
 	var wg sync.WaitGroup
 
+	e.DeepDataMerge.Tags = make(map[template.URL]parser.TemplateData)
+
+	for tag := range e.DeepDataMerge.TagsMap {
+		tagString := string(tag)
+		tagString, _ = strings.CutPrefix(tagString, "tags/")
+		tagString, _ = strings.CutSuffix(tagString, ".html")
+
+		e.DeepDataMerge.Tags[tag] = parser.TemplateData{
+			Frontmatter: parser.Frontmatter{
+				Title: tagString,
+			},
+		}
+	}
+
 	// Rendering the subpages with merged tagged posts
-	for tag, taggedTemplates := range e.TagsMap {
+	for tag, taggedTemplates := range e.DeepDataMerge.TagsMap {
 		wg.Add(1)
-		go func(tag string, taggedTemplates []parser.TemplateData) {
+		go func(tag template.URL, taggedTemplates []parser.TemplateData) {
 			defer wg.Done()
 
-			pagePath := "tags/" + tag
-			templateData := parser.TemplateData{
-				FilenameWithoutExtension: tag,
-				Layout:                   e.LayoutConfig,
-				Frontmatter: parser.Frontmatter{
-					Title: tag,
-				},
-				SpecificTagTemplates: taggedTemplates,
-			}
-
-			e.RenderPage(fileOutPath, template.URL(pagePath), templateData, templ, "tag-subpage")
+			e.RenderPage(fileOutPath, template.URL(tag), templ, "tag-subpage")
 		}(tag, taggedTemplates)
 	}
 
@@ -88,16 +112,15 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 
 	// Copying contents from e.Templates to new JsonMerged struct
 	jsonIndexTemplate := make(map[template.URL]JSONIndexTemplate)
-	for templateURL, templateData := range e.Templates {
+	for templateURL, templateData := range e.DeepDataMerge.Templates {
 		jsonIndexTemplate[templateURL] = JSONIndexTemplate{
-			CompleteURL:              templateData.CompleteURL,
-			FilenameWithoutExtension: templateData.FilenameWithoutExtension,
-			Frontmatter:              templateData.Frontmatter,
-			Tags:                     templateData.Frontmatter.Tags,
+			CompleteURL: templateData.CompleteURL,
+			Frontmatter: templateData.Frontmatter,
+			Tags:        templateData.Frontmatter.Tags,
 		}
 	}
 
-	e.JSONIndex = jsonIndexTemplate
+	e.DeepDataMerge.JSONIndex = jsonIndexTemplate
 
 	// Marshal the contents of jsonMergedData
 	jsonMergedMarshaledData, err := json.Marshal(jsonIndexTemplate)
@@ -117,22 +140,22 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 	buffer.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
 
 	// Sorting templates by key
-	keys := make([]string, 0, len(e.Templates))
-	for k := range e.Templates {
+	keys := make([]string, 0, len(e.DeepDataMerge.Templates))
+	for k := range e.DeepDataMerge.Templates {
 		keys = append(keys, string(k))
 	}
 	sort.Strings(keys)
 
 	tempTemplates := make(map[template.URL]parser.TemplateData)
 	for _, templateURL := range keys {
-		tempTemplates[template.URL(templateURL)] = e.Templates[template.URL(templateURL)]
+		tempTemplates[template.URL(templateURL)] = e.DeepDataMerge.Templates[template.URL(templateURL)]
 	}
 
-	e.Templates = tempTemplates
+	e.DeepDataMerge.Templates = tempTemplates
 
 	// Iterate over parsed markdown files
-	for _, templateData := range e.Templates {
-		url := e.LayoutConfig.BaseURL + "/" + templateData.FilenameWithoutExtension + ".html"
+	for _, templateData := range e.DeepDataMerge.Templates {
+		url := e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL)
 		buffer.WriteString("\t<url>\n")
 		buffer.WriteString("\t\t<loc>" + url + "</loc>\n")
 		buffer.WriteString("\t\t<lastmod>" + templateData.Frontmatter.Date + "</lastmod>\n")
@@ -156,17 +179,17 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 	buffer.WriteString("<?xml-stylesheet href=\"/static/styles/feed.xsl\" type=\"text/xsl\"?>\n")
 	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
-	buffer.WriteString("    <title>" + e.LayoutConfig.SiteTitle + "</title>\n")
-	buffer.WriteString("    <link href=\"" + e.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
+	buffer.WriteString("    <title>" + e.DeepDataMerge.LayoutConfig.SiteTitle + "</title>\n")
+	buffer.WriteString("    <link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
 	buffer.WriteString("    <updated>" + time.Now().Format(time.RFC3339) + "</updated>\n")
 
 	// iterate over parsed markdown files that are non-draft posts
-	for _, templateData := range e.Templates {
+	for _, templateData := range e.DeepDataMerge.Templates {
 		if !templateData.Frontmatter.Draft {
 			buffer.WriteString("<entry>\n")
 			buffer.WriteString("        <title>" + templateData.Frontmatter.Title + "</title>\n")
-			buffer.WriteString("        <link href=\"" + e.LayoutConfig.BaseURL + "/posts/" + templateData.FilenameWithoutExtension + ".html\"/>\n")
-			buffer.WriteString("        <id>" + e.LayoutConfig.BaseURL + "/posts/" + templateData.FilenameWithoutExtension + ".html</id>\n")
+			buffer.WriteString("        <link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + string(templateData.CompleteURL) + "/>\n")
+			buffer.WriteString("        <id>" + e.DeepDataMerge.LayoutConfig.BaseURL + string(templateData.CompleteURL) + "</id>\n")
 			buffer.WriteString("        <updated>" + time.Unix(templateData.Date, 0).Format(time.RFC3339) + "</updated>\n")
 			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(templateData.Body) + "]]></content>\n")
 			buffer.WriteString("    </entry>\n")

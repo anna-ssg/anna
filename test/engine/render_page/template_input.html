@@ -1,29 +1,28 @@
 {{ define "page"}}
-{{ template "head" .}}
+{{$PageData := index .DeepDataMerge.Templates .PageURL}}
 
 <body>
 
-    {{template "header" .}}
     <article>
         <section class="body">
-            {{ if eq .Frontmatter.Type "post" }}
+            {{ if eq $PageData.Frontmatter.Type "post" }}
             <div class="post-description">
-                <h1>{{ .Frontmatter.Title }}</h1>
+                <h1>{{ $PageData.Frontmatter.Title }}</h1>
                 <div class="authors-paceholder">
                     <p>
-                        Published on {{.Frontmatter.Date}}
+                        Published on {{$PageData.Frontmatter.Date}}
                         <!-- if length of frontmatter authors is 0 -->
-                        {{ if eq (len .Frontmatter.Authors) 0 }}
-                        {{$.Layout.Author}}
+                        {{ if eq (len $PageData.Frontmatter.Authors) 0 }}
+                        {{.DeepDataMerge.LayoutConfig.Author}}
                         {{ else }}
-                        {{range .Frontmatter.Authors }}
+                        {{range $PageData.Frontmatter.Authors }}
                         {{ . }},
                         {{ end }}
                         {{ end }}
                     </p>
                 </div>
                 <div class="tags-paceholder">
-                    {{range .Frontmatter.Tags}}
+                    {{range $PageData.Frontmatter.Tags}}
                     <div class="tag">
                         <a href="/tags/{{.}}.html">{{.}}</a>
                     </div>
@@ -32,12 +31,9 @@
             </div>
             {{ else }}
             {{ end }}
-            {{.Body}}
+            {{$PageData.Body}}
         </section>
     </article>
-    {{template "footer" .}}
 </body>
-
-</html>
 
 {{ end}}

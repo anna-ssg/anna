@@ -29,6 +29,7 @@ func main() {
 			}
 
 			if serve {
+				annaCmd.LiveReload = true
 				annaCmd.StartLiveReload()
 			}
 
