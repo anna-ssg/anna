@@ -20,10 +20,10 @@ func TestRenderPage(t *testing.T) {
 
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
 		engine := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		engine.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
 
 		page := parser.TemplateData{
 			CompleteURL:              template.URL("got"),
@@ -50,7 +50,7 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderPage(TestDirPath+"render_page/", "posts/got.md", page, templ, "page")
+		engine.RenderPage(TestDirPath+"render_page/", "posts/got.html", page, templ, "page")
 
 		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {

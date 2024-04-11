@@ -21,10 +21,10 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, templ *template.
 	var postsBuffer bytes.Buffer
 
 	postsData := postsTemplateData{
-		Posts: e.Posts,
+		Posts: e.DeepDataMerge.Posts,
 		TemplateData: parser.TemplateData{
 			Frontmatter: parser.Frontmatter{Title: "Posts"},
-			Layout:      e.LayoutConfig,
+			Layout:      e.DeepDataMerge.LayoutConfig,
 		},
 	}
 
@@ -42,7 +42,7 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, templ *template.
 
 func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Template) {
 	numCPU := runtime.NumCPU()
-	numTemplates := len(e.Templates)
+	numTemplates := len(e.DeepDataMerge.Templates)
 	concurrency := numCPU * 2 // Adjust the concurrency factor based on system hardware resources
 
 	if numTemplates < concurrency {
@@ -50,7 +50,7 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 	}
 
 	templateURLs := make([]string, 0, numTemplates)
-	for templateURL := range e.Templates {
+	for templateURL := range e.DeepDataMerge.Templates {
 		templateURLs = append(templateURLs, string(templateURL))
 	}
 
@@ -58,9 +58,9 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 	semaphore := make(chan struct{}, concurrency)
 
 	for _, templateURL := range templateURLs {
-		templData := e.Templates[template.URL(templateURL)]
+		templData := e.DeepDataMerge.Templates[template.URL(templateURL)]
 		fileInPath := strings.TrimSuffix(string(templData.CompleteURL), ".html")
-		if fileInPath == "" {
+		if fileInPath == ".html" {
 			continue
 		}
 
@@ -73,7 +73,7 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 				wg.Done()
 			}()
 
-			e.RenderPage(fileOutPath, template.URL(fileInPath), templData, templ, "page")
+			e.RenderPage(fileOutPath, templData.CompleteURL, templData, templ, "page")
 		}(templateURL)
 	}
 

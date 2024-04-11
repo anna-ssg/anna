@@ -15,15 +15,15 @@ import (
 
 func TestRenderTags(t *testing.T) {
 	e := engine.Engine{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-	e.LayoutConfig.BaseURL = "example.org"
+	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+	e.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
+	e.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
 
 	fileOutPath := "../../test/engine/render_tags/"
 
-	e.TagsMap["blogs"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["blogs"] = []parser.TemplateData{
 		{
 			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
@@ -40,7 +40,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	e.TagsMap["tech"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["tech"] = []parser.TemplateData{
 		{
 			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
@@ -124,12 +124,12 @@ func TestGenerateMergedJson(t *testing.T) {
 
 	t.Run("test json creation for the search index", func(t *testing.T) {
 		e := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		e.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
 
-		e.Templates["docs.md"] = parser.TemplateData{
+		e.DeepDataMerge.Templates["docs.md"] = parser.TemplateData{
 			FilenameWithoutExtension: "docs",
 			CompleteURL:              "docs.html",
 			Frontmatter: parser.Frontmatter{
@@ -165,10 +165,10 @@ func TestGenerateMergedJson(t *testing.T) {
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		engine := engine.Engine{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[string][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
+		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		engine.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
 
 		t1 := parser.TemplateData{
 			FilenameWithoutExtension: "index",
@@ -191,11 +191,11 @@ func TestGenerateSitemap(t *testing.T) {
 			},
 		}
 
-		engine.LayoutConfig.BaseURL = "example.org"
+		engine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
 		// setting up engine
-		engine.Templates["index"] = t1
-		engine.Templates["about"] = t2
-		engine.Templates["research"] = t3
+		engine.DeepDataMerge.Templates["index"] = t1
+		engine.DeepDataMerge.Templates["about"] = t2
+		engine.DeepDataMerge.Templates["research"] = t3
 
 		engine.GenerateSitemap(TestDirPath + "sitemap/got_sitemap.xml")
 

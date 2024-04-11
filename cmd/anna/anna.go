@@ -24,11 +24,12 @@ func (cmd *Cmd) VanillaRender() {
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts: cmd.RenderDrafts,
 	}
+
 	e := engine.Engine{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[string][]parser.TemplateData),
-		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
+	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+	e.DeepDataMerge.TagsMap = make(map[string][]parser.TemplateData)
 
 	helper := helpers.Helper{
 		ErrorLogger:  e.ErrorLogger,
@@ -47,18 +48,18 @@ func (cmd *Cmd) VanillaRender() {
 	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
 
-	e.Templates = p.Templates
-	e.TagsMap = p.TagsMap
-	e.LayoutConfig = p.LayoutConfig
-	e.Posts = p.Posts
+	e.DeepDataMerge.Templates = p.Templates
+	e.DeepDataMerge.TagsMap = p.TagsMap
+	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
+	e.DeepDataMerge.Posts = p.Posts
 
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
 	e.GenerateJSONIndex(helpers.SiteDataPath)
 	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
-	sort.Slice(e.Posts, func(i, j int) bool {
-		return e.Posts[i].Frontmatter.Date > e.Posts[j].Frontmatter.Date
+	sort.Slice(e.DeepDataMerge.Posts, func(i, j int) bool {
+		return e.DeepDataMerge.Posts[i].Frontmatter.Date > e.DeepDataMerge.Posts[j].Frontmatter.Date
 	})
 
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.layout")
