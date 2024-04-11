@@ -22,11 +22,17 @@ func TestRenderUserDefinedPages(t *testing.T) {
 		parser.TemplateData{
 			FilenameWithoutExtension: "index",
 			Body:                     template.HTML("<h1>Index Page</h1>"),
+			CompleteURL:              "index.html",
 		}
 
 	engine.Templates["posts/hello.md"] = parser.TemplateData{
 		FilenameWithoutExtension: "hello",
 		Body:                     template.HTML("<h1>Hello World</h1>"),
+		CompleteURL:              "posts/hello.html",
+	}
+
+	if err := os.MkdirAll(TestDirPath+"render_user_defined/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
 	}
 
 	t.Run("render a set of user defined pages", func(t *testing.T) {
@@ -35,6 +41,7 @@ func TestRenderUserDefinedPages(t *testing.T) {
 		if err != nil {
 			t.Errorf("%v", err)
 		}
+
 		engine.RenderUserDefinedPages(TestDirPath+"render_user_defined/", templ)
 
 		want_index_file, err := os.ReadFile(TestDirPath + "render_user_defined/want_index.html")
@@ -65,4 +72,8 @@ func TestRenderUserDefinedPages(t *testing.T) {
 			t.Errorf("The expected and generated post/hello.html can be found in test/engine/render_user_defined/rendered/posts/")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "render_user_defined/rendered"); err != nil {
+		t.Errorf("%v", err)
+	}
 }

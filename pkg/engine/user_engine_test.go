@@ -47,6 +47,10 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 		},
 	}
 
+	if err := os.MkdirAll(TestDirPath+"render_engine_generated/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
+	}
+
 	t.Run("test rendering of post.html", func(t *testing.T) {
 		templ, err := template.ParseFiles(TestDirPath + "render_engine_generated/posts_template.layout")
 		if err != nil {
@@ -69,4 +73,8 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 			t.Errorf("The expected and generated posts.html can be found in test/engine/render_engine_generated/rendered/")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "render_engine_generated/rendered"); err != nil {
+		t.Errorf("%v", err)
+	}
 }

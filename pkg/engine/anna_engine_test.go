@@ -61,6 +61,9 @@ func TestRenderTags(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+	if err := os.MkdirAll(TestDirPath+"render_tags/rendered", 0750); err != nil {
+		t.Errorf("%v", err)
+	}
 	e.RenderTags(fileOutPath, templ)
 
 	t.Run("render tag.html", func(t *testing.T) {
@@ -105,14 +108,21 @@ func TestRenderTags(t *testing.T) {
 		}
 
 		if !slices.Equal(got_tech_file, want_tech_file) {
-		t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
+			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "render_tags/rendered"); err != nil {
+		t.Errorf("%v", err)
+	}
 }
 
-
 func TestGenerateMergedJson(t *testing.T) {
-	t.Run("test json creation from e.Templates", func(t *testing.T) {
+	if err := os.MkdirAll(TestDirPath+"json_index_test/static", 0750); err != nil {
+		t.Errorf("%v", err)
+	}
+
+	t.Run("test json creation for the search index", func(t *testing.T) {
 		e := engine.Engine{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[string][]parser.TemplateData),
@@ -127,14 +137,14 @@ func TestGenerateMergedJson(t *testing.T) {
 			},
 		}
 
-		e.GenerateJSONIndex(TestDirPath + "merged_data_test")
+		e.GenerateJSONIndex(TestDirPath + "json_index_test")
 
-		got_json, err := os.ReadFile(TestDirPath + "/merged_data_test/static/index.json")
+		got_json, err := os.ReadFile(TestDirPath + "/json_index_test/static/index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_json, err := os.ReadFile(TestDirPath + "/merged_data_test/want_index.json")
+		want_json, err := os.ReadFile(TestDirPath + "/json_index_test/want_index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -143,9 +153,13 @@ func TestGenerateMergedJson(t *testing.T) {
 		want_json = bytes.TrimSpace(want_json)
 
 		if !slices.Equal(got_json, want_json) {
-			t.Errorf("The expected and generated json can be found in test/layout/")
+			t.Errorf("The expected and generated json can be found in test/engine/json_index_test")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "json_index_test/static"); err != nil {
+		t.Errorf("%v", err)
+	}
 }
 
 func TestGenerateSitemap(t *testing.T) {
@@ -205,7 +219,11 @@ func TestGenerateSitemap(t *testing.T) {
 		})
 
 		if strings.Compare(got_sitemap_string, want_sitemap_string) == 0 {
-			t.Errorf("The expected and generated sitemap can be found in test/layout/sitemap/")
+			t.Errorf("The expected and generated sitemap can be found in test/engine/sitemap/")
 		}
 	})
+
+	if err := os.RemoveAll(TestDirPath + "sitemap/got_sitemap.xml"); err != nil {
+		t.Errorf("%v", err)
+	}
 }
