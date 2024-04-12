@@ -1,10 +1,20 @@
 package engine
 
 import (
+	"bytes"
 	"html/template"
+	"os"
 	"runtime"
 	"sync"
+
+	"github.com/acmpesuecc/anna/pkg/parser"
 )
+
+type notesTemplateData struct {
+	DeepDataMerge DeepDataMerge
+	PageURL       template.URL
+	TemplateData  parser.TemplateData
+}
 
 func (e *Engine) RenderNotes(fileOutPath string, templ *template.Template) {
 	// templ.Funcs(funcMap template.FuncMap)
@@ -55,6 +65,33 @@ func (e *Engine) GenerateLinkStore() {
 			}
 		}
 	}
+}
+
+func (e *Engine) GenerateNoteRoot(fileOutPath string, templ *template.Template) {
+	var buffer bytes.Buffer
+
+
+	notesTemplateData := notesTemplateData{
+			DeepDataMerge: e.DeepDataMerge,
+			PageURL:      "notes.html",
+			TemplateData:  parser.TemplateData {
+				Frontmatter: parser.Frontmatter{
+					Title: "Curated Notes",
+					Description: "Currated heads of various zettles part of the page",
+				},
+			},
+	}
+
+	err := templ.ExecuteTemplate(&buffer, "notes-root", notesTemplateData)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+
+	err = os.WriteFile(fileOutPath+"rendered/notes.html", buffer.Bytes(), 0666)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+
 }
 
 // func (z *Zettel) RetrieveNotePointer(noteTitle string) *zettel_parser.Note {

@@ -89,4 +89,5 @@ func (cmd *Cmd) VanillaRender() {
 	e.GenerateLinkStore()
 	fmt.Println(e.DeepDataMerge.LinkStore)
 	e.RenderNotes(helpers.SiteDataPath, templ)
+	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
 }

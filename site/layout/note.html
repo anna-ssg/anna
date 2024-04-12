@@ -35,15 +35,6 @@
             {{ end }}
             {{$PageData.Body}}
         </section>
-        <!-- </section class="posts">
-        {{ range  index .DeepDataMerge.LinkStore .PageURL }}
-            <a class="post-card">
-                <div class="post-card-div">
-                    <h3> {{ .Frontmatter.Title }}</h3>
-                </div>
-            </a>
-        {{end}}
-        </section> -->
         <hr />
         <section class="posts">
             <h3>Related Posts</h3>
@@ -52,7 +43,6 @@
                     <div class="post-card-div">
                         <h4>{{ .Frontmatter.Title }}</h4>
                         <p>{{ .Frontmatter.Description }}</p>
-                        <p>{{ printf "%10s" .Body }}</p>
                         <p>{{ .Frontmatter.Date }}</p>
                     </div>
                 </a>
