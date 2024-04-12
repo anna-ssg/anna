@@ -346,6 +346,31 @@ iframe {
     transform: translate(-50%, -50%);
 }
 
+#hoverDiv {
+    background-color: var(--color-background);
+    /* width: 25rem; */
+
+    border: 2px solid #1e1e1e;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 1rem;
+
+    border-radius: .8rem;
+
+    & > p {
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+        padding: 0;
+    }
+
+    & > .date {
+        color: var(--color-text-dim);
+    }
+
+}
+
 /* Code styling */
 /* pre code {
       font-family: agave, monospace;

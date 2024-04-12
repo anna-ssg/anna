@@ -13,6 +13,7 @@ type Note struct {
 	Date           int64
 	Frontmatter    Frontmatter
 	Body           template.HTML
+	MarkdownBody   string
 	LinkedNoteURLs []template.URL
 }
 
@@ -44,11 +45,11 @@ func (p *Parser) BackLinkParser() {
 			noteTitle := strings.Trim(backlink, "[]")
 
 			referenceCompleteURL, err := p.ValidateBackLink(noteTitle)
-			if err != nil{
+			if err != nil {
 				p.ErrorLogger.Fatal(err)
 			} else {
 				// creating anchor tag reference for parsed markdown
-				anchorReference := fmt.Sprintf(`<a href="/%s">%s</a>`, referenceCompleteURL, noteTitle)
+				anchorReference := fmt.Sprintf(`<a id="zettel-reference" href="/%s">%s</a>`, referenceCompleteURL, noteTitle)
 				noteBody = strings.ReplaceAll(noteBody, backlink, anchorReference)
 
 				// fmt.Println(note.LinkedNoteURLs)
@@ -61,6 +62,7 @@ func (p *Parser) BackLinkParser() {
 			Date:           note.Date,
 			Frontmatter:    note.Frontmatter,
 			Body:           template.HTML(noteBody),
+			MarkdownBody:   note.MarkdownBody,
 			LinkedNoteURLs: note.LinkedNoteURLs,
 		}
 

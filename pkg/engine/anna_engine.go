@@ -99,6 +99,25 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	wg.Wait()
 }
 
+func (e *Engine) GenerateNoteJSONIdex(outFilePath string) {
+	jsonFile, err := os.Create(outFilePath + "/static/noteindex.json")
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+
+	defer jsonFile.Close()
+
+	jsonMergedMarshaledData, err := json.Marshal(e.DeepDataMerge.Notes)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+
+	_, err = jsonFile.Write(jsonMergedMarshaledData)
+	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+}
+
 func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// This function creates an index of the site for search
 	// It extracts data from the e.Templates slice

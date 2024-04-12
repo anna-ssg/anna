@@ -1,7 +1,6 @@
 package anna
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -87,7 +86,8 @@ func (cmd *Cmd) VanillaRender() {
 	e.DeepDataMerge.Notes = p.Notes
 
 	e.GenerateLinkStore()
-	fmt.Println(e.DeepDataMerge.LinkStore)
+	// fmt.Println(e.DeepDataMerge.LinkStore)
 	e.RenderNotes(helpers.SiteDataPath, templ)
 	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
+	e.GenerateNoteJSONIdex(helper.SiteDataPath)
 }
