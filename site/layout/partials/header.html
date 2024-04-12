@@ -10,10 +10,10 @@
     {{range .DeepDataMerge.LayoutConfig.Navbar}}
         <!-- Replacing with author name for index page -->
         {{ if eq . "index" }}
-            <a href="/">[{{ $.DeepDataMerge.LayoutConfig.Author }}]</a>
+            <a class="navitem" href="/">[{{ $.DeepDataMerge.LayoutConfig.Author }}]</a>
         {{else}}
             <!-- Other layout fields are filled here -->
-            <a href="/{{.}}.html">[{{.}}]</a>
+            <a class="navitem" href="/{{.}}.html">[{{.}}]</a>
         {{end}}
     {{end}}
   </nav>

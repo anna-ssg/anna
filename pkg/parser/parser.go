@@ -107,14 +107,14 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 						p.ErrorLogger.Fatal(err)
 					}
 
-					fronmatter, body, parseSuccess := p.ParseMarkdownContent(string(content))
+					fronmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content))
 					if parseSuccess {
 						if fronmatter.Type == "post" {
 							if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
-								p.AddFile(baseDirPath, fileName, fronmatter, body)
+								p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
 							}
 						} else {
-							p.AddFile(baseDirPath, fileName, fronmatter, body)
+							p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
 						}
 					}
 
@@ -125,7 +125,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	})
 }
 
-func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string) {
+func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, markdownContent string, body string) {
 	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
 	// fmt.Println(baseDirPath, dirEntryPath)
 	filepath := baseDirPath + dirEntryPath
@@ -172,11 +172,22 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	if frontmatter.Type == "note" {
 		// url = "notes/" + url
 
+		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
+			return r == '\n' || r == '\t'
+		})
+
+		// trim the content up to n characters
+
+		if len(markdownContent) > 200 {
+			markdownContent = markdownContent[:200]
+		}
+
 		note := Note{
 			CompleteURL:    template.URL(url),
 			Date:           date,
 			Frontmatter:    frontmatter,
 			Body:           template.HTML(body),
+			MarkdownBody:   markdownContent,
 			LinkedNoteURLs: []template.URL{},
 		}
 
@@ -188,7 +199,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 
 }
 
-func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, bool) {
+func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, string, bool) {
 	var parsedFrontmatter Frontmatter
 	var markdown string
 	/*
@@ -203,14 +214,14 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", "", false
 	}
 
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", "", false
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -234,7 +245,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		p.ErrorLogger.Fatal(err)
 	}
 
-	return parsedFrontmatter, parsedMarkdown.String(), true
+	return parsedFrontmatter, parsedMarkdown.String(), markdown, true
 }
 
 func (p *Parser) DateParse(date string) time.Time {

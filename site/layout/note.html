@@ -7,7 +7,7 @@
     {{template "header" .}}
     <article>
         <section class="body">
-            {{ if eq $PageData.Frontmatter.Type "post" }}
+            {{ if eq $PageData.Frontmatter.Type "note" }}
             <div class="post-description">
                 <h1>{{ $PageData.Frontmatter.Title }}</h1>
                 <div class="authors-paceholder">
@@ -23,13 +23,6 @@
                         {{ end }}
                     </p>
                 </div>
-                <div class="tags-paceholder">
-                    {{range $PageData.Frontmatter.Tags}}
-                    <div class="tag">
-                        <a href="/tags/{{.}}.html">{{.}}</a>
-                    </div>
-                    {{end}}
-                </div>
             </div>
             {{ else }}
             {{ end }}
@@ -37,6 +30,9 @@
         </section>
         <hr />
         <section class="posts">
+            {{ $CurratedNotes := index .DeepDataMerge.LinkStore .PageURL}}
+            {{ if eq (len $CurratedNotes ) 0 }}
+            {{ else }}
             <h3>Related Posts</h3>
             {{range index .DeepDataMerge.LinkStore .PageURL }}
                 <a class="post-card" href="/{{ .CompleteURL }}">
@@ -47,9 +43,99 @@
                     </div>
                 </a>
             {{end}}
+            {{ end }}
         </section>
     </article>
     {{template "footer" .}}
+
+    <script>
+        document.querySelectorAll('a:not(.post-card):not(.navitem)').forEach(function(anchor) {
+            anchor.addEventListener('mouseover', function(e) {
+                /*var iframe = document.createElement('iframe');
+                iframe.src = this.href;
+                iframe.id = 'hoverIframe';
+                iframe.style.position = 'absolute';
+                iframe.style.left = e.clientX + 'px';
+                iframe.style.top = e.clientY + 'px';
+                document.body.appendChild(iframe);*/
+                var div = document.createElement('div');
+                div.id = "hoverDiv"
+                div.style.position = 'fixed';
+
+                div.style.maxWidth = '25rem';
+
+                var divWidth = 200; // Assume the width of the div
+                var divHeight = 100; // Assume the height of the div
+
+                div.style.left = e.clientX + 'px';
+                div.style.top = e.clientY + 'px';
+
+                var left = e.clientX;
+                var top = e.clientY;
+                if (left + divWidth > document.innerWidth) {
+                    left = window.innerWidth - divWidth;
+                }
+                if (top + divHeight > document.innerHeight) {
+                    top = window.innerHeight - divHeight;
+                }
+
+                div.style.left = left + 'px';
+                div.style.top = top + 'px';
+
+                const url = "/static/noteindex.json"
+                fetch(url)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        // check if the value of the anchor tag <a>THIS ONE</a>
+                        // has a match in the data.Frontmatter.Title
+
+                        for (key in data) {
+                            title = data[key]["Frontmatter"]["Title"];
+                            if (title == anchor.innerHTML) {
+                                // Create a new heading element
+                                var heading = document.createElement('h4');
+                                var mdBody = document.createElement('p');
+                                var fileDate = document.createElement('p');
+                                fileDate.className = "date"
+
+                                heading.textContent = title;
+                                mdBody.textContent = data[key]["MarkdownBody"];
+                                fileDate.textContent = `Created on ${data[key]["Frontmatter"]["Date"]}`
+
+                                div.appendChild(heading);
+                                div.appendChild(mdBody);
+                                div.appendChild(fileDate)
+
+                                // Append the div to the body of the current document
+                                document.body.appendChild(div);
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "There was a problem with the fetch operation:",
+                            error,
+                        );
+                    })
+            });
+
+            anchor.addEventListener('mouseout', function(e) {
+                var hoverDiv = document.getElementById('hoverDiv');
+                if (hoverDiv) {
+                    hoverDiv.remove();
+                }
+            });
+
+        });
+
+
+
+    </script>
 </body>
 
 </html>
