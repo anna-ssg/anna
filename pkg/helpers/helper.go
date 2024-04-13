@@ -78,7 +78,7 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 
 func (h *Helper) Bootstrap() {
 	log.Println("Downloading base theme")
-	url := "https://github.com/acmpesuecc/anna/archive/refs/heads/main.zip"
+	url := "https://github.com/acmpesuecc/anna/archive/refs/tags/v1.0.0-alpha.zip"
 	output, err := os.Create("anna-repo.zip")
 	if err != nil {
 		fmt.Println("Error creating output file:", err)
@@ -153,7 +153,7 @@ func ext() {
 	helper := &Helper{
 		ErrorLogger: log.New(os.Stderr, "ERROR: ", log.LstdFlags),
 	}
-	helper.CopyDirectoryContents("anna-main/site/", "site/")
+	helper.CopyDirectoryContents("anna-1.0.0-alpha/site/", "site/")
 
 	if err := os.RemoveAll("anna-main"); err != nil {
 		log.Println("Error deleting directory:", err)
