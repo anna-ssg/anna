@@ -348,20 +348,30 @@ iframe {
 
 #hoverDiv {
     background-color: var(--color-background);
-    /* width: 25rem; */
 
-    border: 2px solid #1e1e1e;
+    box-shadow:0 0 15px #1e1e1e7a;
+    margin: 1rem;
 
     display: flex;
     flex-direction: column;
 
-    padding: 1rem;
+    padding: .5rem;
 
-    border-radius: .8rem;
+    border-radius: .3rem;
 
     & > p {
         margin-top: 0.2rem;
         margin-bottom: 0.2rem;
+        padding: 0;
+        font-size: .85rem;
+    }
+
+    & > img {
+        margin: 0;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: .1rem;
+        width: 100%;
         padding: 0;
     }
 
@@ -369,6 +379,20 @@ iframe {
         color: var(--color-text-dim);
     }
 
+}
+
+.article-container {
+    display: flex; /* This will make the articles line up horizontally */
+    flex-wrap: nowrap; /* This will prevent the articles from wrapping to the next line */
+    overflow-x: auto; /* This will make the container scrollable when the articles overflow */
+    justify-content: center; /* This will center the articles when there's only one */
+    align-items: center; /* This will vertically center the articles */
+}
+
+.article-container > article {
+    flex: 0 0 auto; /* This will prevent the articles from growing or shrinking */
+    width: 100%; /* This will make each article the same width */
+    margin: 0 1rem; /* This will add some space between the articles */
 }
 
 /* Code styling */

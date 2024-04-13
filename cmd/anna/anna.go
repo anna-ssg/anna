@@ -51,7 +51,7 @@ func (cmd *Cmd) VanillaRender() {
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
 	p.BackLinkParser()
 
-	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
+	p.ParseRobots(helpers.SiteDataPath + "layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
 
 	e.DeepDataMerge.Templates = p.Templates
