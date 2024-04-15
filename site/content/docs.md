@@ -161,8 +161,11 @@ In addition to page data, the following fields can be accessed:
 navbar:
   - about
   - posts
+  - tags
 
-baseURL: http://localhost:8000/
+# make sure no trailing slash com/
+baseURL: https://example.com
+
 # Replace this with the actual canonical-url of your site
 # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet.
 # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site.
@@ -230,7 +233,7 @@ anna
 ### Installing anna with go
 
 ```sh
-go run github.com/acmpesuecc/anna@v1.0.0-alpha
+go run github.com/acmpesuecc/anna@v1.0.1
 ```
 
 ### Flags for usage and purpose

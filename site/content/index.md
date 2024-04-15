@@ -2,7 +2,7 @@
 date: 2024-02-24
 title: Home
 type: page
-previewimage: "/static/plane.jpg"
+previewimage: "/static/images/anna_ascii.png"
 description: "homepage for our ssg"
 ---
 
@@ -23,7 +23,7 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 ## install
 
 ```text
-go install github.com/acmpesuecc/anna@latest
+go run github.com/acmpesuecc/anna@v1.0.1
 ```
 
 ---

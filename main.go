@@ -17,7 +17,7 @@ func main() {
 	var webconsole bool
 	var version bool
 	var validateHTMLLayouts bool
-	var Version string = "v1.0.0-alpha-15-g1eb8e48" // to be set at build time $(git describe --tags)
+	var Version string = "v1.0.1-46-ge4aae40" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",
@@ -62,7 +62,7 @@ func main() {
 		},
 	}
 
-	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "ip address to serve rendered content to")
+	rootCmd.Flags().StringVarP(&addr, "addr", "a", "8000", "specify port to serve rendered content to")
 	rootCmd.Flags().BoolVarP(&renderDrafts, "draft", "d", false, "renders draft posts")
 	rootCmd.Flags().BoolVarP(&validateHTMLLayouts, "layout", "l", false, "validates html layouts")
 	rootCmd.Flags().BoolVarP(&prof, "prof", "p", false, "enable profiling")
