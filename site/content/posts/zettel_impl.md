@@ -127,8 +127,8 @@ type Note struct {
 
 # TODO for zettelkasten impl
 
-- [ ] Generation of Linked Notes
-    - [ ] Implement 1.1 version of linking (user defined references to notes)
-    - [ ] Implement automation for the process of linking. Using `[[]]` callouts to file names.
+- [x] Generation of Linked Notes
+    - [x] Implement 1.1 version of linking (user defined references to notes)
+    - [x] Implement automation for the process of linking. Using `[[]]` callouts to file names.
 - Tests:
     - [ ] unit tests for parsing parocess of the package rendering processes of package

@@ -48,20 +48,30 @@ func (cmd *Cmd) VanillaRender() {
 
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
 	p.Notes = make(map[template.URL]parser.Note, 10)
+
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
+
+	// generate backlinks and validations for notes
 	p.BackLinkParser()
 
 	p.ParseRobots(helpers.SiteDataPath + "layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
 
+
 	e.DeepDataMerge.Templates = p.Templates
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
 	e.DeepDataMerge.Posts = p.Posts
+	e.DeepDataMerge.Notes = p.Notes
+
+	e.GenerateLinkStore()
+
 
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
 	e.GenerateJSONIndex(helpers.SiteDataPath)
+	e.GenerateNoteJSONIdex(helper.SiteDataPath)
+
 	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
 	sort.Slice(e.DeepDataMerge.Posts, func(i, j int) bool {
@@ -77,17 +87,13 @@ func (cmd *Cmd) VanillaRender() {
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
+
+	e.RenderNotes(helpers.SiteDataPath, templ)
+	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
 	e.RenderEngineGeneratedFiles(helpers.SiteDataPath, templ)
 	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
 
 	e.RenderTags(helpers.SiteDataPath, templ)
 
-	// Zettel engine functionality
-	e.DeepDataMerge.Notes = p.Notes
 
-	e.GenerateLinkStore()
-	// fmt.Println(e.DeepDataMerge.LinkStore)
-	e.RenderNotes(helpers.SiteDataPath, templ)
-	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
-	e.GenerateNoteJSONIdex(helper.SiteDataPath)
 }

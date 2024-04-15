@@ -70,16 +70,15 @@ func (e *Engine) GenerateLinkStore() {
 func (e *Engine) GenerateNoteRoot(fileOutPath string, templ *template.Template) {
 	var buffer bytes.Buffer
 
-
 	notesTemplateData := notesTemplateData{
-			DeepDataMerge: e.DeepDataMerge,
-			PageURL:      "notes.html",
-			TemplateData:  parser.TemplateData {
-				Frontmatter: parser.Frontmatter{
-					Title: "Curated Notes",
-					Description: "Currated heads of various zettles part of the page",
-				},
+		DeepDataMerge: e.DeepDataMerge,
+		PageURL:       "notes.html",
+		TemplateData: parser.TemplateData{
+			Frontmatter: parser.Frontmatter{
+				Title:       "Curated Notes",
+				Description: "Currated heads of various zettles part of the page",
 			},
+		},
 	}
 
 	err := templ.ExecuteTemplate(&buffer, "notes-root", notesTemplateData)
@@ -93,39 +92,3 @@ func (e *Engine) GenerateNoteRoot(fileOutPath string, templ *template.Template) 
 	}
 
 }
-
-// func (z *Zettel) RetrieveNotePointer(noteTitle string) *zettel_parser.Note {
-// 	for _, Note := range e.NotesMergedData.Notes {
-// 		if Note.Frontmatter.Title == noteTitle {
-// 			return &Note
-// 		}
-// 	}
-// 	return nil
-// }
-
-// func (e *Engine) GenerateRootNote(fileOutPath string, templ *template.Template) {
-// 	// This is the page that acts as the root of all the
-// 	// notes part of the site
-
-// 	// Creating a map of all head notes
-
-// 	var buffer bytes.Buffer
-
-// 	fmt.Println(e.NotesMergedData.LinkStore)
-
-// 	/*
-// 		t := template.Must(templ.Funcs(template.FuncMap{
-// 			"Deref": func(i *zettel_parser.Note) zettel_parser.Note { return *note },
-// 		}).Parse(src))
-// 	*/
-
-// 	err := templ.ExecuteTemplate(&buffer, "root", e.NotesMergedData.LinkStore)
-// 	if err != nil {
-// 		e.ErrorLogger.Fatal(err)
-// 	}
-
-// 	err = os.WriteFile(fileOutPath+"rendered/notes.html", buffer.Bytes(), 0666)
-// 	if err != nil {
-// 		e.ErrorLogger.Fatal(err)
-// 	}
-// }

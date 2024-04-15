@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"html/template"
 	"regexp"
+	"runtime"
 	"strings"
+	"sync"
 )
 
 type Note struct {
@@ -16,6 +18,8 @@ type Note struct {
 	MarkdownBody   string
 	LinkedNoteURLs []template.URL
 }
+
+var backlinkRE = regexp.MustCompile(`\[[^\]]*\]\]`)
 
 func (p *Parser) BackLinkParser() {
 	/*
@@ -28,44 +32,78 @@ func (p *Parser) BackLinkParser() {
 		of the note `/note/1234.md` must have "Nunc ullamcorper"
 	*/
 
-	for noteURL, note := range p.Notes {
+	numCPU := runtime.NumCPU()
+	numNotes := len(p.Notes)
+	concurrency := numCPU * 2
 
-		noteBody := string(note.Body) // template.HTML -> string
-		// noteParentDir := note.CompleteURL
+	if numNotes < concurrency {
+		concurrency = numNotes
+	}
 
-		// fmt.Println("Finding links for :", noteParentDir)
+	noteURLS := make([]string, 0, numNotes)
+	for noteURL := range p.Notes {
+		noteURLS = append(noteURLS, string(noteURL))
+	}
 
-		backlinkRE := regexp.MustCompile(`\[[^\]]*\]\]`)
-		backlinks := backlinkRE.FindAllString(noteBody, -1)
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, concurrency)
 
-		for _, backlink := range backlinks {
-			// Now that we have the backlinks to titles,
-			// we need to walk the notes dir to find if there
-			// are any matches
-			noteTitle := strings.Trim(backlink, "[]")
-
-			referenceCompleteURL, err := p.ValidateBackLink(noteTitle)
-			if err != nil {
-				p.ErrorLogger.Fatal(err)
-			} else {
-				// creating anchor tag reference for parsed markdown
-				anchorReference := fmt.Sprintf(`<a id="zettel-reference" href="/%s">%s</a>`, referenceCompleteURL, noteTitle)
-				noteBody = strings.ReplaceAll(noteBody, backlink, anchorReference)
-
-				// fmt.Println(note.LinkedNoteURLs)
-				note.LinkedNoteURLs = append(note.LinkedNoteURLs, referenceCompleteURL)
-			}
+	for _, url := range noteURLS {
+		if url == ".html" {
+			continue
 		}
 
-		p.Notes[noteURL] = Note{
-			CompleteURL:    note.CompleteURL,
-			Date:           note.Date,
-			Frontmatter:    note.Frontmatter,
-			Body:           template.HTML(noteBody),
-			MarkdownBody:   note.MarkdownBody,
-			LinkedNoteURLs: note.LinkedNoteURLs,
-		}
+		wg.Add(1)
+		semaphore <- struct{}{}
 
+		go func(noteURL string) {
+			defer func() {
+				<-semaphore
+				wg.Done()
+			}()
+
+			p.ParseBacklink(template.URL(noteURL))
+		}(url)
+
+		wg.Wait()
+	}
+}
+
+func (p *Parser) ParseBacklink(noteURL template.URL) {
+	note := p.Notes[noteURL]
+	noteBody := string(note.Body) // template.HTML -> string
+	// noteParentDir := note.CompleteURL
+
+	// fmt.Println("Finding links for :", noteParentDir)
+
+	backlinks := backlinkRE.FindAllString(noteBody, -1)
+
+	for _, backlink := range backlinks {
+		// Now that we have the backlinks to titles,
+		// we need to walk the notes dir to find if there
+		// are any matches
+		noteTitle := strings.Trim(backlink, "[]")
+
+		referenceCompleteURL, err := p.ValidateBackLink(noteTitle)
+		if err != nil {
+			p.ErrorLogger.Fatal(err)
+		} else {
+			// creating anchor tag reference for parsed markdown
+			anchorReference := fmt.Sprintf(`<a id="zettel-reference" href="/%s">%s</a>`, referenceCompleteURL, noteTitle)
+			noteBody = strings.ReplaceAll(noteBody, backlink, anchorReference)
+
+			// fmt.Println(note.LinkedNoteURLs)
+			note.LinkedNoteURLs = append(note.LinkedNoteURLs, referenceCompleteURL)
+		}
+	}
+
+	p.Notes[noteURL] = Note{
+		CompleteURL:    note.CompleteURL,
+		Date:           note.Date,
+		Frontmatter:    note.Frontmatter,
+		Body:           template.HTML(noteBody),
+		MarkdownBody:   note.MarkdownBody,
+		LinkedNoteURLs: note.LinkedNoteURLs,
 	}
 }
 
@@ -75,6 +113,7 @@ func (p *Parser) ValidateBackLink(noteTitle string) (template.URL, error) {
 			return note.CompleteURL, nil
 		}
 	}
+
 	errorMessage := fmt.Sprintf("ERR: Failed to find a note for backlink %s\n", noteTitle)
 	return "", errors.New(errorMessage)
 }

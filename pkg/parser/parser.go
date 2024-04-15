@@ -13,6 +13,7 @@ import (
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
@@ -183,12 +184,13 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		}
 
 		note := Note{
-			CompleteURL:    template.URL(url),
-			Date:           date,
-			Frontmatter:    frontmatter,
-			Body:           template.HTML(body),
-			MarkdownBody:   markdownContent,
-			LinkedNoteURLs: []template.URL{},
+			CompleteURL:  template.URL(url),
+			Date:         date,
+			Frontmatter:  frontmatter,
+			Body:         template.HTML(body),
+			MarkdownBody: markdownContent,
+			// preallocating the slice
+			LinkedNoteURLs: make([]template.URL, 0, 5),
 		}
 
 		p.Notes[note.CompleteURL] = note
@@ -236,6 +238,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	var parsedMarkdown bytes.Buffer
 
 	md := goldmark.New(
+		goldmark.WithExtensions(extension.TaskList),
 		goldmark.WithRendererOptions(
 			html.WithUnsafe(),
 		),
