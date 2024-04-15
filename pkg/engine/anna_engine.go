@@ -18,7 +18,7 @@ import (
 
 type TagRootTemplateData struct {
 	DeepDataMerge DeepDataMerge
-	PageURL      template.URL
+	PageURL       template.URL
 	TemplateData  parser.TemplateData
 	TagNames      []string
 }
@@ -51,7 +51,7 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 
 	tagTemplateData := TagRootTemplateData{
 		DeepDataMerge: e.DeepDataMerge,
-		PageURL:      "tags.html",
+		PageURL:       "tags.html",
 		TemplateData:  tagRootTemplataData,
 		TagNames:      tagNames,
 	}
@@ -100,7 +100,7 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 }
 
 func (e *Engine) GenerateNoteJSONIdex(outFilePath string) {
-	jsonFile, err := os.Create(outFilePath + "/static/noteindex.json")
+	jsonFile, err := os.Create(outFilePath + "rendered/static/noteindex.json")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// It extracts data from the e.Templates slice
 	// The index.json file is created during every VanillaRender()
 
-	jsonFile, err := os.Create(outFilePath + "/static/index.json")
+	jsonFile, err := os.Create(outFilePath + "/rendered/static/index.json")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
