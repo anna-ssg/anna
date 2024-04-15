@@ -111,11 +111,10 @@ func TestRenderTags(t *testing.T) {
 			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
 		}
 	})
-
 }
 
 func TestGenerateMergedJson(t *testing.T) {
-	if err := os.MkdirAll(TestDirPath+"json_index_test/static", 0750); err != nil {
+	if err := os.MkdirAll(TestDirPath+"json_index_test/rendered/static", 0750); err != nil {
 		t.Errorf("%v", err)
 	}
 
@@ -135,7 +134,7 @@ func TestGenerateMergedJson(t *testing.T) {
 
 		e.GenerateJSONIndex(TestDirPath + "json_index_test")
 
-		got_json, err := os.ReadFile(TestDirPath + "/json_index_test/static/index.json")
+		got_json, err := os.ReadFile(TestDirPath + "/json_index_test/rendered/static/index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
@@ -152,7 +151,6 @@ func TestGenerateMergedJson(t *testing.T) {
 			t.Errorf("The expected and generated json can be found in test/engine/json_index_test")
 		}
 	})
-
 }
 
 func TestGenerateSitemap(t *testing.T) {
@@ -215,5 +213,4 @@ func TestGenerateSitemap(t *testing.T) {
 			t.Errorf("The expected and generated sitemap can be found in test/engine/sitemap/")
 		}
 	})
-
 }

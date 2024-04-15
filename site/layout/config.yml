@@ -2,6 +2,7 @@ navbar:
   - index
   - docs
   - tags
+  - notes
   - posts
 baseURL: https://anna-docs.netlify.app
 siteTitle: "anna-docs"

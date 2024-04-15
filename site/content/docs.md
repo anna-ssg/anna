@@ -1,6 +1,7 @@
 ---
 date: 2024-04-10
 title: Anna Documentation
+type: page
 ---
 
 # Anna
@@ -35,8 +36,9 @@ The ssg currently requires the following directory structure
 │   └── /parser
 ├── /site
 │    ├── /content
-│    │   │   └── /posts
-│    │   │           └── sample.md
+│    │   │   ├── /posts
+│    │   │   │      └── sample.md
+│    │   │   └─── /notes
 │    │   └── index.md
 │    ├── /layout
 │    │   ├── config.yml (This file is necessary and cannot be omitted)
@@ -79,7 +81,7 @@ The ssg currently requires the following directory structure
 
 ## Building layouts
 
-Each layout file(except `posts.html` and `tags.html`) can access any data from the entire ssg
+Each layout file(except `posts.html`, `tags.html` & `notes.html`) can access any data from the entire ssg
 
 The URL for the current page can be accessed using `{{.PageURL}}`
 
@@ -108,8 +110,10 @@ In addition to page data, the following fields can be accessed:
 - `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all posts for a particular tag url
 - `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.yml`
 - `{{.DeepDataMerge.Posts}}` - Stores a slice of templates of all posts
-- `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site
-(primarily used for search and graphing of tags)
+- `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site (primarily used for search and graphing of tags)
+- `{{.DeepDataMerge.LinkStore}}` - Stores a map which contains a slice of pointers to the *linked notes*.
+- `{{.DeepDataMerge.Notes}}` - Similar to `Posts` but for all the notes part of the site
+
 
 ## Notes
 
@@ -132,11 +136,12 @@ In addition to page data, the following fields can be accessed:
 - `date`: The date of the current page
 - `draft`: When set to 'true', the current page is not rendered unless the '-d' flag is used
 - `scripts`: Stores the page-level scripts to be added
-- `type`: Sets the type of the page. Use type 'post' for posts
+- `type`: Sets the type of the page. Use type 'post' for posts & `note` for notes
 - `description`: Stores the description of the current post previewed in posts.html
 - `previewimage`: Stores the preview image of the current page
 - `tags`: Stores the tags of the particular page
 - `authors`: Stores (multiple) author/s of a particular page
+- `head`: Users need to manually specify head of the zettel in the frontmatter. Only head notes will be a part of `notes.html`
 
 (**The above tags are Frontmatter tags**)
 
@@ -172,24 +177,66 @@ author: Anna
 
 ---
 
-## Run locally
+# Notes Usage
+
+Anna provides users with functionality of maintaining notes and sharing them. Notes opens another set of functionality for anna. Users can create under the `site/notes` directory. Besides similar use cases as a post, notes can be short snippets of information, code or even some kind of list that the users want. It supports some important aspects of [zettelkasten](https://zettelkasten.de/overview/) where users can link notes to each other, and organise similar posts in a zettel.
+
+We aren't trying to re-invent the process of making an editor that helps users maintain these zettels as there are already some fantastic applications, namely [Obsidian](https://obsidian.md/), [Ginko Writer](https://app.gingkowriter.com) and [Evergreen Notes](https://evergreennotes.com/). Our application as a rather needs to provide a generator to stitch these notes together to make it accessible on the site.
+
+## Directory structure 
+
+```text
+/notes
+├── /zettel A
+└── /zettel B 
+    ├── note A 
+    ├── note B
+    └── note C 
+```
+
+## Linking Notes
+
+Notes can be linked by using callouts in markdown files such as `[[]]`. The parser will validate these links during the runtime. It checks whether there are existing valid notes with a title matching the content of the callout. If not an error is thrown and you wont be able to compile the site. 
+
+For example. If you have a note with the title `Note A` and you would like to reference it else where in another note (could even be part of another zettel). Then `[[Note A]]` would be the appropriate callout to use it.
+
+---
+
+## Anna Usage
+
+
+### Installing anna from releases
+
+Run this in the appropriate folder. Note that if you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
+
+```sh 
+curl -L https://github.com/acmpesuecc/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
+tar -xvf anna.tar.gz # unzip the tar file 
+rm anna.tar.gz # removing the tar file 
+
+# here you could add anna to your path if you want and use in in any directory 
+./anna # runs anna. The instructions are given below
+```
+
+### Brew taps for MacOS
+
+To get anna set up on your mac using brew taps, heres the repo you need to tap off from
+
+```sh 
+brew tap anna-ssg/anna 
+brew install anna
+
+# to run anna 
+anna
+```
+
+### Installing anna with go
 
 ```sh
 go run github.com/acmpesuecc/anna@v1.0.1
 ```
 
-> If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
-
-## Contributing to Anna
-
-Detailed documentation for our SSG can be found: [here](https://anna-docs.netlify.app/)
-
-If you have git installed, clone our repository and build against the latest commit
-
-```sh
-git clone github.com/acmpesuecc/anna; cd anna
-go build
-```
+### Flags for usage and purpose
 
 ```text
 Usage:
@@ -205,3 +252,16 @@ Flags:
   -v, --version       prints current version number
   -w, --webconsole    wizard to setup anna
 ```
+
+
+## Contributing to Anna
+
+Detailed documentation for our SSG can be found: [here](https://anna-docs.netlify.app/)
+
+If you have git installed, clone our repository and build against the latest commit
+
+```sh
+git clone github.com/acmpesuecc/anna; cd anna
+go build
+```
+

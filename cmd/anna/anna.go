@@ -20,8 +20,9 @@ type Cmd struct {
 func (cmd *Cmd) VanillaRender() {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
-		Templates:    make(map[template.URL]parser.TemplateData),
-		TagsMap:      make(map[template.URL][]parser.TemplateData),
+		Templates:    make(map[template.URL]parser.TemplateData, 10),
+		TagsMap:      make(map[template.URL][]parser.TemplateData, 10),
+		Notes:        make(map[template.URL]parser.Note, 10),
 		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts: cmd.RenderDrafts,
 		LiveReload:   cmd.LiveReload,
@@ -30,8 +31,10 @@ func (cmd *Cmd) VanillaRender() {
 	e := engine.Engine{
 		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
+	e.DeepDataMerge.Notes = make(map[template.URL]parser.Note, 10)
+	e.DeepDataMerge.LinkStore = make(map[template.URL][]*parser.Note, 10)
 
 	helper := helpers.Helper{
 		ErrorLogger:  e.ErrorLogger,
@@ -40,29 +43,36 @@ func (cmd *Cmd) VanillaRender() {
 
 	helper.CreateRenderedDir(helper.SiteDataPath)
 
-	// Copies the contents of the 'static/' directory to 'rendered/'
-
 	p.ParseConfig(helpers.SiteDataPath + "layout/config.yml")
+	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 
 	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
 	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
 
-	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
 	p.ParseLayoutFiles()
+
+	// Generate backlinks and validations for notes
+	p.BackLinkParser()
 
 	e.DeepDataMerge.Templates = p.Templates
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
 	e.DeepDataMerge.Posts = p.Posts
-
-	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
-	e.GenerateFeed()
-	e.GenerateJSONIndex(helpers.SiteDataPath)
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
+	e.DeepDataMerge.Notes = p.Notes
 
 	sort.Slice(e.DeepDataMerge.Posts, func(i, j int) bool {
 		return e.DeepDataMerge.Posts[i].Frontmatter.Date > e.DeepDataMerge.Posts[j].Frontmatter.Date
 	})
+
+	// Copies the contents of the 'static/' directory to 'rendered/'
+	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
+
+	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
+	e.GenerateFeed()
+	e.GenerateJSONIndex(helpers.SiteDataPath)
+
+	e.GenerateLinkStore()
+	e.GenerateNoteJSONIdex(helper.SiteDataPath)
 
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {
@@ -73,8 +83,10 @@ func (cmd *Cmd) VanillaRender() {
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
+
+	e.RenderNotes(helpers.SiteDataPath, templ)
+	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
 	e.RenderEngineGeneratedFiles(helpers.SiteDataPath, templ)
 	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
-
 	e.RenderTags(helpers.SiteDataPath, templ)
 }

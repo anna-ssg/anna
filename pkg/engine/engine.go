@@ -28,6 +28,12 @@ type DeepDataMerge struct {
 	// Posts contains the template data of files in the posts directory
 	Posts []parser.TemplateData
 
+	//Stores all the notes
+	Notes map[template.URL]parser.Note
+
+	//Stores the links of each note to other notes
+	LinkStore map[template.URL][]*parser.Note
+
 	// Stores the index generated for search functionality
 	JSONIndex map[template.URL]JSONIndexTemplate
 }

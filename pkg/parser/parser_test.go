@@ -37,14 +37,14 @@ func TestAddFileandRender(t *testing.T) {
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: got_parser.ErrorLogger,
 		}
-		sample_frontmatter, _, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
+		sample_frontmatter, _, markdownContent, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
 		sample_body := "sample_body"
 		if !parseSuccess {
 			return
 		}
 
 		filename := "testpost.md"
-		fileurl := "posts/testpost.html"
+		fileurl := "testpost.html"
 		want_parser.MdFilesName = append(want_parser.MdFilesName, filename)
 		want_parser.MdFilesPath = append(want_parser.MdFilesPath, filename)
 		want_page := parser.TemplateData{
@@ -56,7 +56,7 @@ func TestAddFileandRender(t *testing.T) {
 		}
 		want_parser.LayoutConfig = want_layout
 
-		want_parser.Templates[template.URL("posts/testpost.html")] = want_page
+		want_parser.Templates[template.URL("testpost.html")] = want_page
 		for _, tag := range sample_frontmatter.Tags {
 			want_parser.TagsMap[template.URL(tag)] = append(want_parser.TagsMap[template.URL(tag)], want_page)
 		}
@@ -65,7 +65,7 @@ func TestAddFileandRender(t *testing.T) {
 			want_parser.Posts = append(want_parser.Posts, want_page)
 		}
 
-		got_parser.AddFileAndRender("", filename, sample_frontmatter, sample_body)
+		got_parser.AddFile("", filename, sample_frontmatter, markdownContent, sample_body)
 
 		if !reflect.DeepEqual(got_parser, want_parser) {
 			t.Errorf("want %v; \ngot %v", want_parser, got_parser)
@@ -86,7 +86,7 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		_, body_got, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		_, body_got, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
 
 		if parseSuccess {
 
@@ -106,7 +106,7 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		frontmatter_got, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		frontmatter_got, _, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
 
 		if !parseSuccess {
 			frontmatter_want := parser.Frontmatter{

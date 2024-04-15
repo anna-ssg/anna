@@ -13,6 +13,7 @@ import (
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"gopkg.in/yaml.v3"
 )
@@ -36,6 +37,10 @@ type Frontmatter struct {
 	PreviewImage string   `yaml:"previewimage"`
 	Tags         []string `yaml:"tags"`
 	Authors      []string `yaml:"authors"`
+
+	// Head is specifically used for
+	// mentioning the head of the notes
+	Head bool `yaml:"head"`
 }
 
 // This struct holds all of the data required to render any page of the site
@@ -63,6 +68,9 @@ type Parser struct {
 	// Posts contains the template data of files in the posts directory
 	Posts []TemplateData
 
+	//Stores all the notes
+	Notes map[template.URL]Note
+
 	// TODO: Look into the two below fields into a single one
 	MdFilesName []string
 	MdFilesPath []string
@@ -81,25 +89,36 @@ type Parser struct {
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
-		if path != "." {
+		if path != "." && path != ".obsidian" {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
 				p.ParseMDDir(path, subDir)
 			} else {
 				if filepath.Ext(path) == ".md" {
-					fileName := filepath.Base(path)
+					// OLD IMPL
+					// fileName := filepath.Base(path)
+					//
+					// NEW IMPL
+					// /contents/notes/2134321.md ==> notes/2134321.md
+					fileName := strings.TrimPrefix(path, baseDirPath)
+					// fmt.Println(fileNameWithPath, fileName)
 
 					content, err := os.ReadFile(baseDirPath + path)
 					if err != nil {
 						p.ErrorLogger.Fatal(err)
 					}
 
-					fronmatter, body, parseSuccess := p.ParseMarkdownContent(string(content))
+					fronmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content))
 					if parseSuccess {
-						if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
-							p.AddFileAndRender(baseDirPath, fileName, fronmatter, body)
+						if fronmatter.Type == "post" {
+							if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
+								p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
+							}
+						} else {
+							p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
 						}
 					}
+
 				}
 			}
 		}
@@ -107,8 +126,9 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	})
 }
 
-func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, body string) {
+func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, markdownContent string, body string) {
 	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
+	// fmt.Println(baseDirPath, dirEntryPath)
 	filepath := baseDirPath + dirEntryPath
 	p.MdFilesPath = append(p.MdFilesPath, filepath)
 
@@ -122,33 +142,67 @@ func (p *Parser) AddFileAndRender(baseDirPath string, dirEntryPath string, front
 	key, _ := strings.CutPrefix(filepath, helpers.SiteDataPath+"content/")
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
-	if frontmatter.Type == "post" {
-		url = "posts/" + url
+
+	if frontmatter.Type == "post" || frontmatter.Type == "page" {
+
+		page := TemplateData{
+			CompleteURL: template.URL(url),
+			Date:        date,
+			Frontmatter: frontmatter,
+			Body:        template.HTML(body),
+			LiveReload:  p.LiveReload,
+		}
+
+		// Adding the page to the merged map storing all site pages
+		if frontmatter.Type == "post" {
+			// url = "posts/" + url
+			p.Posts = append(p.Posts, page)
+		}
+
+		p.Templates[template.URL(url)] = page
+
+		// Adding the page to the tags map with the corresponding tags
+		for _, tag := range page.Frontmatter.Tags {
+			tagsMapKey := "tags/" + tag + ".html"
+			p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
+
+		}
+
 	}
 
-	page := TemplateData{
-		CompleteURL: template.URL(url),
-		Date:        date,
-		Frontmatter: frontmatter,
-		Body:        template.HTML(body),
-		LiveReload:  p.LiveReload,
+	if frontmatter.Type == "note" {
+		// url = "notes/" + url
+
+		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
+			return r == '\n' || r == '\t'
+		})
+
+		// trim the content up to n characters
+
+		if len(markdownContent) > 200 {
+			markdownContent = markdownContent[:200]
+		}
+
+		note := Note{
+			CompleteURL:  template.URL(url),
+			Date:         date,
+			Frontmatter:  frontmatter,
+			Body:         template.HTML(body),
+			MarkdownBody: markdownContent,
+			// preallocating the slice
+			LinkedNoteURLs: make([]template.URL, 0, 5),
+			LiveReload:     p.LiveReload,
+		}
+
+		p.Notes[note.CompleteURL] = note
+
+		// NOTE: not adding the template urls of referenced ntoes
+		// rather, will populate it while links
 	}
 
-	// Adding the page to the merged map storing all site pages
-	if frontmatter.Type == "post" {
-		p.Posts = append(p.Posts, page)
-	}
-
-	p.Templates[template.URL(url)] = page
-
-	// Adding the page to the tags map with the corresponding tags
-	for _, tag := range page.Frontmatter.Tags {
-		tagsMapKey := "tags/" + tag + ".html"
-		p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
-	}
 }
 
-func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, bool) {
+func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, string, bool) {
 	var parsedFrontmatter Frontmatter
 	var markdown string
 	/*
@@ -163,14 +217,14 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", "", false
 	}
 
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
-		return Frontmatter{}, "", false
+		return Frontmatter{}, "", "", false
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -185,6 +239,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	var parsedMarkdown bytes.Buffer
 
 	md := goldmark.New(
+		goldmark.WithExtensions(extension.TaskList),
 		goldmark.WithRendererOptions(
 			html.WithUnsafe(),
 		),
@@ -194,7 +249,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		p.ErrorLogger.Fatal(err)
 	}
 
-	return parsedFrontmatter, parsedMarkdown.String(), true
+	return parsedFrontmatter, parsedMarkdown.String(), markdown, true
 }
 
 func (p *Parser) DateParse(date string) time.Time {
