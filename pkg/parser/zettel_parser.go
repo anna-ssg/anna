@@ -17,6 +17,7 @@ type Note struct {
 	Body           template.HTML
 	MarkdownBody   string
 	LinkedNoteURLs []template.URL
+	LiveReload     bool
 }
 
 var backlinkRE = regexp.MustCompile(`\[[^\]]*\]\]`)

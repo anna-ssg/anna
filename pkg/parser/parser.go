@@ -191,6 +191,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 			MarkdownBody: markdownContent,
 			// preallocating the slice
 			LinkedNoteURLs: make([]template.URL, 0, 5),
+			LiveReload:     p.LiveReload,
 		}
 
 		p.Notes[note.CompleteURL] = note

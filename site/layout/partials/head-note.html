@@ -1,6 +1,6 @@
-{{ define "head" }}
+{{ define "head-note" }}
 <!-- If the template for a particular url does not exist(posts.html), setting it to the specific page template data -->
-{{ $PageData := index .DeepDataMerge.Templates .PageURL }}
+{{ $PageData := index .DeepDataMerge.Notes .PageURL }}
 {{if eq $PageData nil }}
 {{ $PageData = .TemplateData }}
 {{end}}
@@ -34,7 +34,7 @@
 
   {{range $PageData.Frontmatter.JSFiles}}
   <script src="/script/{{.}}" defer></script>
-  {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts}}
+  {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts }}
   <script src="/script/{{.}}" defer></script>
   {{end}}
 
