@@ -21,6 +21,14 @@ type Note struct {
 
 var backlinkRE = regexp.MustCompile(`\[[^\]]*\]\]`)
 
+// TODO: The current regex will search for all types of callouts of
+// [[]] in the body of the markdown. The disadvantage is that it will
+// not be able to ignore the callouts mentioned inside code blocks
+// on inline code blocks.
+//
+// Change the current method with which these are parsed such that
+// this edge cases is handled correctly.
+
 func (p *Parser) BackLinkParser() {
 	/*
 		This function is going to validate whether all the
