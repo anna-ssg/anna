@@ -17,7 +17,7 @@ func main() {
 	var webconsole bool
 	var version bool
 	var validateHTMLLayouts bool
-	var Version string = "v1.0.1-46-ge4aae40" // to be set at build time $(git describe --tags)
+	Version := "v1.0.1-46-ge4aae40" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",
@@ -35,11 +35,9 @@ func main() {
 
 			if prof {
 				startTime := time.Now()
-				anna.StartProfiling(&annaCmd)
-
+				annaCmd.VanillaRender()
 				elapsedTime := time.Since(startTime)
-				go anna.PrintStats(elapsedTime)
-				anna.RunProfilingServer()
+				annaCmd.PrintStats(elapsedTime)
 			}
 
 			if version {

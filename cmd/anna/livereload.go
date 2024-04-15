@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -103,6 +104,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 
 func (lr *liveReload) startServer(addr string) {
 	fmt.Print("Serving content at: http://localhost:", addr, "\n")
+	fmt.Print("Profile data can be viewed at: http://localhost:", addr, "/debug/pprof", "\n")
 	http.Handle("/", http.FileServer(http.Dir(helpers.SiteDataPath+"./rendered")))
 	http.HandleFunc("/events", eventsHandler)
 	err := http.ListenAndServe(":"+addr, nil)
