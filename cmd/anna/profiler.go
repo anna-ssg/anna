@@ -2,14 +2,11 @@ package anna
 
 import (
 	"log"
-	"net/http"
-	"os"
 	"runtime"
-	"runtime/pprof"
 	"time"
 )
 
-func PrintStats(elapsedTime time.Duration) {
+func (cmd *Cmd) PrintStats(elapsedTime time.Duration) {
 	memStats := new(runtime.MemStats)
 	runtime.ReadMemStats(memStats)
 	log.Printf("Memory Usage: %d bytes", memStats.Alloc)
@@ -32,45 +29,4 @@ func PrintStats(elapsedTime time.Duration) {
 	pc, _, _, _ := runtime.Caller(1)
 	function := runtime.FuncForPC(pc)
 	log.Printf("Function with Highest CPU Usage: %s", function.Name())
-
-	log.Println("-----------------------------------")
-}
-
-func StopProfiling() {
-	pprof.StopCPUProfile()
-}
-
-func StartProfiling(annaCmd *Cmd) {
-	file, err := os.Create("cpu.prof")
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	if err := pprof.StartCPUProfile(file); err != nil {
-		log.Fatalf("%v", err)
-	}
-	defer pprof.StopCPUProfile()
-
-	for i := 0; i < 500; i++ {
-		annaCmd.VanillaRender()
-	}
-
-	memProfileFile, err := os.Create("mem.prof")
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	defer memProfileFile.Close()
-
-	if err := pprof.WriteHeapProfile(memProfileFile); err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	log.Println("-----------------------------------")
-	log.Println("Memory and CPU profiles written to file")
-}
-
-func RunProfilingServer() {
-	log.Println("Profiling server started at http://localhost:8080/debug/pprof")
-	log.Println("-----------------------------------")
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }
