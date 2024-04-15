@@ -40,7 +40,15 @@ function drawNodes(nodes) {
         .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
         .on("click", onClick);
 
-    node.append("title").text(d => d.id);
+    node.append("title").text(d => {
+        //Removing the url prefix and file extension
+
+        if (d.id.indexOf("/") != -1) {
+            d.id = d.id.replace(/.*\//, "")
+        }
+        d.id = d.id.replace(/.html/, "")
+        d.id;
+    })
 }
 
 function drawLabels(nodes) {
@@ -88,7 +96,7 @@ async function onClick(event, d) {
         .map(([key, post]) => ({ filename: key, title: post.Frontmatter.Title }));
 
     if (commonPosts.length === 0 && d.group !== 0) {
-        const nodeName = d.id.replace(/\.md$/, ""); // Remove the ".md" extension from the node name (eh)
+        nodeName = "posts/" + d.id + ".html" // Adding url prefix and extension for posts
         window.location.href = `/${nodeName}`; // If it's a leaf node, automatically redirect
     }
     else {

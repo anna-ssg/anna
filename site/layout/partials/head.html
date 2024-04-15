@@ -2,7 +2,7 @@
 <!-- If the template for a particular url does not exist(posts.html), setting it to the specific page template data -->
 {{ $PageData := index .DeepDataMerge.Templates .PageURL }}
 {{if eq $PageData nil }}
-  {{ $PageData = .TemplateData }}
+{{ $PageData = .TemplateData }}
 {{end}}
 
 <!doctype html>
@@ -12,14 +12,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{$PageData.Frontmatter.Title}}</title>
-    <link rel="preload stylesheet" href="{{.DeepDataMerge.LayoutConfig.ThemeURL}}" />
+    <link rel="preload stylesheet" href="{{.DeepDataMerge.LayoutConfig.ThemeURL}}" as="style" />
 
     <!-- External Stylesheets and Plugins -->
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-    <script defer src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/tomorrow-night.css">
+
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
     <link rel="alternate" type="application/atom+xml" title="feed" href="/feed.xml" />
-
 
     <!-- Scripts filled in from plugins -->
     {{ if $PageData.LiveReload }}
@@ -46,10 +48,6 @@
 
     <meta name="description" content="{{ $PageData.Frontmatter.Description }}">
 
-    <script defer>
-        hljs.highlightAll();
-        hljs.addPlugin(new CopyButtonPlugin());
-    </script>
 </head>
 {{end}}
 
