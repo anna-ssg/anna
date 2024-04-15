@@ -7,11 +7,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/cheggaaa/pb/v3"
 )
 
 const SiteDataPath string = "site/"
+
+var version string = "2.0.0" // use variable
 
 type Helper struct {
 	ErrorLogger  *log.Logger
@@ -79,9 +82,9 @@ func (h *Helper) Bootstrap() {
 		fmt.Println("Bootstrap process cancelled.")
 		return
 	}
-	log.Println("Downloading base theme")
-	url := "https://github.com/acmpesuecc/anna/archive/refs/heads/main.zip"
-	output, err := os.Create("anna-repo.zip")
+	url := fmt.Sprintf("https://github.com/acmpesuecc/anna/archive/refs/tags/v%s.zip", version)
+
+	output, err := os.Create("anna-dl.zip")
 	if err != nil {
 		fmt.Println("Error creating output file:", err)
 		return
@@ -107,63 +110,55 @@ func (h *Helper) Bootstrap() {
 		fmt.Println("Error copying:", err)
 		return
 	}
-	log.Println("Downloaded successfully")
-	ext()
+	ext(version)
 }
 
-func ext() {
-	zipFilePath := "anna-repo.zip"
-
-	// Open the zip file
+func ext(version string) {
+	zipFilePath := "anna-dl.zip"
 	zipFile, err := zip.OpenReader(zipFilePath)
 	if err != nil {
-		fmt.Println("Error opening zip file:", err)
-		return
+		log.Fatal(err)
 	}
 	defer zipFile.Close()
-
-	// Extract each file from the zip archive
 	for _, file := range zipFile.File {
-		// Open file from zip archive
 		zippedFile, err := file.Open()
 		if err != nil {
-			fmt.Println("Error opening zipped file:", err)
-			return
+			log.Fatal(err)
 		}
 		defer zippedFile.Close()
 
-		// Create the file in the extraction directory
-		extractedFilePath := file.Name
+		extractedFilePath := filepath.Join(".", file.Name) // Extract to the current directory
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(extractedFilePath, file.Mode())
-		} else {
-			extractedFile, err := os.OpenFile(extractedFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+			err := os.MkdirAll(extractedFilePath, os.ModePerm)
 			if err != nil {
-				fmt.Println("Error creating extracted file:", err)
-				return
+				log.Fatal(err)
+			}
+		} else {
+			extractedFile, err := os.Create(extractedFilePath)
+			if err != nil {
+				log.Fatal(err)
 			}
 			defer extractedFile.Close()
 
 			_, err = io.Copy(extractedFile, zippedFile)
 			if err != nil {
-				fmt.Println("Error extracting file:", err)
-				return
+				log.Fatal(err)
 			}
 		}
 	}
 
+	// Bootstrap the base theme
 	helper := &Helper{
 		ErrorLogger: log.New(os.Stderr, "ERROR: ", log.LstdFlags),
 	}
-	helper.CopyDirectoryContents("anna-main/site/", "site/")
-
-	if err := os.RemoveAll("anna-main"); err != nil {
-		log.Println("Error deleting directory:", err)
+	helper.CopyDirectoryContents(fmt.Sprintf("anna-%s/site/", version), "site/")
+	err = os.Remove("anna-dl.zip")
+	if err != nil {
+		log.Fatal("Error cleaning-up zip file:", err)
 	}
-
-	if err := os.RemoveAll("anna-repo.zip"); err != nil {
-		log.Println("Error deleting zip file:", err)
+	err = os.RemoveAll(fmt.Sprintf("anna-%s", version))
+	if err != nil {
+		log.Fatal("Error deleting directory:", err)
 	}
 	log.Println("Bootstrapped base theme")
-
 }

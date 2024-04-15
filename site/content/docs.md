@@ -233,7 +233,7 @@ anna
 ### Installing anna with go
 
 ```sh
-go run github.com/acmpesuecc/anna@v1.0.1
+go run github.com/acmpesuecc/anna@v2.0.0
 ```
 
 ### Flags for usage and purpose

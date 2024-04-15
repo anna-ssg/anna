@@ -17,7 +17,7 @@ func main() {
 	var webconsole bool
 	var version bool
 	var validateHTMLLayouts bool
-	Version := "v1.0.1-46-ge4aae40" // to be set at build time $(git describe --tags)
+	Version := "v2.0.0" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",

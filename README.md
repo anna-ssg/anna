@@ -25,7 +25,7 @@ Pronounced: `/ɐnːɐ/` which means rice 🍚 in Kannada
 ## Get Started
 
 ```sh
-go run github.com/acmpesuecc/anna@v1.0.0-alpha
+go run github.com/acmpesuecc/anna@v2.0.0
 ```
 > If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
