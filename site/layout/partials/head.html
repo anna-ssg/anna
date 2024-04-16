@@ -2,6 +2,9 @@
 <!-- If the template for a particular url does not exist(posts.html), setting it to the specific page template data -->
 {{ $PageData := index .DeepDataMerge.Templates .PageURL }}
 {{if eq $PageData nil }}
+{{ $PageData := index .DeepDataMerge.Notes .PageURL }}
+{{end}}
+{{if eq $PageData nil }}
 {{ $PageData = .TemplateData }}
 {{end}}
 
