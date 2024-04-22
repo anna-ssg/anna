@@ -5,8 +5,12 @@ go 1.22.2
 require (
 	github.com/PuerkitoBio/goquery v1.9.1
 	github.com/cheggaaa/pb/v3 v3.1.5
+	github.com/mangoumbrella/goldmark-figure v1.0.0
 	github.com/spf13/cobra v1.8.0
 	github.com/yuin/goldmark v1.7.1
+	go.abhg.dev/goldmark/anchor v0.1.1
+	go.abhg.dev/goldmark/mermaid v0.5.0
+	go.abhg.dev/goldmark/toc v0.10.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

@@ -37,7 +37,7 @@ is a lot of time spent fixing things rather than getting productive work done.
 
 > A static site generator is an immensely useful application
 
-![Lighthouse scores of the anna-docs page](/static/images/posts/building-anna/lighthouse.png)
+![Lighthouse scores of the anna-docs page](images/lighthouse.png)
 
 It can simplify the whole process: allowing you to spend time and energy
 on quality content. Keep reading to find out how we designed anna `v1.0.0`
@@ -146,6 +146,7 @@ Here are some screenshots out of our group chats, that demonstrate build times, 
 just copy-pasting a single markdown file en-mass!
 
 ![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](images/bench.png)
+Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty
 
 > After about 2 weeks of training (_ahem_) coding, we had a (merge) bringing parallel rendering and profiling to the table
 
@@ -160,9 +161,9 @@ It also writes a cpu.prof and mem.prof file, which can be analysed and visualise
 Here,s the CPU profile generated while rendering this site.
 This is an SVG showing how much time each function call takes, the number of times it ran in a given test sample and various other useful information.
 
-![CPU profile of an anna render generated using pprof](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/building-anna/cpu_prof.svg)
+![CPU profile of an anna render generated using pprof](images/cpu_prof.svg)
 
-<!-- ![CPU profile of an anna render generated using pprof](/static/images/posts/building-anna/cpu_prof.svg) -->
+<!-- ![CPU profile of an anna render generated using pprof](images/cpu_prof.svg) -->
 
 You may wanna zoom-in about 3-4x times to get to see how our ssg works
 
@@ -289,7 +290,7 @@ We mean to re-write it using WASM if necessary.
 
 Here's a gif demonstrating search
 
-![Demonstration of the search feature in anna](/static/images/posts/building-anna/search.gif)
+![Demonstration of the search feature in anna](images/search.gif)
 
 ## JS integration as plugins
 
@@ -317,7 +318,7 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-![Demonstration of the GUI wizard in anna](/static/images/posts/building-anna/wizard.gif)
+![Demonstration of the GUI wizard in anna](images/wizard.gif)
 
 ---
 

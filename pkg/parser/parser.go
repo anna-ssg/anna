@@ -12,9 +12,14 @@ import (
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
+	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+	"go.abhg.dev/goldmark/anchor"
+	"go.abhg.dev/goldmark/mermaid"
+	"go.abhg.dev/goldmark/toc"
 	"gopkg.in/yaml.v3"
 )
 
@@ -232,13 +237,44 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
+	var md goldmark.Markdown
 
-	md := goldmark.New(
-		goldmark.WithExtensions(extension.TaskList),
-		goldmark.WithRendererOptions(
-			html.WithUnsafe(),
-		),
-	)
+	if parsedFrontmatter.Type == "post" {
+		md = goldmark.New(
+			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+			goldmark.WithExtensions(
+				extension.TaskList,
+				figure.Figure,
+				&toc.Extender{
+					Compact: true,
+				},
+				&mermaid.Extender{
+					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
+				},
+				&anchor.Extender{
+					Texter: anchor.Text("#"),
+				},
+			),
+			goldmark.WithRendererOptions(
+				html.WithUnsafe(),
+			),
+		)
+	} else {
+		md = goldmark.New(
+			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+			goldmark.WithExtensions(
+				extension.TaskList,
+				figure.Figure,
+				&mermaid.Extender{
+					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
+				},
+			),
+			goldmark.WithRendererOptions(
+				html.WithUnsafe(),
+			),
+		)
+
+	}
 
 	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {
 		p.ErrorLogger.Fatal(err)
