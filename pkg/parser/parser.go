@@ -12,9 +12,14 @@ import (
 	"time"
 
 	"github.com/acmpesuecc/anna/pkg/helpers"
+	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+	"go.abhg.dev/goldmark/anchor"
+	"go.abhg.dev/goldmark/mermaid"
+	"go.abhg.dev/goldmark/toc"
 	"gopkg.in/yaml.v3"
 )
 
@@ -88,21 +93,17 @@ type Parser struct {
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
+	helper := helpers.Helper{
+		ErrorLogger: p.ErrorLogger,
+	}
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
 		if path != "." && path != ".obsidian" {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
 				p.ParseMDDir(path, subDir)
 			} else {
+				fileName := strings.TrimPrefix(path, baseDirPath)
 				if filepath.Ext(path) == ".md" {
-					// OLD IMPL
-					// fileName := filepath.Base(path)
-					//
-					// NEW IMPL
-					// /contents/notes/2134321.md ==> notes/2134321.md
-					fileName := strings.TrimPrefix(path, baseDirPath)
-					// fmt.Println(fileNameWithPath, fileName)
-
 					content, err := os.ReadFile(baseDirPath + path)
 					if err != nil {
 						p.ErrorLogger.Fatal(err)
@@ -118,7 +119,8 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 							p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
 						}
 					}
-
+				} else {
+					helper.CopyFiles(helpers.SiteDataPath+"content/"+fileName, helpers.SiteDataPath+"rendered/"+fileName)
 				}
 			}
 		}
@@ -128,7 +130,6 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 
 func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, markdownContent string, body string) {
 	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
-	// fmt.Println(baseDirPath, dirEntryPath)
 	filepath := baseDirPath + dirEntryPath
 	p.MdFilesPath = append(p.MdFilesPath, filepath)
 
@@ -155,7 +156,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 
 		// Adding the page to the merged map storing all site pages
 		if frontmatter.Type == "post" {
-			// url = "posts/" + url
 			p.Posts = append(p.Posts, page)
 		}
 
@@ -167,12 +167,9 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 			p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
 
 		}
-
 	}
 
 	if frontmatter.Type == "note" {
-		// url = "notes/" + url
-
 		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
 			return r == '\n' || r == '\t'
 		})
@@ -220,6 +217,9 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		return Frontmatter{}, "", "", false
 	}
 
+	// If the first section of the page contains a title field, continue parsing
+	// Else, prevent parsing of the current file
+	// TODO: Add this to documentation
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
@@ -237,13 +237,44 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
+	var md goldmark.Markdown
 
-	md := goldmark.New(
-		goldmark.WithExtensions(extension.TaskList),
-		goldmark.WithRendererOptions(
-			html.WithUnsafe(),
-		),
-	)
+	if parsedFrontmatter.Type == "post" {
+		md = goldmark.New(
+			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+			goldmark.WithExtensions(
+				extension.TaskList,
+				figure.Figure,
+				&toc.Extender{
+					Compact: true,
+				},
+				&mermaid.Extender{
+					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
+				},
+				&anchor.Extender{
+					Texter: anchor.Text("#"),
+				},
+			),
+			goldmark.WithRendererOptions(
+				html.WithUnsafe(),
+			),
+		)
+	} else {
+		md = goldmark.New(
+			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+			goldmark.WithExtensions(
+				extension.TaskList,
+				figure.Figure,
+				&mermaid.Extender{
+					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
+				},
+			),
+			goldmark.WithRendererOptions(
+				html.WithUnsafe(),
+			),
+		)
+
+	}
 
 	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {
 		p.ErrorLogger.Fatal(err)

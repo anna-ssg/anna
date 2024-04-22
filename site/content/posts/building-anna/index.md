@@ -26,7 +26,7 @@ experience. It also motivates one to maintain and improve their personal site.
 
 > Presented and written by Adhesh, Anirudh, Aditya and Nathan
 
-Building personal blogs from the ground up can be a *tedious process*. Some of us
+Building personal blogs from the ground up can be a _tedious process_. Some of us
 have had our hands deep in vanilla HTML and CSS, which isn't fun to maintain. We
 all want to get to the point and share our thoughts on the web. But, there is a
 small bump that stops us from doing so.
@@ -37,7 +37,7 @@ is a lot of time spent fixing things rather than getting productive work done.
 
 > A static site generator is an immensely useful application
 
-![Lighthouse scores of the anna-docs page](/static/images/posts/building-anna/lighthouse.png)
+![Lighthouse scores of the anna-docs page](images/lighthouse.png)
 
 It can simplify the whole process: allowing you to spend time and energy
 on quality content. Keep reading to find out how we designed anna `v1.0.0`
@@ -116,17 +116,17 @@ Later, we implemented a front matter YAML parser to retrieve page metadata
 ## What made us develop this to a great extent?
 
 - Beginner-friendly: An easy setup wizard, easy and ready to use layouts, and themes. We want the
-process of typing out a blog and putting it up on your site to be short and
-simple.
+  process of typing out a blog and putting it up on your site to be short and
+  simple.
 - Speed: Be fast (hugo – written in Go, is remarkably fast)
 - Maintainable: This ssg will be used by us, hence it should be easy to fix
-bugs and add new features
+  bugs and add new features
 - Learning curve: None of us have really shipped a production ready
-application. Since AIEP is all about making industry-ready projects, we chose
-to use go: so we could spend more ***writing** code* and not worrying about our
-toolchain or escaping dependency hell.
+  application. Since AIEP is all about making industry-ready projects, we chose
+  to use go: so we could spend more **\*writing** code\* and not worrying about our
+  toolchain or escaping dependency hell.
 - Owning a piece of the internet: Aditya and Anirudh registered their own
-domain names. Now their anna sites live on [hegde.live] and [sudhir.live]
+  domain names. Now their anna sites live on [hegde.live] and [sudhir.live]
 
 ---
 
@@ -145,9 +145,10 @@ goroutines.
 Here are some screenshots out of our group chats, that demonstrate build times, profiling et-al when having thousands of markdown files or in this case
 just copy-pasting a single markdown file en-mass!
 
-![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](/static/images/posts/building-anna/bench.png)
+![Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty](images/bench.png)
+Hyperfine benchmarks comparing the render times of anna, Saaru and 11ty
 
-> After about 2 weeks of training (*ahem*) coding, we had a (merge) bringing parallel rendering and profiling to the table
+> After about 2 weeks of training (_ahem_) coding, we had a (merge) bringing parallel rendering and profiling to the table
 
 ---
 
@@ -160,8 +161,9 @@ It also writes a cpu.prof and mem.prof file, which can be analysed and visualise
 Here,s the CPU profile generated while rendering this site.
 This is an SVG showing how much time each function call takes, the number of times it ran in a given test sample and various other useful information.
 
-![CPU profile of an anna render generated using pprof](https://raw.githubusercontent.com/acmpesuecc/anna/main/site/static/images/posts/building-anna/cpu_prof.svg)
-<!-- ![CPU profile of an anna render generated using pprof](/static/images/posts/building-anna/cpu_prof.svg) -->
+![CPU profile of an anna render generated using pprof](images/cpu_prof.svg)
+
+<!-- ![CPU profile of an anna render generated using pprof](images/cpu_prof.svg) -->
 
 You may wanna zoom-in about 3-4x times to get to see how our ssg works
 
@@ -275,7 +277,7 @@ by category.
 
 ## To search or not to search? 🤔
 
-> That is the question > Is our *static site* becoming dynamic and at what cost?
+> That is the question > Is our _static site_ becoming dynamic and at what cost?
 
 We were wondering if we’d need a search function on our site since Google and
 any other web-crawler index our site anyway.
@@ -288,7 +290,7 @@ We mean to re-write it using WASM if necessary.
 
 Here's a gif demonstrating search
 
-![Demonstration of the search feature in anna](/static/images/posts/building-anna/search.gif)
+![Demonstration of the search feature in anna](images/search.gif)
 
 ## JS integration as plugins
 
@@ -316,7 +318,7 @@ validates fields using regex checks so you don’t need to worry about relative
 paths in baseURLs, canonical links, and sitemaps. After successfully completing
 the setup, the wizard launches a live preview of your site in a new tab.
 
-![Demonstration of the GUI wizard in anna](/static/images/posts/building-anna/wizard.gif)
+![Demonstration of the GUI wizard in anna](images/wizard.gif)
 
 ---
 
@@ -342,7 +344,7 @@ We are at week: 4/6 and have a lot of things in store and bugs to squash!
 > Feel free to ask any questions / send feature requests you'd like to see?
 
 This blog post misses out of many not-so well documented features and learnings that
- we got during midnight calls and the patches we kept sending each other fixing trivial but
+we got during midnight calls and the patches we kept sending each other fixing trivial but
 interesting issues.
 Have a look at our [GitHub](https://github.com/acmpesuecc/anna/issues), for more
 

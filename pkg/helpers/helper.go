@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -17,8 +18,7 @@ const SiteDataPath string = "site/"
 var version string = "2.0.0" // use variable
 
 type Helper struct {
-	ErrorLogger  *log.Logger
-	SiteDataPath string
+	ErrorLogger *log.Logger
 }
 
 // Copies the contents of the dirPath directory to outDirPath
@@ -49,6 +49,19 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 		h.ErrorLogger.Fatal(err)
 	}
 	defer source.Close()
+
+	// Creating subdirectories if the filepath contains '/'
+	if strings.Contains(string(destPath), "/") {
+		// Extracting the directory path from the page path
+		splitPaths := strings.Split(string(destPath), "/")
+		filename := splitPaths[len(splitPaths)-1]
+		pagePathWithoutFilename, _ := strings.CutSuffix(string(destPath), filename)
+
+		err := os.MkdirAll(pagePathWithoutFilename, 0750)
+		if err != nil {
+			h.ErrorLogger.Fatal(err)
+		}
+	}
 
 	destination, err := os.Create(destPath)
 	if err != nil {

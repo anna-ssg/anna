@@ -37,11 +37,10 @@ func (cmd *Cmd) VanillaRender() {
 	e.DeepDataMerge.LinkStore = make(map[template.URL][]*parser.Note, 10)
 
 	helper := helpers.Helper{
-		ErrorLogger:  e.ErrorLogger,
-		SiteDataPath: helpers.SiteDataPath,
+		ErrorLogger: e.ErrorLogger,
 	}
 
-	helper.CreateRenderedDir(helper.SiteDataPath)
+	helper.CreateRenderedDir(helpers.SiteDataPath)
 
 	p.ParseConfig(helpers.SiteDataPath + "layout/config.yml")
 	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
@@ -72,7 +71,7 @@ func (cmd *Cmd) VanillaRender() {
 	e.GenerateJSONIndex(helpers.SiteDataPath)
 
 	e.GenerateLinkStore()
-	e.GenerateNoteJSONIdex(helper.SiteDataPath)
+	e.GenerateNoteJSONIdex(helpers.SiteDataPath)
 
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
 	if err != nil {
