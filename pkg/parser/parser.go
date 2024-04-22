@@ -88,21 +88,17 @@ type Parser struct {
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
+	helper := helpers.Helper{
+		ErrorLogger: p.ErrorLogger,
+	}
 	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
 		if path != "." && path != ".obsidian" {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
 				p.ParseMDDir(path, subDir)
 			} else {
+				fileName := strings.TrimPrefix(path, baseDirPath)
 				if filepath.Ext(path) == ".md" {
-					// OLD IMPL
-					// fileName := filepath.Base(path)
-					//
-					// NEW IMPL
-					// /contents/notes/2134321.md ==> notes/2134321.md
-					fileName := strings.TrimPrefix(path, baseDirPath)
-					// fmt.Println(fileNameWithPath, fileName)
-
 					content, err := os.ReadFile(baseDirPath + path)
 					if err != nil {
 						p.ErrorLogger.Fatal(err)
@@ -118,7 +114,8 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 							p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
 						}
 					}
-
+				} else {
+					helper.CopyFiles(helpers.SiteDataPath+"content/"+fileName, helpers.SiteDataPath+"rendered/"+fileName)
 				}
 			}
 		}
@@ -128,7 +125,6 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 
 func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, markdownContent string, body string) {
 	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
-	// fmt.Println(baseDirPath, dirEntryPath)
 	filepath := baseDirPath + dirEntryPath
 	p.MdFilesPath = append(p.MdFilesPath, filepath)
 
@@ -155,7 +151,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 
 		// Adding the page to the merged map storing all site pages
 		if frontmatter.Type == "post" {
-			// url = "posts/" + url
 			p.Posts = append(p.Posts, page)
 		}
 
@@ -167,12 +162,9 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 			p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
 
 		}
-
 	}
 
 	if frontmatter.Type == "note" {
-		// url = "notes/" + url
-
 		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
 			return r == '\n' || r == '\t'
 		})
@@ -220,6 +212,9 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		return Frontmatter{}, "", "", false
 	}
 
+	// If the first section of the page contains a title field, continue parsing
+	// Else, prevent parsing of the current file
+	// TODO: Add this to documentation
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
