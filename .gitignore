@@ -3,8 +3,6 @@ anna
 *.exe
 **/.DS_Store
 *.prof
-ssg/
-*.txt
 dist/
 
 #Test directories

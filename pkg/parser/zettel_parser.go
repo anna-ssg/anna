@@ -114,11 +114,13 @@ func (p *Parser) ParseBacklink(noteURL template.URL) {
 		MarkdownBody:   note.MarkdownBody,
 		LinkedNoteURLs: note.LinkedNoteURLs,
 	}
+	// fmt.Println(p.Notes[noteURL])
 }
 
 func (p *Parser) ValidateBackLink(noteTitle string) (template.URL, error) {
 	for _, note := range p.Notes {
 		if note.Frontmatter.Title == noteTitle {
+			// fmt.Println("URL: ", note.CompleteURL)
 			return note.CompleteURL, nil
 		}
 	}

@@ -132,7 +132,7 @@ func TestGenerateMergedJson(t *testing.T) {
 			},
 		}
 
-		e.GenerateJSONIndex(TestDirPath + "json_index_test")
+		e.GenerateJSONIndex(TestDirPath + "json_index_test/")
 
 		got_json, err := os.ReadFile(TestDirPath + "/json_index_test/rendered/static/index.json")
 		if err != nil {

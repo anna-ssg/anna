@@ -170,3 +170,65 @@ func TestParseRobots(t *testing.T) {
 		}
 	})
 }
+
+// func TestParseBacklink(t *testing.T) {
+
+// 	got_parser := parser.Parser{
+// 		Notes:       make(map[template.URL]parser.Note),
+// 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+// 	}
+
+// 	// creating dummy notes for testing
+
+// 	got_parser.Notes[template.URL("notes/test/test.md")] = parser.Note{
+// 		Frontmatter: parser.Frontmatter{
+// 			Title: "head note",
+// 			Type:  "note",
+// 			Head:  true,
+// 		},
+// 		Body: template.HTML("This is a [[backlink]]"),
+// 	}
+
+// 	got_parser.Notes[template.URL("notes/test/backlink.md")] = parser.Note{
+// 		Frontmatter: parser.Frontmatter{
+// 			Title: "backlink",
+// 			Type:  "note",
+// 		},
+// 		Body: template.HTML("Content of note."),
+// 	}
+
+// 	t.Run("testing backlink parsing in body of markdown files", func(t *testing.T) {
+
+// 		got_parser.ParseBacklink("notes/test/test.md")
+
+// 		want_parser := parser.Parser{
+// 			Notes: map[template.URL]parser.Note{
+// 				template.URL("notes/test/test.md"): parser.Note{
+// 					Frontmatter: parser.Frontmatter{
+// 						Title: "head note",
+// 						Type:  "note",
+// 						Head:  true,
+// 					},
+// 					Body:           template.HTML("This is a [[backlink]] here"),
+// 					LinkedNoteURLs: []template.URL{"notes/test/backlink.md"},
+// 				},
+
+// 				template.URL("notes/test/backlink.md"): parser.Note{
+// 					Frontmatter: parser.Frontmatter{
+// 						Title: "backlink",
+// 						Type:  "note",
+// 					},
+// 					Body: template.HTML("Content of note."),
+// 				},
+// 			},
+// 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+// 		}
+
+// 		got_list := got_parser.Notes["notes/test/test.md"].LinkedNoteURLs
+// 		want_list := want_parser.Notes["notes/test/test.md"].LinkedNoteURLs
+
+// 		if !slices.Equal(got_list, want_list) {
+// 			t.Errorf("got %v, want %v", got_list, want_list)
+// 		}
+// 	})
+// }

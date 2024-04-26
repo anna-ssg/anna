@@ -41,6 +41,7 @@ type Frontmatter struct {
 	Description  string   `yaml:"description"`
 	PreviewImage string   `yaml:"previewimage"`
 	Tags         []string `yaml:"tags"`
+	TOC          bool     `yaml:"toc"`
 	Authors      []string `yaml:"authors"`
 
 	// Head is specifically used for
@@ -239,7 +240,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	var parsedMarkdown bytes.Buffer
 	var md goldmark.Markdown
 
-	if parsedFrontmatter.Type == "post" {
+	if parsedFrontmatter.Type == "post" || parsedFrontmatter.TOC {
 		md = goldmark.New(
 			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 			goldmark.WithExtensions(
@@ -292,12 +293,12 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
-	// Check if the configuration file exists
-	_, err := os.Stat(inFilePath)
-	if os.IsNotExist(err) {
-		p.Helper.Bootstrap()
-		return
-	}
+	// // Check if the configuration file exists
+	// _, err := os.Stat(inFilePath)
+	// if os.IsNotExist(err) {
+	// 	p.Helper.Bootstrap()
+	// 	return
+	// }
 
 	// Read and parse the configuration file
 	configFile, err := os.ReadFile(inFilePath)

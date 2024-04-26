@@ -123,7 +123,7 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// It extracts data from the e.Templates slice
 	// The index.json file is created during every VanillaRender()
 
-	jsonFile, err := os.Create(outFilePath + "/rendered/static/index.json")
+	jsonFile, err := os.Create(outFilePath + "rendered/static/index.json")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
