@@ -20,31 +20,34 @@ func TestCopyDirectoryContents(t *testing.T) {
 		helper.CopyDirectoryContents(HelperTestDirPath+"copy_dir/", HelperTestDirPath+"copy_dir/rendered/")
 
 		baseDirFS := os.DirFS(HelperTestDirPath + "copy_dir/input_dir/")
-		TraverseDirectory(baseDirFS, t)
+		err := testfuncTraverseDirectory(baseDirFS, t)
+		if err != nil {
+			t.Error(err)
+		}
 	})
 }
 
-func TraverseDirectory(baseDirFS fs.FS, t *testing.T) error {
-	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
+func testfuncTraverseDirectory(baseDirFS fs.FS, t *testing.T) error {
+	err := fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
 		if !dir.IsDir() {
-			got_file, err := os.ReadFile(HelperTestDirPath + "copy_dir/input_dir/" + path)
+			gotFile, err := os.ReadFile(HelperTestDirPath + "copy_dir/input_dir/" + path)
 			if err != nil {
 				t.Errorf("%v", err)
 			}
 
-			want_file, err := os.ReadFile(HelperTestDirPath + "copy_dir/rendered/input_dir/" + path)
+			wantFile, err := os.ReadFile(HelperTestDirPath + "copy_dir/rendered/input_dir/" + path)
 			if err != nil {
 				t.Errorf("%v", err)
 			}
 
-			if !slices.Equal(got_file, want_file) {
+			if !slices.Equal(gotFile, wantFile) {
 				t.Errorf("The expected and generated files can be found in %s", HelperTestDirPath)
 			}
 
 		}
 		return nil
 	})
-	return nil
+	return err
 }
 
 func TestCopyFiles(t *testing.T) {
@@ -54,17 +57,17 @@ func TestCopyFiles(t *testing.T) {
 		}
 		helper.CopyFiles(HelperTestDirPath+"copy_files/input.txt", HelperTestDirPath+"copy_files/rendered/output.txt")
 
-		got_file, err := os.ReadFile(HelperTestDirPath + "copy_files/input.txt")
+		gotFile, err := os.ReadFile(HelperTestDirPath + "copy_files/input.txt")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_file, err := os.ReadFile(HelperTestDirPath + "copy_files/rendered/output.txt")
+		wantFile, err := os.ReadFile(HelperTestDirPath + "copy_files/rendered/output.txt")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(got_file, want_file) {
+		if !slices.Equal(gotFile, wantFile) {
 			t.Errorf("The expected and generated files can be found in %s", HelperTestDirPath)
 		}
 	})

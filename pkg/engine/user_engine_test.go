@@ -13,13 +13,13 @@ import (
 
 func TestRenderEngineGeneratedFiles(t *testing.T) {
 
-	engine := engine.Engine{
+	testEngine := engine.Engine{
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-	engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+	testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+	testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-	engine.DeepDataMerge.Posts = []parser.TemplateData{
+	testEngine.DeepDataMerge.Posts = []parser.TemplateData{
 		{
 			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
@@ -58,20 +58,20 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderEngineGeneratedFiles(TestDirPath+"render_engine_generated/", templ)
+		testEngine.RenderEngineGeneratedFiles(TestDirPath+"render_engine_generated/", templ)
 
-		want_posts_file, err := os.ReadFile(TestDirPath + "render_engine_generated/want_posts.html")
+		wantPostsFile, err := os.ReadFile(TestDirPath + "render_engine_generated/want_posts.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		got_posts_file, err := os.ReadFile(TestDirPath + "render_engine_generated/rendered/posts.html")
+		gotPostsFile, err := os.ReadFile(TestDirPath + "render_engine_generated/rendered/posts.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(want_posts_file, got_posts_file) {
-			t.Errorf("The expected and generated posts.html can be found in test/engine/render_engine_generated/rendered/")
+		if !slices.Equal(wantPostsFile, gotPostsFile) {
+			t.Errorf("The expected and generated posts.html can be found in test/testEngine/render_engine_generated/rendered/")
 		}
 	})
 }

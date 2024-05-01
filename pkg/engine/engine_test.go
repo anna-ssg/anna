@@ -19,14 +19,14 @@ func TestRenderPage(t *testing.T) {
 	}
 
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
-		engine := engine.Engine{
+		testEngine := engine.Engine{
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
-		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+		testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
-		engine.DeepDataMerge.Templates["posts/got.html"] = parser.TemplateData{
-			CompleteURL: template.URL("got.html"),
+		testEngine.DeepDataMerge.Templates["posts/got.html"] = parser.TemplateData{
+			CompleteURL: "got.html",
 			Frontmatter: parser.Frontmatter{
 				Title:       "Hello",
 				Date:        "2024-03-28",
@@ -35,13 +35,7 @@ func TestRenderPage(t *testing.T) {
 				Description: "Index page of site",
 				Tags:        []string{"blog", "thoughts"},
 			},
-			Body: template.HTML("<h1>Hello World</h1>"),
-			// Layout: parser.LayoutConfig{
-			// 	Navbar:    []string{"index", "posts"},
-			// 	BaseURL:   "https://example.org",
-			// 	SiteTitle: "Anna",
-			// 	Author:    "anna",
-			// },
+			Body: "<h1>Hello World</h1>",
 		}
 
 		templ, err := template.ParseFiles(TestDirPath + "render_page/template_input.html")
@@ -49,20 +43,20 @@ func TestRenderPage(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		engine.RenderPage(TestDirPath+"render_page/", "posts/got.html", templ, "page")
+		testEngine.RenderPage(TestDirPath+"render_page/", "posts/got.html", templ, "page")
 
-		got_file, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
+		gotFile, err := os.ReadFile(TestDirPath + "render_page/rendered/posts/got.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_file, err := os.ReadFile(TestDirPath + "render_page/want.html")
+		wantFile, err := os.ReadFile(TestDirPath + "render_page/want.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(got_file, want_file) {
-			t.Errorf("The expected and generated page.html can be found in test/engine/render_page/rendered/")
+		if !slices.Equal(gotFile, wantFile) {
+			t.Errorf("The expected and generated page.html can be found in test/testEngine/render_page/rendered/")
 		}
 	})
 

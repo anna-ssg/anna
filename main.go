@@ -52,7 +52,9 @@ func main() {
 				server := anna.NewWizardServer(":8080")
 				go server.Start()
 				<-anna.FormSubmittedCh // wait for response
-				server.Stop()          // stop the server
+				if err := server.Stop(); err != nil {
+					log.Println(err)
+				}
 				annaCmd.VanillaRender()
 				annaCmd.StartLiveReload()
 			}

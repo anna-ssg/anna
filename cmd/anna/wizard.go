@@ -3,6 +3,7 @@ package anna
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -38,7 +39,7 @@ func (ws *WizardServer) Start() {
 	fs := http.FileServer(http.Dir("./site/static/wizard"))
 	http.Handle("/", fs)
 	fmt.Printf("Wizard is running at: http://localhost%s\n", ws.server.Addr)
-	if err := ws.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := ws.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("Could not start server: %v", err)
 	}
 }
@@ -76,7 +77,12 @@ func writeConfigToFile(config Config) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	// Encode the config into YAML format and write it to the file.
 	if err := yaml.NewEncoder(file).Encode(&config); err != nil {

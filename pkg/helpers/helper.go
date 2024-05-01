@@ -9,13 +9,16 @@ import (
 
 const SiteDataPath string = "site/"
 
-var version string = "2.0.0" // use variable
+var version = "2.0.0" // use variable
 
 type Helper struct {
 	ErrorLogger *log.Logger
 }
 
-// Copies the contents of the dirPath directory to outDirPath
+/*
+CopyDirectoryContents
+Copies the contents of the dirPath directory to outDirPath
+*/
 func (h *Helper) CopyDirectoryContents(dirPath string, outDirPath string) {
 	dirEntries, err := os.ReadDir(dirPath)
 	if err != nil {
@@ -42,14 +45,19 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		err = source.Close()
+		if err != nil {
+			h.ErrorLogger.Fatal(err)
+		}
+	}()
 
 	// Creating subdirectories if the filepath contains '/'
-	if strings.Contains(string(destPath), "/") {
+	if strings.Contains(destPath, "/") {
 		// Extracting the directory path from the page path
-		splitPaths := strings.Split(string(destPath), "/")
+		splitPaths := strings.Split(destPath, "/")
 		filename := splitPaths[len(splitPaths)-1]
-		pagePathWithoutFilename, _ := strings.CutSuffix(string(destPath), filename)
+		pagePathWithoutFilename, _ := strings.CutSuffix(destPath, filename)
 
 		err := os.MkdirAll(pagePathWithoutFilename, 0750)
 		if err != nil {
@@ -61,7 +69,12 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-	defer destination.Close()
+	defer func() {
+		err = destination.Close()
+		if err != nil {
+			h.ErrorLogger.Fatal(err)
+		}
+	}()
 
 	_, err = io.Copy(destination, source)
 	if err != nil {

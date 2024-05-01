@@ -47,7 +47,12 @@ func parseHTMLFile(path string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	// Load the HTML content into a GoQuery document
 	doc, err := goquery.NewDocumentFromReader(file)

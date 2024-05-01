@@ -21,11 +21,11 @@ func TestParseMDDir(t *testing.T) {
 		TestDirFS := os.DirFS(TestDirPath + "input")
 		p.ParseMDDir(TestDirPath+"input/", TestDirFS)
 
-		got_parsed_files := len(p.MdFilesName)
-		want_parsed_files := 1
+		gotParsedFiles := len(p.MdFilesName)
+		wantParsedFiles := 1
 
-		if got_parsed_files != want_parsed_files {
-			t.Errorf("got %v, want %v", got_parsed_files, want_parsed_files)
+		if gotParsedFiles != wantParsedFiles {
+			t.Errorf("got %v, want %v", gotParsedFiles, wantParsedFiles)
 		}
 
 	})
@@ -41,10 +41,10 @@ func TestParseMDDir(t *testing.T) {
 		inpBaseDirFS := os.DirFS(TestDirPath + "input")
 		p.ParseMDDir(TestDirPath+"input/", inpBaseDirFS)
 
-		got_parsed_files := len(p.MdFilesName)
-		want_parsed_files := 2
-		if got_parsed_files != want_parsed_files {
-			t.Errorf("got %v, want %v", got_parsed_files, want_parsed_files)
+		gotParsedFiles := len(p.MdFilesName)
+		wantParsedFiles := 2
+		if gotParsedFiles != wantParsedFiles {
+			t.Errorf("got %v, want %v", gotParsedFiles, wantParsedFiles)
 		}
 	})
 }
