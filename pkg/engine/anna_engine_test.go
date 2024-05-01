@@ -67,47 +67,47 @@ func TestRenderTags(t *testing.T) {
 	e.RenderTags(fileOutPath, templ)
 
 	t.Run("render tag.html", func(t *testing.T) {
-		got_tags_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags.html")
+		gotTagsFile, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_tags_file, err := os.ReadFile(TestDirPath + "render_tags/want_tags.html")
+		wantTagsFile, err := os.ReadFile(TestDirPath + "render_tags/want_tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(got_tags_file, want_tags_file) {
+		if !slices.Equal(gotTagsFile, wantTagsFile) {
 			t.Errorf("The expected and generated tags.html can be found in test/engine/render_tags/rendered/")
 		}
 	})
 
 	t.Run("render tag-subpage.html", func(t *testing.T) {
-		got_blogs_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/blogs.html")
+		gotBlogsFile, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/blogs.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_blogs_file, err := os.ReadFile(TestDirPath + "render_tags/want_blogs_tags.html")
+		wantBlogsFile, err := os.ReadFile(TestDirPath + "render_tags/want_blogs_tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(got_blogs_file, want_blogs_file) {
+		if !slices.Equal(gotBlogsFile, wantBlogsFile) {
 			t.Errorf("The expected and generated blogs.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
 		}
 
-		got_tech_file, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/tech.html")
+		gotTechFile, err := os.ReadFile(TestDirPath + "render_tags/rendered/tags/tech.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_tech_file, err := os.ReadFile(TestDirPath + "render_tags/want_tech_tags.html")
+		wantTechFile, err := os.ReadFile(TestDirPath + "render_tags/want_tech_tags.html")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		if !slices.Equal(got_tech_file, want_tech_file) {
+		if !slices.Equal(gotTechFile, wantTechFile) {
 			t.Errorf("The expected and generated tech.html tag-subpage can be found in test/engine/render_tags/rendered/tags/")
 		}
 	})
@@ -132,22 +132,22 @@ func TestGenerateMergedJson(t *testing.T) {
 			},
 		}
 
-		e.GenerateJSONIndex(TestDirPath + "json_index_test")
+		e.GenerateJSONIndex(TestDirPath + "json_index_test/")
 
-		got_json, err := os.ReadFile(TestDirPath + "/json_index_test/rendered/static/index.json")
+		gotJson, err := os.ReadFile(TestDirPath + "/json_index_test/rendered/static/index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		want_json, err := os.ReadFile(TestDirPath + "/json_index_test/want_index.json")
+		wantJson, err := os.ReadFile(TestDirPath + "/json_index_test/want_index.json")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 
-		got_json = bytes.TrimSpace(got_json)
-		want_json = bytes.TrimSpace(want_json)
+		gotJson = bytes.TrimSpace(gotJson)
+		wantJson = bytes.TrimSpace(wantJson)
 
-		if !slices.Equal(got_json, want_json) {
+		if !slices.Equal(gotJson, wantJson) {
 			t.Errorf("The expected and generated json can be found in test/engine/json_index_test")
 		}
 	})
@@ -155,11 +155,11 @@ func TestGenerateMergedJson(t *testing.T) {
 
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
-		engine := engine.Engine{
+		testEngine := engine.Engine{
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
-		engine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		engine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+		testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
+		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
 
 		t1 := parser.TemplateData{
 			CompleteURL: "index.html",
@@ -182,35 +182,35 @@ func TestGenerateSitemap(t *testing.T) {
 			},
 		}
 
-		engine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
-		// setting up engine
-		engine.DeepDataMerge.Templates["index"] = t1
-		engine.DeepDataMerge.Templates["about"] = t2
-		engine.DeepDataMerge.Templates["research"] = t3
+		testEngine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
+		// setting up testEngine
+		testEngine.DeepDataMerge.Templates["index"] = t1
+		testEngine.DeepDataMerge.Templates["about"] = t2
+		testEngine.DeepDataMerge.Templates["research"] = t3
 
-		engine.GenerateSitemap(TestDirPath + "sitemap/got_sitemap.xml")
+		testEngine.GenerateSitemap(TestDirPath + "sitemap/got_sitemap.xml")
 
-		got_sitemap, err := os.ReadFile(TestDirPath + "sitemap/got_sitemap.xml")
+		gotSitemap, err := os.ReadFile(TestDirPath + "sitemap/got_sitemap.xml")
 		if err != nil {
 			t.Errorf("Error in reading the contents of got_sitemap.xml")
 		}
 
-		want_sitemap, err := os.ReadFile(TestDirPath + "sitemap/want_sitemap.xml")
+		wantSitemap, err := os.ReadFile(TestDirPath + "sitemap/want_sitemap.xml")
 		if err != nil {
 			t.Errorf("Error in reading the contents of _sitemap.xml")
 		}
 
-		got_sitemap_string := string(got_sitemap)
-		want_sitemap_string := string(want_sitemap)
-		got_sitemap_string = strings.TrimFunc(got_sitemap_string, func(r rune) bool {
+		gotSitemapString := string(gotSitemap)
+		wantSitemapString := string(wantSitemap)
+		gotSitemapString = strings.TrimFunc(gotSitemapString, func(r rune) bool {
 			return r == '\n' || r == '\t' || r == ' '
 		})
-		want_sitemap_string = strings.TrimFunc(want_sitemap_string, func(r rune) bool {
+		wantSitemapString = strings.TrimFunc(wantSitemapString, func(r rune) bool {
 			return r == '\n' || r == '\t' || r == ' '
 		})
 
-		if strings.Compare(got_sitemap_string, want_sitemap_string) == 0 {
-			t.Errorf("The expected and generated sitemap can be found in test/engine/sitemap/")
+		if strings.Compare(gotSitemapString, wantSitemapString) == 0 {
+			t.Errorf("The expected and generated sitemap can be found in test/testEngine/sitemap/")
 		}
 	})
 }

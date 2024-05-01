@@ -10,7 +10,7 @@ import (
 	"github.com/acmpesuecc/anna/pkg/parser"
 )
 
-// This struct holds all of the ssg data
+// DeepDataMerge This struct holds all the ssg data
 type DeepDataMerge struct {
 	// Templates stores the template data of all the pages of the site
 	// Access the data for a particular page by using the relative path to the file as the key
@@ -52,7 +52,7 @@ type PageData struct {
 	PageURL template.URL
 }
 
-// This structure is solely used for storing the JSON index
+// JSONIndexTemplate This structure is solely used for storing the JSON index
 type JSONIndexTemplate struct {
 	CompleteURL template.URL
 	Frontmatter parser.Frontmatter
@@ -60,6 +60,7 @@ type JSONIndexTemplate struct {
 }
 
 /*
+RenderPage
 fileOutPath - stores the parent directory to store rendered files, usually `site/`
 
 pagePath - stores the path to write the given page without the prefix directory

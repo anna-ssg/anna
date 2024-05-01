@@ -41,6 +41,7 @@ type Frontmatter struct {
 	Description  string   `yaml:"description"`
 	PreviewImage string   `yaml:"previewimage"`
 	Tags         []string `yaml:"tags"`
+	TOC          bool     `yaml:"toc"`
 	Authors      []string `yaml:"authors"`
 
 	// Head is specifically used for
@@ -48,7 +49,7 @@ type Frontmatter struct {
 	Head bool `yaml:"head"`
 }
 
-// This struct holds all of the data required to render any page of the site
+// TemplateData This struct holds all of the data required to render any page of the site
 type TemplateData struct {
 	CompleteURL template.URL
 	Date        int64
@@ -96,7 +97,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 	helper := helpers.Helper{
 		ErrorLogger: p.ErrorLogger,
 	}
-	fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
+	err := fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
 		if path != "." && path != ".obsidian" {
 			if dir.IsDir() {
 				subDir := os.DirFS(path)
@@ -126,12 +127,15 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 		}
 		return nil
 	})
+	if err != nil {
+		helper.ErrorLogger.Fatal(err)
+	}
 }
 
 func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Frontmatter, markdownContent string, body string) {
 	p.MdFilesName = append(p.MdFilesName, dirEntryPath)
-	filepath := baseDirPath + dirEntryPath
-	p.MdFilesPath = append(p.MdFilesPath, filepath)
+	testFilepath := baseDirPath + dirEntryPath
+	p.MdFilesPath = append(p.MdFilesPath, testFilepath)
 
 	var date int64
 	if frontmatter.Date != "" {
@@ -140,7 +144,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		date = 0
 	}
 
-	key, _ := strings.CutPrefix(filepath, helpers.SiteDataPath+"content/")
+	key, _ := strings.CutPrefix(testFilepath, helpers.SiteDataPath+"content/")
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
 
@@ -239,7 +243,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	var parsedMarkdown bytes.Buffer
 	var md goldmark.Markdown
 
-	if parsedFrontmatter.Type == "post" {
+	if parsedFrontmatter.Type == "post" || parsedFrontmatter.TOC {
 		md = goldmark.New(
 			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 			goldmark.WithExtensions(
@@ -292,12 +296,12 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
-	// Check if the configuration file exists
-	_, err := os.Stat(inFilePath)
-	if os.IsNotExist(err) {
-		p.Helper.Bootstrap()
-		return
-	}
+	// // Check if the configuration file exists
+	// _, err := os.Stat(inFilePath)
+	// if os.IsNotExist(err) {
+	// 	p.Helper.Bootstrap()
+	// 	return
+	// }
 
 	// Read and parse the configuration file
 	configFile, err := os.ReadFile(inFilePath)
@@ -327,7 +331,12 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
-	defer outputFile.Close()
+	defer func() {
+		err = outputFile.Close()
+		if err != nil {
+			p.ErrorLogger.Fatal(err)
+		}
+	}()
 
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
@@ -335,7 +344,7 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 	}
 }
 
-// Parse all the ".html" layout files in the layout/ directory
+// ParseLayoutFiles Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
 	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")

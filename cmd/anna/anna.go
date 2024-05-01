@@ -66,6 +66,9 @@ func (cmd *Cmd) VanillaRender() {
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
+	// Copies the contents of the 'static/' directory to 'rendered/'
+	helper.CopyDirectoryContents(helpers.SiteDataPath+"public/", helpers.SiteDataPath+"rendered/")
+
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
 	e.GenerateJSONIndex(helpers.SiteDataPath)

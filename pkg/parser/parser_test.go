@@ -13,62 +13,62 @@ import (
 
 const TestDirPath = "../../test/parser/"
 
-func TestAddFileandRender(t *testing.T) {
-	got_parser := parser.Parser{
+func TestAddFileAndRender(t *testing.T) {
+	gotParser := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
 		TagsMap:     make(map[template.URL][]parser.TemplateData),
 		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 
-	want_layout := parser.LayoutConfig{
+	wantLayout := parser.LayoutConfig{
 		Navbar:    []string{"index", "docs", "tags", "posts"},
 		BaseURL:   "example.org",
 		SiteTitle: "ssg",
 		Author:    "Anna",
 	}
-	got_parser.LayoutConfig = want_layout
+	gotParser.LayoutConfig = wantLayout
 	t.Run("parsing data out of one markdown post", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
-		want_parser := parser.Parser{
+		wantParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: got_parser.ErrorLogger,
+			ErrorLogger: gotParser.ErrorLogger,
 		}
-		sample_frontmatter, _, markdownContent, parseSuccess := got_parser.ParseMarkdownContent(string(inputMd))
-		sample_body := "sample_body"
+		sampleFrontmatter, _, markdownContent, parseSuccess := gotParser.ParseMarkdownContent(string(inputMd))
+		sampleBody := "sample_body"
 		if !parseSuccess {
 			return
 		}
 
 		filename := "testpost.md"
-		fileurl := "testpost.html"
-		want_parser.MdFilesName = append(want_parser.MdFilesName, filename)
-		want_parser.MdFilesPath = append(want_parser.MdFilesPath, filename)
-		want_page := parser.TemplateData{
-			CompleteURL: template.URL(fileurl),
-			Date:        want_parser.DateParse(sample_frontmatter.Date).Unix(),
-			Frontmatter: sample_frontmatter,
-			Body:        template.HTML(sample_body),
+		fileURL := "testpost.html"
+		wantParser.MdFilesName = append(wantParser.MdFilesName, filename)
+		wantParser.MdFilesPath = append(wantParser.MdFilesPath, filename)
+		wantPage := parser.TemplateData{
+			CompleteURL: template.URL(fileURL),
+			Date:        wantParser.DateParse(sampleFrontmatter.Date).Unix(),
+			Frontmatter: sampleFrontmatter,
+			Body:        template.HTML(sampleBody),
 			// Layout:      want_layout,
 		}
-		want_parser.LayoutConfig = want_layout
+		wantParser.LayoutConfig = wantLayout
 
-		want_parser.Templates[template.URL("testpost.html")] = want_page
-		for _, tag := range sample_frontmatter.Tags {
-			want_parser.TagsMap[template.URL(tag)] = append(want_parser.TagsMap[template.URL(tag)], want_page)
+		wantParser.Templates["testpost.html"] = wantPage
+		for _, tag := range sampleFrontmatter.Tags {
+			wantParser.TagsMap[template.URL(tag)] = append(wantParser.TagsMap[template.URL(tag)], wantPage)
 		}
 
-		if sample_frontmatter.Type == "post" {
-			want_parser.Posts = append(want_parser.Posts, want_page)
+		if sampleFrontmatter.Type == "post" {
+			wantParser.Posts = append(wantParser.Posts, wantPage)
 		}
 
-		got_parser.AddFile("", filename, sample_frontmatter, markdownContent, sample_body)
+		gotParser.AddFile("", filename, sampleFrontmatter, markdownContent, sampleBody)
 
-		if !reflect.DeepEqual(got_parser, want_parser) {
-			t.Errorf("want %v; \ngot %v", want_parser, got_parser)
+		if !reflect.DeepEqual(gotParser, wantParser) {
+			t.Errorf("want %v; \ngot %v", wantParser, gotParser)
 			// t.Errorf("please see the files yourself")
 		}
 	})
@@ -86,15 +86,15 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		_, body_got, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		_, bodyGot, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
 
 		if parseSuccess {
 
-			body_want, err := os.ReadFile(TestDirPath + "parse_md/html_want_output.html")
-			if err = os.WriteFile(TestDirPath+"parse_md/html_got_output.html", []byte(body_got), 0666); err != nil {
+			bodyWant, err := os.ReadFile(TestDirPath + "parse_md/html_want_output.html")
+			if err = os.WriteFile(TestDirPath+"parse_md/html_got_output.html", []byte(bodyGot), 0666); err != nil {
 				t.Errorf("%v", err)
 			}
-			if string(body_want) != body_got {
+			if string(bodyWant) != bodyGot {
 				t.Errorf("%v\nThe expected and generated html can be found in test/", err)
 			}
 		}
@@ -106,18 +106,18 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		frontmatter_got, _, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		frontmatterGot, _, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
 
 		if !parseSuccess {
-			frontmatter_want := parser.Frontmatter{
+			frontmatterWant := parser.Frontmatter{
 				Title:       "Markdown Test",
 				Date:        "2024-03-23",
 				Description: "File containing markdown to test the SSG",
 				Type:        "post",
 			}
 
-			if !reflect.DeepEqual(frontmatter_got, frontmatter_want) {
-				t.Errorf("got %v, \nwant %v", frontmatter_got, frontmatter_want)
+			if !reflect.DeepEqual(frontmatterGot, frontmatterWant) {
+				t.Errorf("got %v, \nwant %v", frontmatterGot, frontmatterWant)
 			}
 		}
 	})
@@ -125,48 +125,111 @@ func TestParseMarkdownContent(t *testing.T) {
 
 func TestParseConfig(t *testing.T) {
 	t.Run("unmarshal `config.yml` to LayoutConfig", func(t *testing.T) {
-		got_parser := parser.Parser{
+		gotParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
 
-		want_layout := parser.LayoutConfig{
+		wantLayout := parser.LayoutConfig{
 			Navbar:    []string{"index", "docs", "tags", "posts"},
 			BaseURL:   "example.org",
 			SiteTitle: "ssg",
 			Author:    "Anna",
 		}
 
-		got_parser.ParseConfig(TestDirPath + "layout/config.yml")
+		gotParser.ParseConfig(TestDirPath + "layout/config.yml")
 
-		if !reflect.DeepEqual(got_parser.LayoutConfig, want_layout) {
-			t.Errorf("got \n%v want \n%v", got_parser.LayoutConfig, want_layout)
+		if !reflect.DeepEqual(gotParser.LayoutConfig, wantLayout) {
+			t.Errorf("got \n%v want \n%v", gotParser.LayoutConfig, wantLayout)
 		}
 	})
 }
 
 func TestParseRobots(t *testing.T) {
 	t.Run("parse and render `robots.txt`", func(t *testing.T) {
-		parser := parser.Parser{
+		testParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		}
-		parser.LayoutConfig.BaseURL = "example.org"
+		testParser.LayoutConfig.BaseURL = "example.org"
 
-		parser.ParseRobots(TestDirPath+"layout/robots_txt/robots.txt", TestDirPath+"layout/robots_txt/got_robots.txt")
+		testParser.ParseRobots(TestDirPath+"layout/robots_txt/robots.txt", TestDirPath+"layout/robots_txt/got_robots.txt")
 
-		got_robots_txt, err := os.ReadFile(TestDirPath + "layout/robots_txt/got_robots.txt")
+		gotRobotsTxt, err := os.ReadFile(TestDirPath + "layout/robots_txt/got_robots.txt")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
-		want_robots_txt, err := os.ReadFile(TestDirPath + "layout/robots_txt/want_robots.txt")
+		wantRobotsTxt, err := os.ReadFile(TestDirPath + "layout/robots_txt/want_robots.txt")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
-		if !slices.Equal(got_robots_txt, want_robots_txt) {
+		if !slices.Equal(gotRobotsTxt, wantRobotsTxt) {
 			t.Errorf("The expected and generated robots.txt can be found in test/layout/robots_txt/")
+		}
+	})
+}
+
+func TestNotesAndBacklinkParsing(t *testing.T) {
+
+	gotParser := parser.Parser{
+		Notes:       make(map[template.URL]parser.Note),
+		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+	}
+
+	// creating dummy notes for testing
+
+	gotParser.Notes["notes/test/test.md"] = parser.Note{
+		CompleteURL: "notes/test/test.md",
+		Frontmatter: parser.Frontmatter{
+			Title: "head note",
+			Type:  "note",
+			Head:  true,
+		},
+		Body: "This is a [[backlink]] here",
+	}
+
+	gotParser.Notes["notes/test/backlink.md"] = parser.Note{
+		CompleteURL: "notes/test/backlink.md",
+		Frontmatter: parser.Frontmatter{
+			Title: "backlink",
+			Type:  "note",
+		},
+		Body: "Content of note.",
+	}
+
+	t.Run("testing notes and backlink parsing", func(t *testing.T) {
+
+		gotParser.ParseBacklink("notes/test/test.md")
+
+		wantParser := parser.Parser{
+			Notes: map[template.URL]parser.Note{
+				"notes/test/test.md": {
+					CompleteURL: template.URL("notes/test/test.md"),
+					Frontmatter: parser.Frontmatter{
+						Title: "head note",
+						Type:  "note",
+						Head:  true,
+					},
+					Body:           template.HTML("This is a <a id=\"zettel-reference\" href=\"/notes/test/backlink.md\">backlink</a> here"),
+					LinkedNoteURLs: []template.URL{"notes/test/backlink.md"},
+				},
+
+				"notes/test/backlink.md": {
+					CompleteURL: template.URL("notes/test/backlink.md"),
+					Frontmatter: parser.Frontmatter{
+						Title: "backlink",
+						Type:  "note",
+					},
+					Body: template.HTML("Content of note."),
+				},
+			},
+			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		}
+
+		if !reflect.DeepEqual(gotParser.Notes, wantParser.Notes) {
+			t.Errorf("got %v,\n want %v", gotParser.Notes, wantParser.Notes)
 		}
 	})
 }

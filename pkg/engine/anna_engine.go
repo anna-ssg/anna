@@ -91,7 +91,7 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		go func(tag template.URL, taggedTemplates []parser.TemplateData) {
 			defer wg.Done()
 
-			e.RenderPage(fileOutPath, template.URL(tag), templ, "tag-subpage")
+			e.RenderPage(fileOutPath, tag, templ, "tag-subpage")
 		}(tag, taggedTemplates)
 	}
 
@@ -105,7 +105,12 @@ func (e *Engine) GenerateNoteJSONIdex(outFilePath string) {
 		e.ErrorLogger.Fatal(err)
 	}
 
-	defer jsonFile.Close()
+	defer func() {
+		err = jsonFile.Close()
+		if err != nil {
+			e.ErrorLogger.Fatal(err)
+		}
+	}()
 
 	jsonMergedMarshaledData, err := json.Marshal(e.DeepDataMerge.Notes)
 	if err != nil {
@@ -123,11 +128,16 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// It extracts data from the e.Templates slice
 	// The index.json file is created during every VanillaRender()
 
-	jsonFile, err := os.Create(outFilePath + "/rendered/static/index.json")
+	jsonFile, err := os.Create(outFilePath + "rendered/static/index.json")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
-	defer jsonFile.Close()
+	defer func() {
+		err = jsonFile.Close()
+		if err != nil {
+			e.ErrorLogger.Fatal(err)
+		}
+	}()
 
 	// Copying contents from e.Templates to new JsonMerged struct
 	jsonIndexTemplate := make(map[template.URL]JSONIndexTemplate)
@@ -186,7 +196,14 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
-	defer outputFile.Close()
+
+	defer func() {
+		err = outputFile.Close()
+		if err != nil {
+			e.ErrorLogger.Fatal(err)
+		}
+	}()
+
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
@@ -220,7 +237,13 @@ func (e *Engine) GenerateFeed() {
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
-	defer outputFile.Close()
+	defer func() {
+		err = outputFile.Close()
+		if err != nil {
+			e.ErrorLogger.Fatal(err)
+		}
+	}()
+
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
 		e.ErrorLogger.Fatal(err)

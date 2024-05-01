@@ -1,0 +1,1 @@
+This is a test .txt file that will be rendered to the root of rendered/

@@ -132,7 +132,10 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	event := "event:\ndata:\n\n"
-	w.Write([]byte(event))
+	_, err := w.Write([]byte(event))
+	if err != nil {
+		log.Fatal(err)
+	}
 	w.(http.Flusher).Flush()
 
 	countRequests.Store(countRequests.Load() - 1)

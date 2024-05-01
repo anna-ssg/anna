@@ -81,9 +81,6 @@ func (p *Parser) BackLinkParser() {
 func (p *Parser) ParseBacklink(noteURL template.URL) {
 	note := p.Notes[noteURL]
 	noteBody := string(note.Body) // template.HTML -> string
-	// noteParentDir := note.CompleteURL
-
-	// fmt.Println("Finding links for :", noteParentDir)
 
 	backlinks := backlinkRE.FindAllString(noteBody, -1)
 
@@ -101,7 +98,6 @@ func (p *Parser) ParseBacklink(noteURL template.URL) {
 			anchorReference := fmt.Sprintf(`<a id="zettel-reference" href="/%s">%s</a>`, referenceCompleteURL, noteTitle)
 			noteBody = strings.ReplaceAll(noteBody, backlink, anchorReference)
 
-			// fmt.Println(note.LinkedNoteURLs)
 			note.LinkedNoteURLs = append(note.LinkedNoteURLs, referenceCompleteURL)
 		}
 	}
@@ -119,6 +115,7 @@ func (p *Parser) ParseBacklink(noteURL template.URL) {
 func (p *Parser) ValidateBackLink(noteTitle string) (template.URL, error) {
 	for _, note := range p.Notes {
 		if note.Frontmatter.Title == noteTitle {
+			// fmt.Println("URL: ", note.CompleteURL)
 			return note.CompleteURL, nil
 		}
 	}
