@@ -1,9 +1,12 @@
 anna
 !anna/
 *.exe
+
+
 **/.DS_Store
 *.prof
 dist/
+.idea/
 
 #Test directories
 **/rendered/
