@@ -1,4 +1,4 @@
-module github.com/acmpesuecc/anna
+module github.com/acmpesuecc/anna/v2
 
 go 1.22.2
 

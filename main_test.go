@@ -3,7 +3,7 @@ package main_test
 import (
 	"testing"
 
-	"github.com/acmpesuecc/anna/cmd/anna"
+	"github.com/acmpesuecc/anna/v2/cmd/anna"
 )
 
 func BenchmarkMain(b *testing.B) {

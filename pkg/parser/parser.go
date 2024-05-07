@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/acmpesuecc/anna/pkg/helpers"
+	"github.com/acmpesuecc/anna/v2/pkg/helpers"
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"

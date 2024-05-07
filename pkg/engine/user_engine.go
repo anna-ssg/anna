@@ -7,12 +7,12 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/acmpesuecc/anna/pkg/parser"
+	"github.com/acmpesuecc/anna/v2/pkg/parser"
 )
 
 type postsTemplateData struct {
 	DeepDataMerge DeepDataMerge
-	PageURL      template.URL
+	PageURL       template.URL
 	TemplateData  parser.TemplateData
 }
 
@@ -25,7 +25,7 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *templa
 			Frontmatter: parser.Frontmatter{Title: "Posts"},
 		},
 		DeepDataMerge: e.DeepDataMerge,
-		PageURL: "posts.html",
+		PageURL:       "posts.html",
 	}
 
 	err := template.ExecuteTemplate(&postsBuffer, "posts", postsData)

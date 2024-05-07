@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/acmpesuecc/anna/pkg/helpers"
+	"github.com/acmpesuecc/anna/v2/pkg/helpers"
 )
 
 func (cmd *Cmd) ValidateHTMLContent() {

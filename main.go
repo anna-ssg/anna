@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/acmpesuecc/anna/cmd/anna"
+	"github.com/acmpesuecc/anna/v2/cmd/anna"
 	"github.com/spf13/cobra"
 )
 
