@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cmp"
 	"encoding/json"
+	"encoding/xml"
 	"html/template"
 	"os"
 	"slices"
@@ -212,27 +213,61 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 
 func (e *Engine) GenerateFeed() {
 	var buffer bytes.Buffer
-	buffer.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	buffer.WriteString("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n")
 	buffer.WriteString("<?xml-stylesheet href=\"/static/styles/feed.xsl\" type=\"text/xsl\"?>\n")
-	buffer.WriteString("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n")
-	buffer.WriteString("    <title>" + e.DeepDataMerge.LayoutConfig.SiteTitle + "</title>\n")
-	buffer.WriteString("    <link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + "\" rel=\"self\"/>\n")
-	buffer.WriteString("    <updated>" + time.Now().Format(time.RFC3339) + "</updated>\n")
+	buffer.WriteString("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n")
+	buffer.WriteString("  <channel>\n")
+	buffer.WriteString("   <title>")
+	xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.SiteTitle))
+	buffer.WriteString("</title>\n")
+	buffer.WriteString("   <link>" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + "</link>\n")
+	buffer.WriteString("   <description>Recent content on ")
+	xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.SiteTitle))
+	buffer.WriteString("</description>\n")
+	buffer.WriteString("   <language>en-IN</language>\n")
+	buffer.WriteString("   <webMaster>")
+	xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Author))
+	buffer.WriteString("</webMaster>\n")
+	buffer.WriteString("   <copyright>")
+	xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Copyright))
+	buffer.WriteString("</copyright>\n")
+	buffer.WriteString("   <lastBuildDate>" + time.Now().Format(time.RFC1123Z) + "</lastBuildDate>\n")
+	buffer.WriteString("   <atom:link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + "/feed.xml\" rel=\"self\" type=\"application/rss+xml\" />\n")
 
-	// iterate over parsed markdown files that are non-draft posts
+	// slice
+	var posts []parser.TemplateData
 	for _, templateData := range e.DeepDataMerge.Templates {
 		if !templateData.Frontmatter.Draft {
-			buffer.WriteString("<entry>\n")
-			buffer.WriteString("        <title>" + templateData.Frontmatter.Title + "</title>\n")
-			buffer.WriteString("        <link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + string(templateData.CompleteURL) + "/>\n")
-			buffer.WriteString("        <id>" + e.DeepDataMerge.LayoutConfig.BaseURL + string(templateData.CompleteURL) + "</id>\n")
-			buffer.WriteString("        <updated>" + time.Unix(templateData.Date, 0).Format(time.RFC3339) + "</updated>\n")
-			buffer.WriteString("        <content type=\"html\"><![CDATA[" + string(templateData.Body) + "]]></content>\n")
-			buffer.WriteString("    </entry>\n")
+			posts = append(posts, templateData)
 		}
 	}
 
-	buffer.WriteString("</feed>\n")
+	// sort by publication date
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Date > posts[j].Date // assuming Date is Unix timestamp
+	})
+
+	// Iterate over sorted posts
+	for _, templateData := range posts {
+		buffer.WriteString("    <item>\n")
+		buffer.WriteString("      <title>")
+		xml.EscapeText(&buffer, []byte(templateData.Frontmatter.Title))
+		buffer.WriteString("</title>\n")
+		buffer.WriteString("      <link>" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL) + "/</link>\n")
+		buffer.WriteString("      <pubDate>" + time.Unix(templateData.Date, 0).Format(time.RFC1123Z) + "</pubDate>\n")
+		buffer.WriteString("      <author>")
+		xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Author))
+		buffer.WriteString("</author>\n")
+		buffer.WriteString("      <guid>" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL) + "</guid>\n")
+		buffer.WriteString("      <description>")
+		xml.EscapeText(&buffer, []byte(templateData.Body))
+		buffer.WriteString("</description>\n")
+		buffer.WriteString("    </item>\n")
+	}
+
+	buffer.WriteString("  </channel>\n")
+	buffer.WriteString("</rss>\n")
+
 	outputFile, err := os.Create(helpers.SiteDataPath + "rendered/feed.xml")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)

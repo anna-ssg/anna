@@ -29,6 +29,7 @@ type LayoutConfig struct {
 	SiteTitle   string   `yaml:"siteTitle"`
 	SiteScripts []string `yaml:"siteScripts"`
 	Author      string   `yaml:"author"`
+	Copyright   string   `yaml:"copyright"`
 	ThemeURL    string   `yaml:"themeURL"`
 }
 

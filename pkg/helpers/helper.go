@@ -9,7 +9,7 @@ import (
 
 const SiteDataPath string = "site/"
 
-var version = "2.0.0" // use variable
+var version = "2.1.0" // use variable
 
 type Helper struct {
 	ErrorLogger *log.Logger
