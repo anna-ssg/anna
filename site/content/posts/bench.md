@@ -10,6 +10,7 @@ scripts:
 type: post
 tags:
   - test-post
+reverseindex: ["tags"]
 ---
 
 # heading L1
