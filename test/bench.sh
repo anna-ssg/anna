@@ -23,38 +23,19 @@ fi
 
 # cloning candidates
 echo "clone SSGs"
-git clone --depth=1 https://github.com/acmpesuecc/anna /tmp/bench/anna 
+git clone --depth=1 https://github.com/acmpesuecc/anna /tmp/bench/anna
 git clone --depth=1 https://github.com/anirudhRowjee/saaru /tmp/bench/saaru
 git clone --depth=1 https://github.com/NavinShrinivas/sapling /tmp/bench/sapling
 
 # copy benchmark file
-cp /tmp/bench/anna/site/content/posts/bench.md /tmp/bench/test.md 
+cp /tmp/bench/anna/site/content/posts/bench.md /tmp/bench/test.md
 
 echo "build SSGs"
 cd /tmp/bench/anna && go build && cd /tmp/bench
 
-# build rust based SSGs (comment this block if you already have these installed)
-# sapling
-cd /tmp/bench/sapling && cargo build --release
-sudo rm -rf /usr/local/src/sapling
-sudo mkdir -p /usr/local/src/sapling
-sudo cp -r /tmp/bench/sapling/* /usr/local/src/sapling/
-cd /usr/local/src/sapling
-sudo mkdir -p /usr/local/bin/
-sudo rm -rf /usr/local/bin/sapling
-sudo ln -sf /usr/local/src/sapling/target/release/sapling /usr/local/bin/sapling 
-sudo chmod +x /usr/local/bin/sapling
-
-# saaru
-cd /tmp/bench/saaru && cargo build --release
-sudo rm -rf /usr/local/src/saaru
-sudo mkdir -p /usr/local/src/saaru
-sudo cp -r /tmp/bench/saaru/* /usr/local/src/saaru/
-cd /usr/local/src/saaru
-sudo mkdir -p /usr/local/bin/
-sudo rm -rf /usr/local/bin/saaru
-sudo ln -sf /usr/local/src/saaru/target/release/saaru /usr/local/bin/saaru
-sudo chmod +x /usr/local/bin/saaru
+# build rust based SSGs (edit this block if they are already installed)
+cd /tmp/bench/sapling && cargo build --release && mv target/release/sapling .
+cd /tmp/bench/saaru && cargo build --release && mv target/release/saaru .
 
 ## setup hugo
 hugo new site /tmp/bench/hugo; cd /tmp/bench/hugo
@@ -88,8 +69,8 @@ echo -e "\n"
 hyperfine -p 'sync' -w $warm \
   "cd /tmp/bench/11ty && npx @11ty/eleventy" \
   "cd /tmp/bench/hugo && hugo" \
-  "cd /tmp/bench/anna && ./anna"
-  "cd /tmp/bench/saaru && saaru --base-path ./docs" \
-  "cd /tmp/bench/sapling/benchmark && sapling run" \
+  "cd /tmp/bench/anna && ./anna" \
+  "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
+  "cd /tmp/bench/sapling/benchmark && ./../sapling run"
 echo -e "\n"
 
