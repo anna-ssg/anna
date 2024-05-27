@@ -24,13 +24,13 @@ import (
 )
 
 type LayoutConfig struct {
-	Navbar      []string `yaml:"navbar"`
-	BaseURL     string   `yaml:"baseURL"`
-	SiteTitle   string   `yaml:"siteTitle"`
-	SiteScripts []string `yaml:"siteScripts"`
-	Author      string   `yaml:"author"`
-	Copyright   string   `yaml:"copyright"`
-	ThemeURL    string   `yaml:"themeURL"`
+	Navbar      []map[string]string `yaml:"navbar"`
+	BaseURL     string              `yaml:"baseURL"`
+	SiteTitle   string              `yaml:"siteTitle"`
+	SiteScripts []string            `yaml:"siteScripts"`
+	Author      string              `yaml:"author"`
+	Copyright   string              `yaml:"copyright"`
+	ThemeURL    string              `yaml:"themeURL"`
 }
 
 type Frontmatter struct {
@@ -75,7 +75,7 @@ type Parser struct {
 	// Posts contains the template data of files in the posts directory
 	Posts []TemplateData
 
-	//Stores all the notes
+	// Stores all the notes
 	Notes map[template.URL]Note
 
 	// TODO: Look into the two below fields into a single one
@@ -201,7 +201,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		// NOTE: not adding the template urls of referenced ntoes
 		// rather, will populate it while links
 	}
-
 }
 
 func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, string, bool) {
@@ -278,7 +277,6 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 				html.WithUnsafe(),
 			),
 		)
-
 	}
 
 	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {

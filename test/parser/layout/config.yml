@@ -1,8 +1,8 @@
 navbar:
-  - index
-  - docs
-  - tags
-  - posts
+  - Index: index.html
+  - Docs: docs.html
+  - Tags: tags.html
+  - Posts: posts.html
 baseURL: example.org
 siteTitle: ssg
 siteScripts:

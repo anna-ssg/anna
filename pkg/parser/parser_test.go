@@ -21,7 +21,12 @@ func TestAddFileAndRender(t *testing.T) {
 	}
 
 	wantLayout := parser.LayoutConfig{
-		Navbar:    []string{"index", "docs", "tags", "posts"},
+		Navbar: []map[string]string{
+			{"Index": "index.html"},
+			{"Docs": "docs.html"},
+			{"Tags": "tags.html"},
+			{"Posts": "posts.html"},
+		},
 		BaseURL:   "example.org",
 		SiteTitle: "ssg",
 		Author:    "Anna",
@@ -132,7 +137,13 @@ func TestParseConfig(t *testing.T) {
 		}
 
 		wantLayout := parser.LayoutConfig{
-			Navbar:    []string{"index", "docs", "tags", "posts"},
+			Navbar: []map[string]string{
+				{"Index": "index.html"},
+				{"Docs": "docs.html"},
+				{"Tags": "tags.html"},
+				{"Posts": "posts.html"},
+			},
+
 			BaseURL:   "example.org",
 			SiteTitle: "ssg",
 			Author:    "Anna",

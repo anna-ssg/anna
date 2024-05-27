@@ -1,22 +1,14 @@
 {{define "header"}}
 <!-- If the template for a particular url does not exist(posts.html), setting it to the specific page template data -->
-{{ $PageData := index .DeepDataMerge.Templates .PageURL }}
-{{if eq $PageData nil }}
-  {{ $PageData = .TemplateData }}
-{{end}}
+{{ $PageData := index .DeepDataMerge.Templates .PageURL }} {{if eq $PageData nil
+}} {{ $PageData = .TemplateData }} {{end}}
 
 <header>
-  <nav>
-    {{range .DeepDataMerge.LayoutConfig.Navbar}}
-        <!-- Replacing with author name for index page -->
-        {{ if eq . "index" }}
-            <a class="navitem" href="/">[{{ $.DeepDataMerge.LayoutConfig.Author }}]</a>
-        {{else}}
-            <!-- Other layout fields are filled here -->
-            <a class="navitem" href="/{{.}}.html">[{{.}}]</a>
-        {{end}}
-    {{end}}
-  </nav>
+    <nav>
+        {{range $index_no, $map := .DeepDataMerge.LayoutConfig.Navbar}} {{range
+        $key, $value := $map }}
+        <a class="navitem" href="/{{ $value }}">[{{ $key }}]</a>
+        {{ end }} {{end}}
+    </nav>
 </header>
-{{template "search" .}}
-{{end}}
+{{template "search" .}} {{end}}
