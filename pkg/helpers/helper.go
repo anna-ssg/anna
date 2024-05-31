@@ -102,7 +102,7 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 // 		fmt.Println("Bootstrap process cancelled.")
 // 		return
 // 	}
-// 	url := fmt.Sprintf("https://github.com/acmpesuecc/anna/archive/refs/tags/v%s.zip", version)
+// 	url := fmt.Sprintf("https://github.com/anna-ssg/anna/archive/refs/tags/v%s.zip", version)
 
 // 	output, err := os.Create("anna-dl.zip")
 // 	if err != nil {

@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/acmpesuecc/anna/v2/pkg/helpers"
+	"github.com/anna-ssg/anna/v2/pkg/helpers"
 )
 
 var reloadPage = make(chan struct{})

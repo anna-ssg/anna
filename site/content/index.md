@@ -23,7 +23,7 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 ## install
 
 ```text
-go run github.com/acmpesuecc/anna@v2.0.0
+go run github.com/anna-ssg/anna@v2.0.0
 ```
 
 ---

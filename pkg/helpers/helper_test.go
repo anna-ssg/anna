@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/acmpesuecc/anna/v2/pkg/helpers"
+	"github.com/anna-ssg/anna/v2/pkg/helpers"
 )
 
 var HelperTestDirPath = "../../test/helpers/"

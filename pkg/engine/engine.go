@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/acmpesuecc/anna/v2/pkg/parser"
+	"github.com/anna-ssg/anna/v2/pkg/parser"
 )
 
 // DeepDataMerge This struct holds all the ssg data

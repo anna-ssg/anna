@@ -23,7 +23,7 @@ fi
 
 # cloning candidates
 echo "clone SSGs"
-git clone --depth=1 https://github.com/acmpesuecc/anna /tmp/bench/anna
+git clone --depth=1 https://github.com/anna-ssg/anna /tmp/bench/anna
 git clone --depth=1 https://github.com/anirudhRowjee/saaru /tmp/bench/saaru
 git clone --depth=1 https://github.com/NavinShrinivas/sapling /tmp/bench/sapling
 

@@ -6,9 +6,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/acmpesuecc/anna/v2/pkg/engine"
-	"github.com/acmpesuecc/anna/v2/pkg/helpers"
-	"github.com/acmpesuecc/anna/v2/pkg/parser"
+	"github.com/anna-ssg/anna/v2/pkg/engine"
+	"github.com/anna-ssg/anna/v2/pkg/helpers"
+	"github.com/anna-ssg/anna/v2/pkg/parser"
 )
 
 type Cmd struct {

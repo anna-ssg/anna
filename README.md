@@ -1,9 +1,9 @@
 # Anna
 
-[![Test Workflow](https://github.com/acmpesuecc/anna/actions/workflows/tests.yml/badge.svg)](https://github.com/acmpesuecc/anna/actions/workflows/tests.yml)
+[![Test Workflow](https://github.com/anna-ssg/anna/actions/workflows/tests.yml/badge.svg)](https://github.com/acmpesuecc/anna/actions/workflows/tests.yml)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/09b8bdf3-5931-4295-9fe7-d463d5d06a3f/deploy-status)](https://app.netlify.com/sites/anna-docs/deploys)
-[![Go Reference](https://pkg.go.dev/badge/github.com/acmpesuecc/anna.svg)](https://pkg.go.dev/github.com/acmpesuecc/anna)
-[![GitHub Repo Stars](https://img.shields.io/github/stars/acmpesuecc/Anna?style=flat-square&label=Stars&color=lightgreen&logo=github)](https://github.com/acmpesuecc/Anna)
+[![Go Reference](https://pkg.go.dev/badge/github.com/anna-ssg/anna.svg)](https://pkg.go.dev/github.com/acmpesuecc/anna)
+[![GitHub Repo Stars](https://img.shields.io/github/stars/anna-ssg/Anna?style=flat-square&label=Stars&color=lightgreen&logo=github)](https://github.com/acmpesuecc/Anna)
 
 ```text
     ___

@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/acmpesuecc/anna/v2/pkg/parser"
+	"github.com/anna-ssg/anna/v2/pkg/parser"
 )
 
 type notesTemplateData struct {

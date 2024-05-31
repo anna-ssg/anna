@@ -346,11 +346,11 @@ We are at week: 4/6 and have a lot of things in store and bugs to squash!
 This blog post misses out of many not-so well documented features and learnings that
 we got during midnight calls and the patches we kept sending each other fixing trivial but
 interesting issues.
-Have a look at our [GitHub](https://github.com/acmpesuecc/anna/issues), for more
+Have a look at our [GitHub](https://github.com/anna-ssg/anna/issues), for more
 
 ---
 
-Today [anna](https://github.com/acmpesuecc/anna/releases/latest) is tagged at v1.0.0 and we use it on our personal sites:
+Today [anna](https://github.com/anna-ssg/anna/releases/latest) is tagged at v1.0.0 and we use it on our personal sites:
 [hegde.live](https://hegde.live) // [sudhir.live](https://sudhir.live) // [polarhive.net](https://polarhive.net)
 
 ---
