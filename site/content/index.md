@@ -2,7 +2,7 @@
 date: 2024-02-24
 title: Home
 type: page
-previewimage: "/static/images/anna_ascii.png"
+previewimage: "/static/images/anna.png"
 description: "homepage for our ssg"
 ---
 

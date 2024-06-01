@@ -16,7 +16,7 @@ Detailed documentation for our SSG can be found: [here](https://anna-docs.netlif
 If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/acmpesuecc/anna; cd anna
+git clone github.com/anna-ssg/anna; cd anna
 go build
 ```
 

@@ -16,7 +16,7 @@ toc: true
 Run this in the appropriate folder. Note that if you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
 ```sh
-curl -L https://github.com/acmpesuecc/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
+curl -L https://github.com/anna-ssg/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
 tar -xvf anna.tar.gz # unzip the tar file
 rm anna.tar.gz # removing the tar file
 
@@ -39,7 +39,7 @@ anna
 ### Installing anna with go
 
 ```sh
-go run github.com/acmpesuecc/anna@v2.0.0
+go run github.com/anna-ssg/anna@v2.0.0
 ```
 
 ---

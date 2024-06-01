@@ -1,9 +1,9 @@
 # Anna
 
-[![Test Workflow](https://github.com/anna-ssg/anna/actions/workflows/tests.yml/badge.svg)](https://github.com/acmpesuecc/anna/actions/workflows/tests.yml)
+[![Test Workflow](https://github.com/anna-ssg/anna/actions/workflows/tests.yml/badge.svg)](https://github.com/anna-ssg/anna/actions/workflows/tests.yml)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/09b8bdf3-5931-4295-9fe7-d463d5d06a3f/deploy-status)](https://app.netlify.com/sites/anna-docs/deploys)
-[![Go Reference](https://pkg.go.dev/badge/github.com/anna-ssg/anna.svg)](https://pkg.go.dev/github.com/acmpesuecc/anna)
-[![GitHub Repo Stars](https://img.shields.io/github/stars/anna-ssg/Anna?style=flat-square&label=Stars&color=lightgreen&logo=github)](https://github.com/acmpesuecc/Anna)
+[![Go Reference](https://pkg.go.dev/badge/github.com/anna-ssg/anna.svg)](https://pkg.go.dev/github.com/anna-ssg/anna)
+[![GitHub Repo Stars](https://img.shields.io/github/stars/anna-ssg/Anna?style=flat-square&label=Stars&color=lightgreen&logo=github)](https://github.com/anna-ssg/anna)
 
 ```text
     ___
@@ -25,7 +25,7 @@ Pronounced: `/ɐnːɐ/` which means rice 🍚 in Kannada
 ## Get Started
 
 ```sh
-go run github.com/acmpesuecc/anna@v2.0.0
+go run github.com/anna-ssg/anna@v2.0.0
 ```
 > If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
 
@@ -36,7 +36,7 @@ Detailed documentation for our SSG can be found: [here](https://anna-docs.netlif
 If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/acmpesuecc/anna; cd anna 
+git clone github.com/anna-ssg/anna; cd anna 
 go build
 ```
 ```text
