@@ -3,6 +3,9 @@ date: 2024-04-28
 title: Developer Guide
 type: page
 toc: true
+collections:
+  - anna
+  - guide
 ---
 
 # Developer Guide

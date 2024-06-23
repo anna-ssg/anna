@@ -1,0 +1,24 @@
+{{ define "collection-subpage"}}
+{{$PageData := index .DeepDataMerge.Collections .PageURL}}
+{{ template "head" .}}
+
+<body>
+    {{template "header" .}}
+
+    <div class="body">
+        <article>
+            <section class="tagged-posts">
+                {{$CollectionSet := index .DeepDataMerge.CollectionsMap .PageURL}}
+                {{range $CollectionSet }}
+                <a href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>
+                {{end}}
+            </section>
+        </article>
+    </div>
+
+    {{template "footer" .}}
+</body>
+
+</html>
+
+{{ end }}

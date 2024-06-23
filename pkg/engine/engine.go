@@ -28,6 +28,12 @@ type DeepDataMerge struct {
 	// Posts contains the template data of files in the posts directory
 	Posts []parser.TemplateData
 
+	// Templates stores the template data of all collection sub-pages of the site
+	Collections map[template.URL]parser.TemplateData
+
+	// K-V pair storing all templates corresponding to a particular collection in the site
+	CollectionsMap map[template.URL][]parser.TemplateData
+
 	//Stores all the notes
 	Notes map[template.URL]parser.Note
 

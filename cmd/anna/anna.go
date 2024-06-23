@@ -20,12 +20,13 @@ type Cmd struct {
 func (cmd *Cmd) VanillaRender() {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
-		Templates:    make(map[template.URL]parser.TemplateData, 10),
-		TagsMap:      make(map[template.URL][]parser.TemplateData, 10),
-		Notes:        make(map[template.URL]parser.Note, 10),
-		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		RenderDrafts: cmd.RenderDrafts,
-		LiveReload:   cmd.LiveReload,
+		Templates:      make(map[template.URL]parser.TemplateData, 10),
+		TagsMap:        make(map[template.URL][]parser.TemplateData, 10),
+		CollectionsMap: make(map[template.URL][]parser.TemplateData, 10),
+		Notes:          make(map[template.URL]parser.Note, 10),
+		ErrorLogger:    log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		RenderDrafts:   cmd.RenderDrafts,
+		LiveReload:     cmd.LiveReload,
 	}
 
 	e := engine.Engine{
@@ -33,6 +34,7 @@ func (cmd *Cmd) VanillaRender() {
 	}
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
+	e.DeepDataMerge.CollectionsMap = make(map[template.URL][]parser.TemplateData, 10)
 	e.DeepDataMerge.Notes = make(map[template.URL]parser.Note, 10)
 	e.DeepDataMerge.LinkStore = make(map[template.URL][]*parser.Note, 10)
 
@@ -55,6 +57,7 @@ func (cmd *Cmd) VanillaRender() {
 
 	e.DeepDataMerge.Templates = p.Templates
 	e.DeepDataMerge.TagsMap = p.TagsMap
+	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
 	e.DeepDataMerge.Posts = p.Posts
 	e.DeepDataMerge.Notes = p.Notes
@@ -91,4 +94,5 @@ func (cmd *Cmd) VanillaRender() {
 	e.RenderEngineGeneratedFiles(helpers.SiteDataPath, templ)
 	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
 	e.RenderTags(helpers.SiteDataPath, templ)
+	e.RenderCollections(helpers.SiteDataPath, templ)
 }

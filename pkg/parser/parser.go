@@ -44,6 +44,7 @@ type Frontmatter struct {
 	Tags         []string `yaml:"tags"`
 	TOC          bool     `yaml:"toc"`
 	Authors      []string `yaml:"authors"`
+	Collections  []string `yaml:"collections"`
 
 	// Head is specifically used for
 	// mentioning the head of the notes
@@ -68,6 +69,9 @@ type Parser struct {
 
 	// K-V pair storing all templates correspoding to a particular tag in the site
 	TagsMap map[template.URL][]TemplateData
+
+	// Collections stores template data of files in collections
+	CollectionsMap map[template.URL][]TemplateData
 
 	// Stores data parsed from layout/config.yml
 	LayoutConfig LayoutConfig
@@ -172,6 +176,14 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 			p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
 
 		}
+
+		// Adding the page to the collections map with the corresponding collections
+		for _, collection := range page.Frontmatter.Collections {
+			collectionsMapKey := "collections/" + collection + ".html"
+			p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], page)
+
+		}
+
 	}
 
 	if frontmatter.Type == "note" {

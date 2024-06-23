@@ -4,6 +4,7 @@ navbar:
   - Docs: docs.html
   - Dev Guide: developer-guide.html
   - Tags: tags.html
+  - Collections: collections.html
   - Notes: notes.html
   - Posts: posts.html
 baseURL: https://anna-docs.netlify.app

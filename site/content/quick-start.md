@@ -3,6 +3,7 @@ date: 2024-04-28
 title: Quick Start
 type: page
 toc: true
+collections: ["anna"]
 ---
 
 # Quick Start
