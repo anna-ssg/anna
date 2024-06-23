@@ -5,6 +5,8 @@ anna
 
 **/.DS_Store
 *.prof
+anna.test
+pprof.cpu
 dist/
 .idea/
 

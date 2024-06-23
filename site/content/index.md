@@ -20,7 +20,7 @@ A static site generator in go
 
 Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowjee/saaru), this static site generator aims to take performance to the next level with parallel rendering, live reload and so much more, all in Go.
 
-## install
+## Install
 
 ```text
 go run github.com/anna-ssg/anna@v2.0.0

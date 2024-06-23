@@ -22,6 +22,24 @@ go build
 
 ---
 
-## Profiling
+### Profiling
 
 The live profile data of the application can be viewed during live reload by navigating to `http://localhost:8000/debug/pprof`
+
+---
+
+## Makefile
+
+The Makefile contains various commands to aid development
+
+```text
+Usage:
+  make [target]
+
+Targets:
+  build: Build anna and render the site
+  serve: Build anna, render and serve the site with live reload
+  tests: Run all tests
+  bench: Run the benchmark and generate pprof files
+  clean: Remove the rendered site directory and test output
+```
