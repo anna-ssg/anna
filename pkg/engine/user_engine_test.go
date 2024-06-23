@@ -26,6 +26,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 				Title:       "file1",
 				Description: "Description of file 1",
 				Date:        "2024-03-28",
+				Type:        "post",
 			},
 		},
 
@@ -35,6 +36,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 				Title:       "file2",
 				Description: "Description of file 2",
 				Date:        "2024-03-28",
+				Type:        "post",
 			},
 		},
 
@@ -44,6 +46,7 @@ func TestRenderEngineGeneratedFiles(t *testing.T) {
 				Title:       "file3",
 				Description: "Description of file 3",
 				Date:        "2024-03-28",
+				Type:        "post",
 			},
 		},
 	}

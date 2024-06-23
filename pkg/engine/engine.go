@@ -97,9 +97,11 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template 
 		DeepDataMerge: e.DeepDataMerge,
 		PageURL:       pagePath,
 	}
+
 	// Storing the rendered HTML file to a buffer
 	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
 	if err != nil {
+		e.ErrorLogger.Println(pagePath)
 		e.ErrorLogger.Fatal(err)
 	}
 

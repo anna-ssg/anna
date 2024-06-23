@@ -45,6 +45,7 @@ type Frontmatter struct {
 	TOC          bool     `yaml:"toc"`
 	Authors      []string `yaml:"authors"`
 	Collections  []string `yaml:"collections"`
+	Layout       string   `yaml:"layout"`
 
 	// Head is specifically used for
 	// mentioning the head of the notes
@@ -249,6 +250,11 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
+
+	if parsedFrontmatter.Layout == "" {
+		parsedFrontmatter.Layout = "page"
+	}
+
 	markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
 
 	// Parsing markdown to HTML

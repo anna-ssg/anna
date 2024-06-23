@@ -3,4 +3,5 @@ title: home
 type: page
 ---
 
-Collections field and associated documentation
+Collections frontmatter field and associated documentation
+Layout frontmatter field and associated documentation - same as define {{}}

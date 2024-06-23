@@ -1,4 +1,4 @@
-{{ define "page"}}
+{{ define "page_2"}}
 {{$PageData := index .DeepDataMerge.Templates .PageURL}}
 {{ template "head" .}}
 
@@ -38,7 +38,7 @@
     </article>
     {{template "footer" .}}
     <script>
-    console.log("Hello from page.html")
+        console.log("Hello from page_2.html")
     </script>
 </body>
 

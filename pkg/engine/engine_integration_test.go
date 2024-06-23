@@ -22,11 +22,17 @@ func TestRenderUserDefinedPages(t *testing.T) {
 		parser.TemplateData{
 			Body:        "<h1>Index Page</h1>",
 			CompleteURL: "index.html",
+			Frontmatter: parser.Frontmatter{
+				Layout: "page",
+			},
 		}
 
 	testEngine.DeepDataMerge.Templates["posts/hello.html"] = parser.TemplateData{
 		Body:        "<h1>Hello World</h1>",
 		CompleteURL: "posts/hello.html",
+		Frontmatter: parser.Frontmatter{
+			Layout: "page",
+		},
 	}
 
 	if err := os.MkdirAll(TestDirPath+"render_user_defined/rendered", 0750); err != nil {

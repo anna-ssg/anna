@@ -16,7 +16,7 @@ type postsTemplateData struct {
 	TemplateData  parser.TemplateData
 }
 
-func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *template.Template) {
+func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, templates *template.Template) {
 	// Rendering "posts.html"
 	var postsBuffer bytes.Buffer
 
@@ -28,7 +28,7 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *templa
 		PageURL:       "posts.html",
 	}
 
-	err := template.ExecuteTemplate(&postsBuffer, "posts", postsData)
+	err := templates.ExecuteTemplate(&postsBuffer, "posts", postsData)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func (e *Engine) RenderEngineGeneratedFiles(fileOutPath string, template *templa
 	}
 }
 
-func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Template) {
+func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.Template) {
 	numCPU := runtime.NumCPU()
 	numTemplates := len(e.DeepDataMerge.Templates)
 	concurrency := numCPU * 2 // Adjust the concurrency factor based on system hardware resources
@@ -71,7 +71,7 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templ *template.Temp
 				wg.Done()
 			}()
 
-			e.RenderPage(fileOutPath, template.URL(templateURL), templ, "page")
+			e.RenderPage(fileOutPath, template.URL(templateURL), templates, e.DeepDataMerge.Templates[template.URL(templateURL)].Frontmatter.Layout)
 		}(templateURL)
 	}
 

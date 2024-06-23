@@ -6,6 +6,7 @@ toc: true
 collections:
   - anna
   - guide
+layout: page_2
 ---
 
 # Developer Guide

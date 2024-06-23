@@ -43,7 +43,9 @@ site
 │   ├── posts.html*
 │   ├── robots.txt*
 │   ├── tag-subpage.html*
-│   └── tags.html*
+│   |── tags.html*
+│   ├── collection-subpage.html*
+│   └── collections.html*
 ├── public
 └── static
     ├── fonts
