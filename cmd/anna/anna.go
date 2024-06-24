@@ -1,6 +1,7 @@
 package anna
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -9,15 +10,124 @@ import (
 	"github.com/anna-ssg/anna/v2/pkg/engine"
 	"github.com/anna-ssg/anna/v2/pkg/helpers"
 	"github.com/anna-ssg/anna/v2/pkg/parser"
+	"gopkg.in/yaml.v3"
 )
 
 type Cmd struct {
-	RenderDrafts bool
-	Addr         string
-	LiveReload   bool
+	RenderDrafts      bool
+	Addr              string
+	LiveReload        bool
+	RenderAll         bool
+	RenderSpecific    string
+	ServeSpecificSite string
+
+	// Common logger for all cmd functions
+	ErrorLogger *log.Logger
 }
 
-func (cmd *Cmd) VanillaRender() {
+type AnnaConfig struct {
+	SiteDataPaths []map[string]string `yaml:"siteDataPaths"`
+}
+
+func (cmd *Cmd) VanillaRenderManager() {
+
+	// Check if the configuration file exists
+	// If it does not, render only the site/ directory
+
+	_, err := os.Stat("anna.yml")
+	if os.IsNotExist(err) {
+		cmd.VanillaRender("site/")
+		return
+	}
+
+	// Read and parse the configuration file
+	annaConfigFile, err := os.ReadFile("anna.yml")
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	var annaConfig AnnaConfig
+
+	// There are two sites and user wants to render both
+
+	// There are two sites and user wants to serve one
+
+	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	if cmd.RenderAll {
+
+	} else if cmd.RenderSpecific != "" {
+		cmd.ErrorLogger.Fatalln("Did not provide a valid site name present in anna.yml")
+	} else {
+		if entry := annaConfig.SiteDataPaths[cmd.RenderSpecific]; entry {
+			cmd.VanillaRender(cmd.RenderSpecific)
+		}
+	}
+
+}
+
+// todo
+func (cmd *Cmd) ValidateHTMLManager() {
+
+	// Check if the configuration file exists
+	// If it does not, render only the site/ directory
+
+	_, err := os.Stat("anna.yml")
+	if os.IsNotExist(err) {
+		cmd.ValidateHTMLContent("site/")
+		return
+	}
+
+	// Read and parse the configuration file
+	annaConfigFile, err := os.ReadFile("anna.yml")
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	var annaConfig AnnaConfig
+
+	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	fmt.Println(annaConfig)
+}
+
+func (cmd *Cmd) LiveReloadManager() {
+
+	// Check if the configuration file exists
+	// If it does not, render only the site/ directory
+
+	_, err := os.Stat("anna.yml")
+	if os.IsNotExist(err) {
+		cmd.StartLiveReload("site/")
+		return
+	}
+
+	// Read and parse the configuration file
+	annaConfigFile, err := os.ReadFile("anna.yml")
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	var annaConfig AnnaConfig
+
+	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	if err != nil {
+		cmd.ErrorLogger.Fatal(err)
+	}
+
+	if cmd.ServeSpecificSite != "" {
+
+	}
+}
+
+func (cmd *Cmd) VanillaRender(siteDirPath string) {
+
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
 		Templates:      make(map[template.URL]parser.TemplateData, 10),
@@ -42,13 +152,13 @@ func (cmd *Cmd) VanillaRender() {
 		ErrorLogger: e.ErrorLogger,
 	}
 
-	helper.CreateRenderedDir(helpers.SiteDataPath)
+	helper.CreateRenderedDir(siteDirPath)
 
-	p.ParseConfig(helpers.SiteDataPath + "layout/config.yml")
-	p.ParseRobots(helpers.SiteDataPath+"layout/robots.txt", helpers.SiteDataPath+"rendered/robots.txt")
+	p.ParseConfig(siteDirPath + "layout/config.yml")
+	p.ParseRobots(siteDirPath+"layout/robots.txt", siteDirPath+"rendered/robots.txt")
 
-	fileSystem := os.DirFS(helpers.SiteDataPath + "content/")
-	p.ParseMDDir(helpers.SiteDataPath+"content/", fileSystem)
+	fileSystem := os.DirFS(siteDirPath + "content/")
+	p.ParseMDDir(siteDirPath+"content/", fileSystem)
 
 	p.ParseLayoutFiles()
 
@@ -67,32 +177,32 @@ func (cmd *Cmd) VanillaRender() {
 	})
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
+	helper.CopyDirectoryContents(siteDirPath+"static/", siteDirPath+"rendered/static/")
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"public/", helpers.SiteDataPath+"rendered/")
+	helper.CopyDirectoryContents(siteDirPath+"public/", siteDirPath+"rendered/")
 
-	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
+	e.GenerateSitemap(siteDirPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
-	e.GenerateJSONIndex(helpers.SiteDataPath)
+	e.GenerateJSONIndex(siteDirPath)
 
 	e.GenerateLinkStore()
-	e.GenerateNoteJSONIdex(helpers.SiteDataPath)
+	e.GenerateNoteJSONIdex(siteDirPath)
 
-	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
+	templ, err := template.ParseGlob(siteDirPath + "layout/*.html")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
 
-	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.html")
+	templ, err = templ.ParseGlob(siteDirPath + "layout/partials/*.html")
 	if err != nil {
 		e.ErrorLogger.Fatalf("%v", err)
 	}
 
-	e.RenderNotes(helpers.SiteDataPath, templ)
-	e.GenerateNoteRoot(helpers.SiteDataPath, templ)
-	e.RenderEngineGeneratedFiles(helpers.SiteDataPath, templ)
-	e.RenderUserDefinedPages(helpers.SiteDataPath, templ)
-	e.RenderTags(helpers.SiteDataPath, templ)
-	e.RenderCollections(helpers.SiteDataPath, templ)
+	e.RenderNotes(siteDirPath, templ)
+	e.GenerateNoteRoot(siteDirPath, templ)
+	e.RenderEngineGeneratedFiles(siteDirPath, templ)
+	e.RenderUserDefinedPages(siteDirPath, templ)
+	e.RenderTags(siteDirPath, templ)
+	e.RenderCollections(siteDirPath, templ)
 }

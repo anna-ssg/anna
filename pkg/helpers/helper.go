@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-const SiteDataPath string = "site/"
-
 var version = "2.1.0" // use variable
 
 type Helper struct {

@@ -1,0 +1,360 @@
+:root {
+    /* Dark mode variables */
+    --background: #000000;
+    --primary-colour: #ffffe6;
+    --font-colour: #ffffffba;
+    --heading-font-colour: #ffffe6;
+    --navbar-link-colour: #ffffe6;
+
+    /* Light mode variables */
+    /* --background: #D2E0FB; */
+    /* --primary-colour: #000000; */
+    /* --font-colour: #000000; */
+    /* --heading-font-colour: #000000; */
+    /* --navbar-link-colour: #; */
+
+    --h1-heading-font-size: 2.1rem;
+    --navbar-font-size: 1.3rem;
+    --body-font-size: 1.2rem;
+    --post-link-font-size: 1.3rem;
+}
+
+@font-face {
+    font-family: Quicksand;
+    src: url(/static/fonts/Quicksand-Medium.otf);
+}
+
+@font-face {
+    font-family: Britney;
+    src: url(/static/fonts/Britney-Regular.otf);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+
+    font-size: var(--body-font-size);
+    font-family: "Quicksand", sans-serif;
+    font-weight: medium;
+    font-style: normal;
+
+    line-height: calc(var(--body-font-size) + 0.3rem);
+
+    color: var(--font-colour);
+    background-color: var(--background);
+}
+
+.body-container {
+    margin: auto;
+    padding: 30px;
+    width: 750px;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--background);
+}
+
+p {
+    opacity: 0.9;
+}
+
+header,
+footer {
+    flex: 0;
+}
+
+header {
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-colour);
+}
+
+footer {
+    padding: 10px 0 10px;
+    border-top: 2px solid var(--primary-colour);
+    color: var(--font-colour);
+    text-align: center;
+}
+
+footer a {
+    color: var(--primary-colour);
+}
+
+.body {
+    flex: 1 0 auto;
+}
+
+a {
+    text-decoration: underline;
+    color: var(--primary-colour);
+}
+
+nav {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+nav a {
+    text-decoration: none;
+    font-size: var(--navbar-font-size);
+    color: var(--navbar-link-colour);
+}
+
+.search {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#searchSiteInput {
+    width: auto;
+
+    outline: none;
+    border: 2px var(--primary-colour) solid;
+    border-radius: 5px;
+    padding: 8px;
+
+    color: var(--font-colour);
+    background-color: var(--background);
+}
+
+#searchSiteInput::placeholder {
+    color: var(--font-colour);
+    font-size: (var(--body-font-size) - 0.1rem);
+}
+
+#site_search_result {
+    margin-top: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.post-card {
+    padding: 3px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.post-card-date {
+    font-size: calc(var(--body-font-size) - 0.2rem);
+    font-weight: 300;
+}
+
+.post-card-link-and-description {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.post-card-link {
+    font-size: var(--post-link-font-size);
+}
+
+.post-card a {
+    text-decoration: underline;
+    color: var(--primary-colour);
+}
+
+.post-card a:hover {
+    text-decoration: underline;
+}
+
+.tags-placeholder,
+.post-tags-placeholder {
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    font-weight: 400;
+}
+
+.tags-placeholder a,
+.post-tags-placeholder a {
+    color: var(--primary-colour);
+    font-style: italic;
+}
+
+.tags-placeholder {
+    margin-top: 10px;
+}
+
+.tagpage-tags-placeholder {
+    margin-top: 20px;
+}
+
+.tagpage-tags-placeholder a {
+    font-style: normal;
+    color: var(--primary-colour);
+}
+
+.tag-subpage-keyword {
+    color: var(--primary-colour);
+}
+
+#chart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#hoverDiv {
+    background-color: var(--background);
+
+    box-shadow: 0 0 15px #1e1e1e7a;
+    margin: 1rem;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 0.5rem;
+
+    border-radius: 0.3rem;
+
+    &>p {
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+        padding: 0;
+        font-size: 0.85rem;
+    }
+
+    &>img {
+        margin: 0;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 0.1rem;
+        width: 100%;
+        padding: 0;
+    }
+
+    &>.date {
+        color: var(--color-text-dim);
+    }
+}
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+.anchor {
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+}
+
+hr {
+    border: 1px solid var(--font-colour);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Quicksand", sans-serif;
+    font-family: "Britney", sans-serif;
+    font-weight: 500;
+
+    margin: 0;
+    color: var(--heading-font-colour);
+
+    &:hover {
+        .anchor {
+            opacity: 1;
+        }
+    }
+}
+
+h1 {
+    font-size: var(--h1-heading-font-size);
+    margin-top: calc(var(--h1-heading-font-size) - 0.1rem);
+}
+
+h2 {
+    font-size: calc(var(--h1-heading-font-size) - 0.2rem);
+    margin-top: calc(var(--h1-heading-font-size) - 0.3rem);
+}
+
+h3 {
+    font-size: calc(var(--h1-heading-font-size) - 0.4rem);
+    margin-top: calc(var(--h1-heading-font-size) - 0.5rem);
+}
+
+h4 {
+    font-size: calc(var(--h1-heading-font-size) - 0.6rem);
+    margin-top: calc(var(--h1-heading-font-size) - 0.6rem);
+}
+
+h5 {
+    font-size: calc(var(--h1-heading-font-size) - 0.7rem);
+    margin-top: calc(var(--h1-heading-font-size) - 0.7rem);
+}
+
+h6 {
+    font-size: calc(var(--h1-heading-font-size) - 0.8rem);
+    margin-top: calc(var(--h1-heading-font-size) - 0.8rem);
+}
+
+blockquote {
+    border-left: 5px var(--primary-colour) solid;
+    margin-left: 0;
+    padding: 10px;
+    padding-left: 20px;
+
+    color: var(--font-colour-opaque);
+}
+
+@media (max-width: 900px) {
+    .body-container {
+        padding: 15px 45px;
+    }
+
+    svg {
+        width: auto;
+        height: auto;
+    }
+}
+
+@media (max-width: 750px) {
+    :root {
+        --h1-heading-font-size: 2rem;
+        --navbar-font-size: 1.1rem;
+        --body-font-size: 1rem;
+        --post-link-font-size: 1.1rem;
+    }
+
+    .body-container {
+        padding: 15px 20px;
+        width: auto;
+    }
+
+    svg {
+        width: auto;
+        height: auto;
+    }
+
+    .search {
+        padding: 0px 0.1em 0px;
+    }
+
+    #searchSiteInput {
+        width: 100%;
+    }
+}

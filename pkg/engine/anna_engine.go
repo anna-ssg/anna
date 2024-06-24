@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anna-ssg/anna/v2/pkg/helpers"
 	"github.com/anna-ssg/anna/v2/pkg/parser"
 )
 
@@ -275,7 +274,7 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 		buffer.WriteString("\t</url>\n")
 	}
 	buffer.WriteString("</urlset>\n")
-	// helpers.SiteDataPath is the DirPath
+	// e.SiteDataPath is the DirPath
 	outputFile, err := os.Create(outFilePath)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
@@ -351,7 +350,7 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("  </channel>\n")
 	buffer.WriteString("</rss>\n")
 
-	outputFile, err := os.Create(helpers.SiteDataPath + "rendered/feed.xml")
+	outputFile, err := os.Create(e.SiteDataPath + "rendered/feed.xml")
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}

@@ -11,6 +11,6 @@ func BenchmarkMain(b *testing.B) {
 		RenderDrafts: true,
 	}
 	for i := 0; i < b.N; i++ {
-		annaCmd.VanillaRender()
+		annaCmd.VanillaRenderManager()
 	}
 }

@@ -1,0 +1,134 @@
+{{ define "hover" }}
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var data_cache = null;
+
+        var url = "/static/noteindex.json";
+
+        fetch(url)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                data_cache = data;
+            })
+            .catch((error) => {
+                console.error(
+                    "There was a problem with the fetch operation:",
+                    error,
+                );
+            })
+
+        document.querySelectorAll('a:not(.post-card):not(.navitem)').forEach(function (anchor) {
+            anchor.addEventListener('mouseover', function (e) {
+                var div = document.createElement('div');
+                div.id = "hoverDiv"
+                div.style.position = 'fixed';
+                div.style.minWidth = '20rem';
+
+                // fade in animation
+                div.style.transition = 'top 0.2s, opacity 0.5s';
+                div.style.opacity = 0;
+                div.style.top = e.clientY - divHeight / 2 + 'px';
+
+                div.style.left = e.clientX + 'px';
+                setTimeout(function () {
+                    div.style.opacity = 1;
+                    div.style.top = e.clientY + 'px';
+                }, 50);
+
+                // div.style.maxWidth = '20rem';
+                var divWidth = 200; // Assume the width of the div
+                var divHeight = 100; // Assume the height of the div
+
+                div.style.left = e.clientX + 'px';
+                div.style.top = e.clientY + 'px';
+
+                var left = e.clientX;
+                var top = e.clientY + 150;
+
+                // Check if the div is going out of the window
+                if (left + divWidth > window.innerWidth - 200) {
+                    left = window.innerWidth - divWidth - 200;
+                }
+
+                if (top + divHeight > window.innerHeight) {
+                    top = window.innerHeight - divHeight;
+                }
+
+                div.style.left = left + 'px';
+                div.style.top = top + 'px';
+
+                div.style.maxWidth = '200px';
+                div.style.maxHeight = 'auto';
+
+
+                for (key in data_cache) {
+                    title = data_cache[key]["Frontmatter"]["Title"];
+                    if (title == anchor.innerHTML) {
+                        // Create a new heading element
+                        var heading = document.createElement('h4');
+                        var mdBody = document.createElement('p');
+                        var fileDate = document.createElement('p');
+                        var filePreviewImage = document.createElement("img")
+                        fileDate.className = "date"
+                        filePreviewImage.loading = "lazy"
+
+                        heading.textContent = title;
+                        mdBody.textContent = data_cache[key]["MarkdownBody"];
+                        fileDate.textContent = `Created on ${data_cache[key]["Frontmatter"]["Date"]}`
+                        body = data_cache[key]["Body"]
+                        const src = data_cache[key]["Frontmatter"]["PreviewImage"];
+                        if (src != "") {
+                            filePreviewImage.src = src;
+                            filePreviewImage.alt = "Preview Image"
+                            div.appendChild(filePreviewImage)
+                        }
+
+                        div.appendChild(heading);
+                        div.appendChild(mdBody);
+                        div.appendChild(fileDate)
+
+                        document.body.appendChild(div);
+                        // Append the div to the body of the current document
+                    }
+                }
+            });
+
+            anchor.addEventListener('mouseout', function (e) {
+                var hoverDivs = document.querySelectorAll('#hoverDiv');
+                // kill all hoverDiv elements
+                hoverDivs.forEach(function (hoverDiv) {
+                    hoverDiv.remove();
+                });
+            });
+        });
+
+
+
+
+        /*
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+        
+            // Create a new article
+            var newArticle = document.createElement('article');
+        
+            // Add content to the new article
+            newArticle.innerHTML = body;
+        
+            // Find the article container
+            var articleContainer = document.querySelector('.article-container');
+        
+            // Append the new article to the article container
+            articleContainer.appendChild(newArticle);
+        });
+        */
+
+    });
+</script>
+{{ end }}
