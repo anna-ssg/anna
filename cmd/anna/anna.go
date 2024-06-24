@@ -69,8 +69,14 @@ func (cmd *Cmd) VanillaRender() {
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(helpers.SiteDataPath+"static/", helpers.SiteDataPath+"rendered/static/")
 
-	// Copies the contents of the 'static/' directory to 'rendered/'
-	helper.CopyDirectoryContents(helpers.SiteDataPath+"public/", helpers.SiteDataPath+"rendered/")
+	// Check if the public folder exists ands copy contents
+
+	_, err := os.Stat(helpers.SiteDataPath + "public/")
+	if os.IsNotExist(err) {
+	} else {
+		// Copies the contents of the 'static/' directory to 'rendered/'
+		helper.CopyDirectoryContents(helpers.SiteDataPath+"public/", helpers.SiteDataPath+"rendered/")
+	}
 
 	e.GenerateSitemap(helpers.SiteDataPath + "rendered/sitemap.xml")
 	e.GenerateFeed()
