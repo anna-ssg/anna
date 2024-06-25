@@ -1,0 +1,24 @@
+{{ define "tag-subpage"}}
+{{$PageData := index .DeepDataMerge.Tags .PageURL}}
+{{ template "head" .}}
+
+<body>
+    {{template "header" .}}
+
+    <div class="body">
+        <article>
+            <section class="tagged-posts">
+                {{$TagSet := index .DeepDataMerge.TagsMap .PageURL}}
+                {{range $TagSet }}
+                <a href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>
+                {{end}}
+            </section>
+        </article>
+    </div>
+
+    {{template "footer" .}}
+</body>
+
+</html>
+
+{{ end}}

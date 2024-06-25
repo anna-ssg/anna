@@ -42,7 +42,7 @@ func TestAddFileAndRender(t *testing.T) {
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
 			ErrorLogger: gotParser.ErrorLogger,
 		}
-		sampleFrontmatter, _, markdownContent, parseSuccess := gotParser.ParseMarkdownContent(string(inputMd))
+		sampleFrontmatter, _, markdownContent, parseSuccess := gotParser.ParseMarkdownContent(string(inputMd), "sample_test_path")
 		sampleBody := "sample_body"
 		if !parseSuccess {
 			return
@@ -91,7 +91,7 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		_, bodyGot, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		_, bodyGot, _, parseSuccess := p.ParseMarkdownContent(string(inputMd), "sample_test_path")
 
 		if parseSuccess {
 
@@ -111,7 +111,7 @@ func TestParseMarkdownContent(t *testing.T) {
 			t.Errorf("%v", err)
 		}
 
-		frontmatterGot, _, _, parseSuccess := p.ParseMarkdownContent(string(inputMd))
+		frontmatterGot, _, _, parseSuccess := p.ParseMarkdownContent(string(inputMd), "sample_test_path")
 
 		if !parseSuccess {
 			frontmatterWant := parser.Frontmatter{

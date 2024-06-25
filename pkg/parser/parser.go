@@ -52,13 +52,6 @@ type Frontmatter struct {
 	Head bool `yaml:"head"`
 }
 
-// type Sushi struct {
-// 	// collections: ["homebrew", "workshop"]
-// 	// 					0			1
-// 	child_collection   string
-// 	parsent_collection string
-// }
-
 // TemplateData This struct holds all of the data required to render any page of the site
 type TemplateData struct {
 	CompleteURL template.URL
@@ -126,7 +119,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 						p.ErrorLogger.Fatal(err)
 					}
 
-					fronmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content))
+					fronmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
 					if parseSuccess {
 						if fronmatter.Type == "post" {
 							if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
@@ -164,36 +157,32 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
 
-	if frontmatter.Type == "post" || frontmatter.Type == "page" {
+	page := TemplateData{
+		CompleteURL: template.URL(url),
+		Date:        date,
+		Frontmatter: frontmatter,
+		Body:        template.HTML(body),
+		LiveReload:  p.LiveReload,
+	}
 
-		page := TemplateData{
-			CompleteURL: template.URL(url),
-			Date:        date,
-			Frontmatter: frontmatter,
-			Body:        template.HTML(body),
-			LiveReload:  p.LiveReload,
-		}
+	// Adding the page to the merged map storing all site pages
+	if frontmatter.Type == "post" {
+		p.Posts = append(p.Posts, page)
+	}
 
-		// Adding the page to the merged map storing all site pages
-		if frontmatter.Type == "post" {
-			p.Posts = append(p.Posts, page)
-		}
+	p.Templates[template.URL(url)] = page
 
-		p.Templates[template.URL(url)] = page
+	// Adding the page to the tags map with the corresponding tags
+	for _, tag := range page.Frontmatter.Tags {
+		tagsMapKey := "tags/" + tag + ".html"
+		p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
 
-		// Adding the page to the tags map with the corresponding tags
-		for _, tag := range page.Frontmatter.Tags {
-			tagsMapKey := "tags/" + tag + ".html"
-			p.TagsMap[template.URL(tagsMapKey)] = append(p.TagsMap[template.URL(tagsMapKey)], page)
+	}
 
-		}
-
-		// Adding the page to the collections map with the corresponding collections
-		for _, collection := range page.Frontmatter.Collections {
-			collectionsMapKey := "collections/" + collection + ".html"
-			p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], page)
-
-		}
+	// Adding the page to the collections map with the corresponding collections
+	for _, collection := range page.Frontmatter.Collections {
+		collectionsMapKey := "collections/" + collection + ".html"
+		p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], page)
 
 	}
 
@@ -226,7 +215,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	}
 }
 
-func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, string, bool) {
+func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmatter, string, string, bool) {
 	var parsedFrontmatter Frontmatter
 	var markdown string
 	/*
@@ -241,17 +230,16 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		return Frontmatter{}, "", "", false
+		p.ErrorLogger.Fatal("Frontmatter missing on path: ", path)
 	}
 
 	// If the first section of the page contains a title field, continue parsing
 	// Else, prevent parsing of the current file
-	// TODO: Add this to documentation
 	regex := regexp.MustCompile(`title(.*): (.*)`)
 	match := regex.FindStringSubmatch(splitContents[1])
 
 	if match == nil {
-		return Frontmatter{}, "", "", false
+		p.ErrorLogger.Fatal("Title field missing from frontmatter missing on path: ", path)
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -265,39 +253,13 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 		parsedFrontmatter.Layout = "page"
 	}
 
-	// parent_collection := parsedFrontmatter.Collections[0]
-	// child_collection := parsedFrontmatter.Collections[1]
-
-	// sushi_collection := Sushi{child_collection: child_collection, parsent_collection: parent_collection}
-
-	// workshop.html
-	// +---> collection is workshop
-	// 						+---> from DDM parent collection is homebrew
-	// 															^^^^^
-	// 								assgin "hombrew" to the collection map in frontmatter
-
-	// INSIDE DDM Struct
-	// -----------------------
-	// Parent Collections: homebrew, hsp
-	// Child Collections []Sushi -> {workshop, homebrew}, {features, hsp}
-	// 					  ^^^^ not good
-
-	// hsp-ecc.xyz/homebrew/about.md
-	// 		Frontmatter: Collection: [homebrew]
-	//
-	// hsp-ecc.xyz/homebrew/workshops_post/zig.md
-	// 		Frontmatter: Collection: [homebrew, workshop]
-	//
-	// hsp-ecc.xyz/hsp/events/zig.md
-	// 		Frontmatter: Collection: [hsp, events]
-
 	markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
 	var md goldmark.Markdown
 
-	if parsedFrontmatter.Type == "post" || parsedFrontmatter.TOC {
+	if parsedFrontmatter.TOC {
 		md = goldmark.New(
 			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 			goldmark.WithExtensions(

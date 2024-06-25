@@ -7,7 +7,7 @@ build:
 serve:
 	@echo "anna: serving site"
 	@go build
-	@./anna -s
+	@./anna -s "site/"
 tests:
 	@echo "anna: running all tests"
 	@go test ./...

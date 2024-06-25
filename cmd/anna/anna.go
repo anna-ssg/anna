@@ -240,12 +240,12 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	} else {
 		// Check if the public folder exists ands copy contents
 
-	_, err := os.Stat(helpers.SiteDataPath + "public/")
-	if os.IsNotExist(err) {
-	} else {
-		// Copies the contents of the 'static/' directory to 'rendered/'
+		_, err := os.Stat(siteDirPath + "public/")
+		if os.IsNotExist(err) {
+		} else {
+			// Copies the contents of the 'static/' directory to 'rendered/'
 			helper.CopyDirectoryContents(siteDirPath+"public/", siteDirPath+"rendered/")
-	}
+		}
 	}
 
 	e.GenerateSitemap(siteDirPath + "rendered/sitemap.xml")
