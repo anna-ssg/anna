@@ -40,9 +40,9 @@
   {{ end }}
 
   {{range $PageData.Frontmatter.JSFiles}}
-  <script src="/script/{{.}}" defer></script>
+  <script src="/static/scripts/{{.}}" defer></script>
   {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts}}
-  <script src="/script/{{.}}" defer></script>
+  <script src="/static/scripts/{{.}}" defer></script>
   {{end}}
 
 

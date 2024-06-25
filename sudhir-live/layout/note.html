@@ -1,0 +1,49 @@
+{{ define "note"}}
+{{$PageData := index .DeepDataMerge.Notes .PageURL}}
+{{ template "head" .}}
+
+<body>
+    <div class="body-container">
+        {{template "header" .}}
+        <div class="body">
+
+            <article>
+                {{if eq $PageData.Frontmatter.Type "note"}}
+                <h2>{{$PageData.Frontmatter.Title}}</h2>
+                {{end}}
+
+                {{$PageData.Body}}
+
+            </article>
+        </div>
+
+        <section class="notes">
+            {{ $CuratedNotes := index .DeepDataMerge.LinkStore .PageURL}}
+            {{ if eq (len $CuratedNotes ) 0 }}
+            {{ else }}
+            <h3>Related Posts</h3>
+            {{range index .DeepDataMerge.LinkStore .PageURL }}
+
+            <div class="post-card">
+                <a id="post-link" href="/{{.CompleteURL}}">
+                    {{.Frontmatter.Title}}
+                </a>
+            </div>
+
+            {{ end }}
+            {{ end }}
+
+        </section>
+        {{template "footer" .}}
+
+        {{ template "hover" .}}
+    </div>
+    <script>
+        hljs.highlightAll();
+        hljs.addPlugin(new CopyButtonPlugin());
+    </script>
+</body>
+
+</html>
+
+{{ end}}

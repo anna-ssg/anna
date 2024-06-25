@@ -50,6 +50,9 @@ type Engine struct {
 
 	// Common logger for all engine functions
 	ErrorLogger *log.Logger
+
+	// The path to the directory being rendered
+	SiteDataPath string
 }
 
 type PageData struct {

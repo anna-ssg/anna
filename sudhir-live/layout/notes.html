@@ -1,0 +1,36 @@
+{{ define "notes-root" }}
+{{$PageData := .DeepDataMerge.Notes }}
+{{ template "head" .}}
+
+<body>
+    <div class="body-container">
+
+        {{template "header" .}}
+
+        <div class="body">
+            <article>
+                <div class="posts">
+                    <h2>Notes</h2>
+
+                    {{range $PageData }}
+                    {{ if eq .Frontmatter.Head true }}
+                    <div class="post-card">
+                        <a id="post-link" href="{{.CompleteURL}}">
+                            {{.Frontmatter.Title}}
+                        </a>
+                    </div>
+                    {{ end }}
+                    {{end}}
+
+                </div>
+            </article>
+        </div>
+
+        {{template "footer" .}}
+
+    </div>
+</body>
+
+</html>
+
+{{ end}}

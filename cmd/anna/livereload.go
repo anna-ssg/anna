@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"sync/atomic"
 	"time"
-
-	"github.com/anna-ssg/anna/v2/pkg/helpers"
 )
 
 var reloadPage = make(chan struct{})
@@ -28,27 +26,30 @@ type liveReload struct {
 	extensions []string
 
 	serverRunning bool
+
+	siteDataPath string
 }
 
-func newLiveReload() *liveReload {
+func newLiveReload(siteDataPath string) *liveReload {
 	lr := liveReload{
-		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		fileTimes:   make(map[string]time.Time),
-		rootDirs:    []string{helpers.SiteDataPath},
-		extensions:  []string{".go", ".md", ".yml"},
+		errorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		fileTimes:    make(map[string]time.Time),
+		rootDirs:     []string{siteDataPath},
+		extensions:   []string{".go", ".md", ".yml"},
+		siteDataPath: siteDataPath,
 	}
 	return &lr
 }
 
-func (cmd *Cmd) StartLiveReload() {
+func (cmd *Cmd) StartLiveReload(siteDataPath string) {
 	fmt.Println("Live Reload is active")
-	lr := newLiveReload()
+	lr := newLiveReload(siteDataPath)
 	go lr.startServer(cmd.Addr)
 
 	for {
 		for _, rootDir := range lr.rootDirs {
 			if lr.traverseDirectory(rootDir) {
-				cmd.VanillaRender()
+				cmd.VanillaRender(lr.siteDataPath)
 				reloadPage <- struct{}{}
 			}
 		}
@@ -105,7 +106,7 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 func (lr *liveReload) startServer(addr string) {
 	fmt.Print("Serving content at: http://localhost:", addr, "\n")
 	fmt.Print("Profile data can be viewed at: http://localhost:", addr, "/debug/pprof", "\n")
-	http.Handle("/", http.FileServer(http.Dir(helpers.SiteDataPath+"./rendered")))
+	http.Handle("/", http.FileServer(http.Dir(lr.siteDataPath+"./rendered")))
 	http.HandleFunc("/events", eventsHandler)
 	err := http.ListenAndServe(":"+addr, nil)
 	if err != nil {

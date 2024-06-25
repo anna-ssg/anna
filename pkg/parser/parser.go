@@ -52,6 +52,13 @@ type Frontmatter struct {
 	Head bool `yaml:"head"`
 }
 
+// type Sushi struct {
+// 	// collections: ["homebrew", "workshop"]
+// 	// 					0			1
+// 	child_collection   string
+// 	parsent_collection string
+// }
+
 // TemplateData This struct holds all of the data required to render any page of the site
 type TemplateData struct {
 	CompleteURL template.URL
@@ -97,6 +104,9 @@ type Parser struct {
 
 	// Determines the injection of Live Reload JS in HTML
 	LiveReload bool
+
+	// The path to the directory being rendered
+	SiteDataPath string
 }
 
 func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
@@ -127,7 +137,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 						}
 					}
 				} else {
-					helper.CopyFiles(helpers.SiteDataPath+"content/"+fileName, helpers.SiteDataPath+"rendered/"+fileName)
+					helper.CopyFiles(p.SiteDataPath+"content/"+fileName, p.SiteDataPath+"rendered/"+fileName)
 				}
 			}
 		}
@@ -150,7 +160,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		date = 0
 	}
 
-	key, _ := strings.CutPrefix(testFilepath, helpers.SiteDataPath+"content/")
+	key, _ := strings.CutPrefix(testFilepath, p.SiteDataPath+"content/")
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
 
@@ -254,6 +264,32 @@ func (p *Parser) ParseMarkdownContent(filecontent string) (Frontmatter, string, 
 	if parsedFrontmatter.Layout == "" {
 		parsedFrontmatter.Layout = "page"
 	}
+
+	// parent_collection := parsedFrontmatter.Collections[0]
+	// child_collection := parsedFrontmatter.Collections[1]
+
+	// sushi_collection := Sushi{child_collection: child_collection, parsent_collection: parent_collection}
+
+	// workshop.html
+	// +---> collection is workshop
+	// 						+---> from DDM parent collection is homebrew
+	// 															^^^^^
+	// 								assgin "hombrew" to the collection map in frontmatter
+
+	// INSIDE DDM Struct
+	// -----------------------
+	// Parent Collections: homebrew, hsp
+	// Child Collections []Sushi -> {workshop, homebrew}, {features, hsp}
+	// 					  ^^^^ not good
+
+	// hsp-ecc.xyz/homebrew/about.md
+	// 		Frontmatter: Collection: [homebrew]
+	//
+	// hsp-ecc.xyz/homebrew/workshops_post/zig.md
+	// 		Frontmatter: Collection: [homebrew, workshop]
+	//
+	// hsp-ecc.xyz/hsp/events/zig.md
+	// 		Frontmatter: Collection: [hsp, events]
 
 	markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
 
@@ -364,13 +400,13 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 // ParseLayoutFiles Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
 	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob(helpers.SiteDataPath + "layout/*.html")
+	templ, err := template.ParseGlob(p.SiteDataPath + "layout/*.html")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
 
 	// Parsing all files in the partials/ dir which match the "*.html" pattern
-	templ, err = templ.ParseGlob(helpers.SiteDataPath + "layout/partials/*.html")
+	templ, err = templ.ParseGlob(p.SiteDataPath + "layout/partials/*.html")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}

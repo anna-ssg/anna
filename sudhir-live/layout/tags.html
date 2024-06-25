@@ -1,0 +1,33 @@
+{{ define "all-tags"}}
+{{$PageData := .TemplateData}}
+{{ template "head" .}}
+
+<body>
+  <div class="body-container">
+
+    {{template "header" .}}
+
+    <div class="body">
+      <article>
+        <div class="all-tags">
+          <h2>Tags</h2>
+          <div class="post-tags-placeholder tagpage-tags-placeholder">
+
+            {{range .TagNames}}
+            <a href="tags/{{.}}.html">{{.}}</a>
+            {{end}}
+
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    {{template "footer" .}}
+
+  </div>
+</body>
+
+</html>
+
+{{ end}}
