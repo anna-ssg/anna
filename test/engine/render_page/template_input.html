@@ -5,23 +5,25 @@
 
     <article>
         <section class="body">
-            {{ if eq $PageData.Frontmatter.Type "post" }}
             <div class="post-description">
                 <h1>{{ $PageData.Frontmatter.Title }}</h1>
-                <div class="authors-paceholder">
+                <div class="page-date">
+                    {{ if ne (len $PageData.Frontmatter.Date) 0 }}
+                    Published on {{$PageData.Frontmatter.Date}}
+                    {{end}}
+                </div>
+                <div class="authors-placeholder">
                     <p>
-                        Published on {{$PageData.Frontmatter.Date}}
                         <!-- if length of frontmatter authors is 0 -->
-                        {{ if eq (len $PageData.Frontmatter.Authors) 0 }}
-                        {{.DeepDataMerge.LayoutConfig.Author}}
-                        {{ else }}
+                        {{ if ne (len $PageData.Frontmatter.Authors) 0 }}
+                        Authors:
                         {{range $PageData.Frontmatter.Authors }}
-                        {{ . }},
+                        {{ . }} |
                         {{ end }}
                         {{ end }}
                     </p>
                 </div>
-                <div class="tags-paceholder">
+                <div class="tags-placeholder">
                     {{range $PageData.Frontmatter.Tags}}
                     <div class="tag">
                         <a href="/tags/{{.}}.html">{{.}}</a>
@@ -29,11 +31,12 @@
                     {{end}}
                 </div>
             </div>
-            {{ else }}
-            {{ end }}
+
             {{$PageData.Body}}
         </section>
     </article>
 </body>
+
+</html>
 
 {{ end}}

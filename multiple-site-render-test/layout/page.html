@@ -1,4 +1,4 @@
-{{ define "page_2"}}
+{{ define "page"}}
 {{$PageData := index .DeepDataMerge.Templates .PageURL}}
 {{ template "head" .}}
 
@@ -7,23 +7,27 @@
     {{template "header" .}}
     <article>
         <section class="body">
-            {{ if eq $PageData.Frontmatter.Type "post" }}
+
+            {{if strSliceContains $PageData.Frontmatter.Collections "posts"}}
             <div class="post-description">
                 <h1>{{ $PageData.Frontmatter.Title }}</h1>
-                <div class="authors-paceholder">
+                <div class="page-date">
+                    {{ if ne (len $PageData.Frontmatter.Date) 0 }}
+                    Published on {{$PageData.Frontmatter.Date}}
+                    {{end}}
+                </div>
+                <div class="authors-placeholder">
                     <p>
-                        Published on {{$PageData.Frontmatter.Date}}
                         <!-- if length of frontmatter authors is 0 -->
-                        {{ if eq (len $PageData.Frontmatter.Authors) 0 }}
-                        {{.DeepDataMerge.LayoutConfig.Author}}
-                        {{ else }}
+                        {{ if ne (len $PageData.Frontmatter.Authors) 0 }}
+                        Authors:
                         {{range $PageData.Frontmatter.Authors }}
-                        {{ . }},
+                        {{ . }} |
                         {{ end }}
                         {{ end }}
                     </p>
                 </div>
-                <div class="tags-paceholder">
+                <div class="tags-placeholder">
                     {{range $PageData.Frontmatter.Tags}}
                     <div class="tag">
                         <a href="/tags/{{.}}.html">{{.}}</a>
@@ -31,15 +35,12 @@
                     {{end}}
                 </div>
             </div>
-            {{ else }}
-            {{ end }}
+            {{end}}
+
             {{$PageData.Body}}
         </section>
     </article>
     {{template "footer" .}}
-    <script>
-        console.log("Hello from page_2.html")
-    </script>
 </body>
 
 </html>

@@ -6,10 +6,15 @@ navbar:
   - Tags: tags.html
   - Collections: collections.html
   - Notes: notes.html
-  - Posts: posts.html
+  - Posts: collections/posts.html
+  - Anna Blog: posts/building-anna/index.html
 baseURL: https://anna-docs.netlify.app
 siteTitle: "anna-docs"
 siteScripts:
 author: anna
 themeURL: "/static/style.css"
 copyright: "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International."
+socials:
+  - Github: https://github.com/anna-ssg/anna
+collectionLayouts:
+  - collections/posts.html: all-posts

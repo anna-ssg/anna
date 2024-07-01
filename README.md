@@ -21,35 +21,27 @@ Pronounced: `/ɐnːɐ/` which means rice 🍚 in Kannada
 
 > This project is a part of the ACM PESU-ECC's yearly [AIEP](https://acmpesuecc.github.io/aiep) program, and is maintained by [Adhesh Athrey](https://github.com/DedLad), [Nathan Paul](https://github.com/polarhive), [Anirudh Sudhir](https://github.com/anirudhsudhir), and [Aditya Hegde](https://github.com/bwaklog)
 
+### Detailed documentation for our SSG can be found [here](https://anna-docs.netlify.app/)
+
 ---
+
 ## Get Started
 
 ```sh
 go run github.com/anna-ssg/anna@v2.0.0
 ```
-> If you don't have a site dir with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository
+
+[Quick start](https://anna-docs.netlify.app/quick-start)
+
+<!-- > If you don't have a site directory with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository -->
 
 ## Contributing to Anna
-
-Detailed documentation for our SSG can be found: [here](https://anna-docs.netlify.app/)
 
 If you have git installed, clone our repository and build against the latest commit
 
 ```sh
-git clone github.com/anna-ssg/anna; cd anna 
+git clone github.com/anna-ssg/anna; cd anna
 go build
 ```
-```text
-Usage:
-  anna [flags]
 
-Flags:
-  -a, --addr string   ip address to serve rendered content to (default "8000")
-  -d, --draft         renders draft posts
-  -h, --help          help for anna
-  -l, --layout        validates html layouts
-  -p, --prof          enable profiling
-  -s, --serve         serve the rendered content
-  -v, --version       prints current version number
-  -w, --webconsole    wizard to setup anna
-```
+[Developer Guide](https://anna-docs.netlify.app/developer-guide)

@@ -25,14 +25,14 @@ type DeepDataMerge struct {
 	// Stores data parsed from layout/config.yml
 	LayoutConfig parser.LayoutConfig
 
-	// Posts contains the template data of files in the posts directory
-	Posts []parser.TemplateData
-
 	// Templates stores the template data of all collection sub-pages of the site
 	Collections map[template.URL]parser.TemplateData
 
 	// K-V pair storing all templates corresponding to a particular collection in the site
 	CollectionsMap map[template.URL][]parser.TemplateData
+
+	// K-V pair storing the template layout name for a particular collection in the site
+	CollectionsSubPageLayouts map[template.URL]string
 
 	//Stores all the notes
 	Notes map[template.URL]parser.Note
@@ -104,7 +104,7 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template 
 	// Storing the rendered HTML file to a buffer
 	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
 	if err != nil {
-		e.ErrorLogger.Println(pagePath)
+		e.ErrorLogger.Println("Error at path: ", pagePath)
 		e.ErrorLogger.Fatal(err)
 	}
 

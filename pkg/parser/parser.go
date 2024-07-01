@@ -24,13 +24,15 @@ import (
 )
 
 type LayoutConfig struct {
-	Navbar      []map[string]string `yaml:"navbar"`
-	BaseURL     string              `yaml:"baseURL"`
-	SiteTitle   string              `yaml:"siteTitle"`
-	SiteScripts []string            `yaml:"siteScripts"`
-	Author      string              `yaml:"author"`
-	Copyright   string              `yaml:"copyright"`
-	ThemeURL    string              `yaml:"themeURL"`
+	Navbar            []map[string]string `yaml:"navbar"`
+	BaseURL           string              `yaml:"baseURL"`
+	SiteTitle         string              `yaml:"siteTitle"`
+	SiteScripts       []string            `yaml:"siteScripts"`
+	Author            string              `yaml:"author"`
+	Copyright         string              `yaml:"copyright"`
+	ThemeURL          string              `yaml:"themeURL"`
+	Socials           []map[string]string `yaml:"socials"`
+	CollectionLayouts []map[string]string `yaml:"collectionLayouts"`
 }
 
 type Frontmatter struct {
@@ -74,11 +76,11 @@ type Parser struct {
 	// Collections stores template data of files in collections
 	CollectionsMap map[template.URL][]TemplateData
 
+	// K-V pair storing the template layout name for a particular collection in the site
+	CollectionsSubPageLayouts map[template.URL]string
+
 	// Stores data parsed from layout/config.yml
 	LayoutConfig LayoutConfig
-
-	// Posts contains the template data of files in the posts directory
-	Posts []TemplateData
 
 	// Stores all the notes
 	Notes map[template.URL]Note
@@ -119,15 +121,9 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 						p.ErrorLogger.Fatal(err)
 					}
 
-					fronmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
-					if parseSuccess {
-						if fronmatter.Type == "post" {
-							if (fronmatter.Draft && p.RenderDrafts) || !fronmatter.Draft {
-								p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
-							}
-						} else {
-							p.AddFile(baseDirPath, fileName, fronmatter, markdownContent, body)
-						}
+					frontmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
+					if parseSuccess && (p.RenderDrafts || !frontmatter.Draft) {
+						p.AddFile(baseDirPath, fileName, frontmatter, markdownContent, body)
 					}
 				} else {
 					helper.CopyFiles(p.SiteDataPath+"content/"+fileName, p.SiteDataPath+"rendered/"+fileName)
@@ -165,11 +161,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		LiveReload:  p.LiveReload,
 	}
 
-	// Adding the page to the merged map storing all site pages
-	if frontmatter.Type == "post" {
-		p.Posts = append(p.Posts, page)
-	}
-
 	p.Templates[template.URL(url)] = page
 
 	// Adding the page to the tags map with the corresponding tags
@@ -179,12 +170,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 
 	}
 
-	// Adding the page to the collections map with the corresponding collections
-	for _, collection := range page.Frontmatter.Collections {
-		collectionsMapKey := "collections/" + collection + ".html"
-		p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], page)
-
-	}
+	p.collectionsParser(page)
 
 	if frontmatter.Type == "note" {
 		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
@@ -246,6 +232,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 	// Parsing YAML frontmatter
 	err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
 	if err != nil {
+		p.ErrorLogger.Println("Error at path: ", path)
 		p.ErrorLogger.Fatal(err)
 	}
 
@@ -328,6 +315,8 @@ func (p *Parser) ParseConfig(inFilePath string) {
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
+
+	p.parseCollectionLayoutEntries()
 }
 
 func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
@@ -361,8 +350,21 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // ParseLayoutFiles Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
-	// Parsing all files in the layout/ dir which match the "*.html" pattern
-	templ, err := template.ParseGlob(p.SiteDataPath + "layout/*.html")
+
+	// Function to check if an element is present in a slice
+	templ := template.New("templates").Funcs(template.FuncMap{
+		"strSliceContains": func(items []string, search string) bool {
+			for _, item := range items {
+				if search == item {
+					return true
+				}
+			}
+			return false
+		},
+	})
+
+	// Parsing all files in the layout/ dir hich match the "*.html" pattern
+	templ, err := templ.ParseGlob(p.SiteDataPath + "layout/*.html")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
@@ -374,4 +376,40 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	}
 
 	return templ
+}
+
+// Adding the page to the collections map with the corresponding collections and sub-collections
+func (p *Parser) collectionsParser(page TemplateData) {
+	// Iterating over all sets of collections defined in the frontmatter
+	for _, collectionSet := range page.Frontmatter.Collections {
+
+		var collections []string
+		// Collections will be nested using > as the separator - "posts>tech>Go"
+		for _, item := range strings.Split(collectionSet, ">") {
+			collections = append(collections, strings.TrimSpace(item))
+		}
+
+		for i := range len(collections) {
+			collectionKey := "collections/"
+			for j := range i + 1 {
+				collectionKey += collections[j]
+				if j != i {
+					collectionKey += "/"
+				}
+
+			}
+			collectionKey += ".html"
+
+			p.CollectionsMap[template.URL(collectionKey)] = append(p.CollectionsMap[template.URL(collectionKey)], page)
+		}
+
+	}
+}
+
+func (p *Parser) parseCollectionLayoutEntries() {
+	for _, pair := range p.LayoutConfig.CollectionLayouts {
+		for collectionURL, layoutName := range pair {
+			p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
+		}
+	}
 }

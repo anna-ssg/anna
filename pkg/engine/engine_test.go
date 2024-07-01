@@ -31,9 +31,9 @@ func TestRenderPage(t *testing.T) {
 				Title:       "Hello",
 				Date:        "2024-03-28",
 				Draft:       false,
-				Type:        "post",
 				Description: "Index page of site",
 				Tags:        []string{"blog", "thoughts"},
+				Layout:      "page",
 			},
 			Body: "<h1>Hello World</h1>",
 		}

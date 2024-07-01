@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"log"
 	"os"
-	"sort"
 	"strings"
 
 	"github.com/anna-ssg/anna/v2/pkg/engine"
@@ -182,14 +181,15 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
-		Templates:      make(map[template.URL]parser.TemplateData, 10),
-		TagsMap:        make(map[template.URL][]parser.TemplateData, 10),
-		CollectionsMap: make(map[template.URL][]parser.TemplateData, 10),
-		Notes:          make(map[template.URL]parser.Note, 10),
-		SiteDataPath:   siteDirPath,
-		ErrorLogger:    log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		RenderDrafts:   cmd.RenderDrafts,
-		LiveReload:     cmd.LiveReload,
+		Templates:                 make(map[template.URL]parser.TemplateData, 10),
+		TagsMap:                   make(map[template.URL][]parser.TemplateData, 10),
+		CollectionsMap:            make(map[template.URL][]parser.TemplateData, 10),
+		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
+		Notes:                     make(map[template.URL]parser.Note, 10),
+		SiteDataPath:              siteDirPath,
+		ErrorLogger:               log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		RenderDrafts:              cmd.RenderDrafts,
+		LiveReload:                cmd.LiveReload,
 	}
 
 	e := engine.Engine{
@@ -214,7 +214,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	fileSystem := os.DirFS(siteDirPath + "content/")
 	p.ParseMDDir(siteDirPath+"content/", fileSystem)
 
-	p.ParseLayoutFiles()
+	templ := p.ParseLayoutFiles()
 
 	// Generate backlinks and validations for notes
 	p.BackLinkParser()
@@ -222,13 +222,9 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	e.DeepDataMerge.Templates = p.Templates
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
+	e.DeepDataMerge.CollectionsSubPageLayouts = p.CollectionsSubPageLayouts
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
-	e.DeepDataMerge.Posts = p.Posts
 	e.DeepDataMerge.Notes = p.Notes
-
-	sort.Slice(e.DeepDataMerge.Posts, func(i, j int) bool {
-		return e.DeepDataMerge.Posts[i].Frontmatter.Date > e.DeepDataMerge.Posts[j].Frontmatter.Date
-	})
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(siteDirPath+"static/", siteDirPath+"rendered/static/")
@@ -255,19 +251,8 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	e.GenerateLinkStore()
 	e.GenerateNoteJSONIdex(siteDirPath)
 
-	templ, err := template.ParseGlob(siteDirPath + "layout/*.html")
-	if err != nil {
-		e.ErrorLogger.Fatalf("%v", err)
-	}
-
-	templ, err = templ.ParseGlob(siteDirPath + "layout/partials/*.html")
-	if err != nil {
-		e.ErrorLogger.Fatalf("%v", err)
-	}
-
 	e.RenderNotes(siteDirPath, templ)
 	e.GenerateNoteRoot(siteDirPath, templ)
-	e.RenderEngineGeneratedFiles(siteDirPath, templ)
 	e.RenderUserDefinedPages(siteDirPath, templ)
 	e.RenderTags(siteDirPath, templ)
 	e.RenderCollections(siteDirPath, templ)

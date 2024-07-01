@@ -66,10 +66,6 @@ func TestAddFileAndRender(t *testing.T) {
 			wantParser.TagsMap[template.URL(tag)] = append(wantParser.TagsMap[template.URL(tag)], wantPage)
 		}
 
-		if sampleFrontmatter.Type == "post" {
-			wantParser.Posts = append(wantParser.Posts, wantPage)
-		}
-
 		gotParser.AddFile("", filename, sampleFrontmatter, markdownContent, sampleBody)
 
 		if !reflect.DeepEqual(gotParser, wantParser) {
@@ -118,7 +114,6 @@ func TestParseMarkdownContent(t *testing.T) {
 				Title:       "Markdown Test",
 				Date:        "2024-03-23",
 				Description: "File containing markdown to test the SSG",
-				Type:        "post",
 			}
 
 			if !reflect.DeepEqual(frontmatterGot, frontmatterWant) {

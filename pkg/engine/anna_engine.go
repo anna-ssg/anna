@@ -174,7 +174,12 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 		go func(collection template.URL, collectionTemplates []parser.TemplateData) {
 			defer wg.Done()
 
-			e.RenderPage(fileOutPath, collection, templ, "collection-subpage")
+			layoutName := e.DeepDataMerge.CollectionsSubPageLayouts[collection]
+			if layoutName == "" {
+				layoutName = "collection-subpage"
+			}
+
+			e.RenderPage(fileOutPath, collection, templ, layoutName)
 		}(collection, collectionTemplates)
 	}
 
