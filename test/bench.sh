@@ -69,8 +69,7 @@ echo -e "\n"
 hyperfine -p 'sync' -w $warm \
   "cd /tmp/bench/11ty && npx @11ty/eleventy" \
   "cd /tmp/bench/hugo && hugo" \
-  "cd /tmp/bench/anna && ./anna" \
+  "cd /tmp/bench/anna && ./anna -r \"site/\"" \
   "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
   "cd /tmp/bench/sapling/benchmark && ./../sapling run"
 echo -e "\n"
-

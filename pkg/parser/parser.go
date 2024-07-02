@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -404,13 +403,14 @@ func (p *Parser) collectionsParser(page TemplateData) {
 
 			var found bool
 			for _, map_page := range p.CollectionsMap[template.URL(collectionKey)] {
-				if reflect.DeepEqual(map_page, page) {
+				if map_page.CompleteURL == page.CompleteURL {
 					found = true
 				}
 			}
 			if !found {
 				p.CollectionsMap[template.URL(collectionKey)] = append(p.CollectionsMap[template.URL(collectionKey)], page)
 			}
+
 		}
 
 	}
