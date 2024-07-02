@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -36,18 +37,19 @@ type LayoutConfig struct {
 }
 
 type Frontmatter struct {
-	Title        string   `yaml:"title"`
-	Date         string   `yaml:"date"`
-	Draft        bool     `yaml:"draft"`
-	JSFiles      []string `yaml:"scripts"`
-	Type         string   `yaml:"type"`
-	Description  string   `yaml:"description"`
-	PreviewImage string   `yaml:"previewimage"`
-	Tags         []string `yaml:"tags"`
-	TOC          bool     `yaml:"toc"`
-	Authors      []string `yaml:"authors"`
-	Collections  []string `yaml:"collections"`
-	Layout       string   `yaml:"layout"`
+	Title        string              `yaml:"title"`
+	Date         string              `yaml:"date"`
+	Draft        bool                `yaml:"draft"`
+	JSFiles      []string            `yaml:"scripts"`
+	Type         string              `yaml:"type"`
+	Description  string              `yaml:"description"`
+	PreviewImage string              `yaml:"previewimage"`
+	Tags         []string            `yaml:"tags"`
+	TOC          bool                `yaml:"toc"`
+	Authors      []string            `yaml:"authors"`
+	Collections  []string            `yaml:"collections"`
+	Layout       string              `yaml:"layout"`
+	CustomFields []map[string]string `yaml:"customFields"`
 
 	// Head is specifically used for
 	// mentioning the head of the notes
@@ -400,7 +402,15 @@ func (p *Parser) collectionsParser(page TemplateData) {
 			}
 			collectionKey += ".html"
 
-			p.CollectionsMap[template.URL(collectionKey)] = append(p.CollectionsMap[template.URL(collectionKey)], page)
+			var found bool
+			for _, map_page := range p.CollectionsMap[template.URL(collectionKey)] {
+				if reflect.DeepEqual(map_page, page) {
+					found = true
+				}
+			}
+			if !found {
+				p.CollectionsMap[template.URL(collectionKey)] = append(p.CollectionsMap[template.URL(collectionKey)], page)
+			}
 		}
 
 	}
