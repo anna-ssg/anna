@@ -58,7 +58,7 @@ func (ws *WizardServer) handleSubmit(w http.ResponseWriter, r *http.Request) {
 		ws.ErrorLogger.Println("Method not allowed")
 		return
 	}
-
+	// got the form data, now ask theme.go to unzip and place in current dir
 	var config parser.LayoutConfig
 	err := json.NewDecoder(r.Body).Decode(&config)
 

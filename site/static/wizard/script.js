@@ -1,3 +1,18 @@
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('https://raw.githubusercontent.com/anna-ssg/themes/main/themes.json')
+    .then(response => response.json())
+    .then(data => {
+      const selectElement = document.getElementById('themeURL');
+      data.themes.forEach(theme => {
+        const option = document.createElement('option');
+        option.value = `${theme.name}`;
+        option.textContent = theme.name;
+        selectElement.appendChild(option);
+      });
+    })
+    .catch(error => console.error('Error fetching themes:', error));
+});
+
 const slides = document.querySelectorAll(".content");
 let currentSlide = 0;
 
@@ -13,9 +28,7 @@ function showSlide(index) {
 
 function updateProgress() {
   const progressContainer = document.querySelector(".progress-container");
-  const oldWidth = window
-    .getComputedStyle(progressContainer)
-    .getPropertyValue("--new-width");
+  const oldWidth = window.getComputedStyle(progressContainer).getPropertyValue("--new-width");
   const newWidth = ((currentSlide + 1) / slides.length) * 100 + "%";
   progressContainer.style.setProperty("--old-width", oldWidth);
   progressContainer.style.setProperty("--new-width", newWidth);
@@ -38,43 +51,34 @@ function checkFormValidity() {
   baseURL = document.getElementById("baseURL").value;
   themeURL = document.getElementById("themeURL").value;
 
-  var nameRegex = /^[a-zA-Z0-9\s]+$/;
-  var urlRegex = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})(\/[^\/\s]+)*$/;
+  const nameRegex = /^[a-zA-Z0-9\s]+$/;
+  const urlRegex = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})(\/[^\/\s]+)*$/;
 
-  var authorButton = document.getElementById("authorButton");
-  var siteTitleButton = document.getElementById("siteTitleButton");
-  var baseURLButton = document.getElementById("baseURLButton");
+  const authorButton = document.getElementById("authorButton");
+  const siteTitleButton = document.getElementById("siteTitleButton");
+  const baseURLButton = document.getElementById("baseURLButton");
 
   authorButton.disabled = !(author && author.match(nameRegex));
   siteTitleButton.disabled = !(siteTitle && siteTitle.match(nameRegex));
   baseURLButton.disabled = !(baseURL && baseURL.match(urlRegex));
 
   // Add or remove 'valid' class based on validity
-  document
-    .getElementById("author")
-    .classList.toggle("valid", author && author.match(nameRegex));
-  document
-    .getElementById("siteTitle")
-    .classList.toggle("valid", siteTitle && siteTitle.match(nameRegex));
-  document
-    .getElementById("baseURL")
-    .classList.toggle("valid", baseURL && baseURL.match(urlRegex));
+  document.getElementById("author").classList.toggle("valid", author && author.match(nameRegex));
+  document.getElementById("siteTitle").classList.toggle("valid", siteTitle && siteTitle.match(nameRegex));
+  document.getElementById("baseURL").classList.toggle("valid", baseURL && baseURL.match(urlRegex));
 }
 
 function submitForm() {
-  var checkboxes = document.querySelectorAll(
-    '.nav-checkboxes input[type="checkbox"]',
-  );
-
-  var navbarOptions = Array.from(checkboxes)
-    .filter((checkbox) => checkbox.checked)
-    .map((checkbox) => {
-      navbarElementsMap = {};
+  const checkboxes = document.querySelectorAll('.nav-checkboxes input[type="checkbox"]');
+  const navbarOptions = Array.from(checkboxes)
+    .filter(checkbox => checkbox.checked)
+    .map(checkbox => {
+      let navbarElementsMap = {};
       navbarElementsMap[checkbox.className] = checkbox.value;
       return navbarElementsMap;
     });
 
-  var formData = JSON.stringify({
+  const formData = JSON.stringify({
     author: author,
     siteTitle: siteTitle,
     baseURL: baseURL,
@@ -88,174 +92,35 @@ function submitForm() {
   fetch("/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: formData,
-  });
-
-  tsParticles.load({
-    id: "tsparticles",
-    options: {
-      fullScreen: {
-        zIndex: 1,
-      },
-      emitters: [
-        {
-          position: {
-            x: 0,
-            y: 30,
-          },
-          rate: {
-            quantity: 5,
-            delay: 0.15,
-          },
-          particles: {
-            move: {
-              direction: "top-right",
-              outModes: {
-                top: "none",
-                left: "none",
-                default: "destroy",
-              },
-            },
-          },
-        },
-        {
-          position: {
-            x: 100,
-            y: 30,
-          },
-          rate: {
-            quantity: 5,
-            delay: 0.15,
-          },
-          particles: {
-            move: {
-              direction: "top-left",
-              outModes: {
-                top: "none",
-                right: "none",
-                default: "destroy",
-              },
-            },
-          },
-        },
-      ],
-      particles: {
-        color: {
-          value: ["#ffffff", "#FF0000"],
-        },
-        move: {
-          decay: 0.05,
-          direction: "top",
-          enable: true,
-          gravity: {
-            enable: true,
-          },
-          outModes: {
-            top: "none",
-            default: "destroy",
-          },
-          speed: {
-            min: 10,
-            max: 50,
-          },
-        },
-        number: {
-          value: 0,
-        },
-        opacity: {
-          value: 1,
-        },
-        rotate: {
-          value: {
-            min: 0,
-            max: 360,
-          },
-          direction: "random",
-          animation: {
-            enable: true,
-            speed: 30,
-          },
-        },
-        tilt: {
-          direction: "random",
-          enable: true,
-          value: {
-            min: 0,
-            max: 360,
-          },
-          animation: {
-            enable: true,
-            speed: 30,
-          },
-        },
-        size: {
-          value: {
-            min: 0,
-            max: 2,
-          },
-          animation: {
-            enable: true,
-            startValue: "min",
-            count: 1,
-            speed: 16,
-            sync: true,
-          },
-        },
-        roll: {
-          darken: {
-            enable: true,
-            value: 25,
-          },
-          enable: true,
-          speed: {
-            min: 5,
-            max: 15,
-          },
-        },
-        wobble: {
-          distance: 30,
-          enable: true,
-          speed: {
-            min: -7,
-            max: 7,
-          },
-        },
-        shape: {
-          type: "emoji",
-          options: {
-            emoji: {
-              particles: {
-                size: {
-                  value: 8,
-                },
-              },
-              value: ["🍚"],
-            },
-          },
-        },
-      },
-    },
-  });
-
-  tsParticles.load("confetti", confettiSettings);
-  currentSlide = currentSlide + 1;
-  updateProgress();
-  setTimeout(() => {
-    window.location.href = "http://localhost:8000";
-  }, 2000);
+    body: formData
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Submit response:', data);
+      // Redirect after successful submission (example: reload or redirect to another page)
+      setTimeout(() => {
+        window.location.href = "http://localhost:8000"; // Change URL as needed
+      }, 2000); // 2 seconds delay before redirecting
+    })
+    .catch(error => {
+      console.error('Error submitting form:', error);
+      // Handle errors here
+    });
 }
 
-showSlide(0);
+// Initialize the wizard by showing the first slide
+showSlide(currentSlide);
 
 // Add event listeners to call checkFormValidity when input fields change
 document.getElementById("author").addEventListener("input", checkFormValidity);
-document
-  .getElementById("siteTitle")
-  .addEventListener("input", checkFormValidity);
+document.getElementById("siteTitle").addEventListener("input", checkFormValidity);
 document.getElementById("baseURL").addEventListener("input", checkFormValidity);
-document
-  .getElementById("themeURL")
-  .addEventListener("input", checkFormValidity);
+document.getElementById("themeURL").addEventListener("input", checkFormValidity);
 
 // Confetti animation
 const confettiSettings = {
@@ -280,3 +145,6 @@ const confettiSettings = {
     },
   },
 };
+
+// Load confetti particles
+tsParticles.load("confetti", confettiSettings);
