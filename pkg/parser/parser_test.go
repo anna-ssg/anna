@@ -124,7 +124,7 @@ func TestParseMarkdownContent(t *testing.T) {
 }
 
 func TestParseConfig(t *testing.T) {
-	t.Run("unmarshal `config.yml` to LayoutConfig", func(t *testing.T) {
+	t.Run("unmarshal `config.json` to LayoutConfig", func(t *testing.T) {
 		gotParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
@@ -144,7 +144,7 @@ func TestParseConfig(t *testing.T) {
 			Author:    "Anna",
 		}
 
-		gotParser.ParseConfig(TestDirPath + "layout/config.yml")
+		gotParser.ParseConfig(TestDirPath + "layout/config.json")
 
 		if !reflect.DeepEqual(gotParser.LayoutConfig, wantLayout) {
 			t.Errorf("got \n%v want \n%v", gotParser.LayoutConfig, wantLayout)

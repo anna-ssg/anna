@@ -1,9 +1,0 @@
-navbar:
-  - Index: index.html
-  - Docs: docs.html
-  - Tags: tags.html
-  - Posts: posts.html
-baseURL: example.org
-siteTitle: ssg
-siteScripts:
-author: Anna

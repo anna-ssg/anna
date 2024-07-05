@@ -31,7 +31,7 @@ func main() {
 				RenderSpecificSite: renderSpecificSite,
 				ServeSpecificSite:  serve,
 				ErrorLogger:        log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-				InfoLogger:         log.New(os.Stderr, "LOG\t", log.Ldate|log.Ltime|log.Lshortfile),
+				InfoLogger:         log.New(os.Stderr, "LOG\t", log.Ldate|log.Ltime),
 			}
 
 			if serve != "" {
@@ -61,9 +61,9 @@ func main() {
 				if err := server.Stop(); err != nil {
 					annaCmd.InfoLogger.Println(err)
 				}
-				annaCmd.VanillaRenderManager()
 				annaCmd.LiveReloadManager()
 			}
+
 			annaCmd.VanillaRenderManager()
 		},
 	}

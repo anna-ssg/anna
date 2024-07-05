@@ -1,6 +1,7 @@
 package anna
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"github.com/anna-ssg/anna/v2/pkg/engine"
 	"github.com/anna-ssg/anna/v2/pkg/helpers"
 	"github.com/anna-ssg/anna/v2/pkg/parser"
-	"gopkg.in/yaml.v3"
 )
 
 type Cmd struct {
@@ -25,7 +25,7 @@ type Cmd struct {
 }
 
 type AnnaConfig struct {
-	SiteDataPaths []map[string]string `yaml:"siteDataPaths"`
+	SiteDataPaths map[string]string `json:"siteDataPaths"`
 }
 
 func (cmd *Cmd) VanillaRenderManager() {
@@ -33,21 +33,21 @@ func (cmd *Cmd) VanillaRenderManager() {
 	// Check if the configuration file exists
 	// If it does not, render only the site/ directory
 
-	_, err := os.Stat("anna.yml")
+	_, err := os.Stat("anna.json")
 	if os.IsNotExist(err) {
 		cmd.VanillaRender("site/")
 		return
 	}
 
 	// Read and parse the configuration file
-	annaConfigFile, err := os.ReadFile("anna.yml")
+	annaConfigFile, err := os.ReadFile("anna.json")
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
 
 	var annaConfig AnnaConfig
 
-	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	err = json.Unmarshal(annaConfigFile, &annaConfig)
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
@@ -56,13 +56,11 @@ func (cmd *Cmd) VanillaRenderManager() {
 	if cmd.RenderSpecificSite == "" {
 		siteRendered := false
 
-		for _, sites := range annaConfig.SiteDataPaths {
-			for _, path := range sites {
-				if !siteRendered {
-					siteRendered = true
-				}
-				cmd.VanillaRender(path)
+		for _, path := range annaConfig.SiteDataPaths {
+			if !siteRendered {
+				siteRendered = true
 			}
+			cmd.VanillaRender(path)
 		}
 
 		// If no site has been rendered due to empty "anna.yml", render the default "site/" path
@@ -72,12 +70,10 @@ func (cmd *Cmd) VanillaRenderManager() {
 	} else {
 		siteRendered := false
 
-		for _, sites := range annaConfig.SiteDataPaths {
-			for _, sitePath := range sites {
-				if strings.Compare(cmd.RenderSpecificSite, sitePath) == 0 {
-					cmd.VanillaRender(sitePath)
-					siteRendered = true
-				}
+		for _, sitePath := range annaConfig.SiteDataPaths {
+			if strings.Compare(cmd.RenderSpecificSite, sitePath) == 0 {
+				cmd.VanillaRender(sitePath)
+				siteRendered = true
 			}
 		}
 
@@ -96,21 +92,21 @@ func (cmd *Cmd) ValidateHTMLManager() {
 	// Check if the configuration file exists
 	// If it does not, validate only the site/ directory
 
-	_, err := os.Stat("anna.yml")
+	_, err := os.Stat("anna.json")
 	if os.IsNotExist(err) {
 		cmd.VanillaRender("site/")
 		return
 	}
 
 	// Read and parse the configuration file
-	annaConfigFile, err := os.ReadFile("anna.yml")
+	annaConfigFile, err := os.ReadFile("anna.json")
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
 
 	var annaConfig AnnaConfig
 
-	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	err = json.Unmarshal(annaConfigFile, &annaConfig)
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
@@ -118,12 +114,10 @@ func (cmd *Cmd) ValidateHTMLManager() {
 	// Validating sites
 	validatedSites := false
 
-	for _, sites := range annaConfig.SiteDataPaths {
-		for _, sitePath := range sites {
-			cmd.ValidateHTMLContent(sitePath)
-			if !validatedSites {
-				validatedSites = true
-			}
+	for _, sitePath := range annaConfig.SiteDataPaths {
+		cmd.ValidateHTMLContent(sitePath)
+		if !validatedSites {
+			validatedSites = true
 		}
 	}
 
@@ -139,21 +133,21 @@ func (cmd *Cmd) LiveReloadManager() {
 	// Check if the configuration file exists
 	// If it does not, serve only the site/ directory
 
-	_, err := os.Stat("anna.yml")
+	_, err := os.Stat("anna.json")
 	if os.IsNotExist(err) {
 		cmd.StartLiveReload("site/")
 		return
 	}
 
 	// Read and parse the configuration file
-	annaConfigFile, err := os.ReadFile("anna.yml")
+	annaConfigFile, err := os.ReadFile("anna.json")
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
 
 	var annaConfig AnnaConfig
 
-	err = yaml.Unmarshal(annaConfigFile, &annaConfig)
+	err = json.Unmarshal(annaConfigFile, &annaConfig)
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
@@ -162,12 +156,10 @@ func (cmd *Cmd) LiveReloadManager() {
 	if cmd.ServeSpecificSite == "" {
 		cmd.StartLiveReload("site/")
 	} else {
-		for _, sites := range annaConfig.SiteDataPaths {
-			for _, sitePath := range sites {
-				if strings.Compare(cmd.ServeSpecificSite, sitePath) == 0 {
-					cmd.StartLiveReload(sitePath)
-					return
-				}
+		for _, sitePath := range annaConfig.SiteDataPaths {
+			if strings.Compare(cmd.ServeSpecificSite, sitePath) == 0 {
+				cmd.StartLiveReload(sitePath)
+				return
 			}
 		}
 
@@ -205,7 +197,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 
 	helper.CreateRenderedDir(siteDirPath)
 
-	p.ParseConfig(siteDirPath + "layout/config.yml")
+	p.ParseConfig(siteDirPath + "layout/config.json")
 	p.ParseRobots(siteDirPath+"layout/robots.txt", siteDirPath+"rendered/robots.txt")
 
 	fileSystem := os.DirFS(siteDirPath + "content/")

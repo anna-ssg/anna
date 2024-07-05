@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"io/fs"
 	"log"
@@ -24,15 +25,15 @@ import (
 )
 
 type LayoutConfig struct {
-	Navbar            []map[string]string `yaml:"navbar"`
-	BaseURL           string              `yaml:"baseURL"`
-	SiteTitle         string              `yaml:"siteTitle"`
-	SiteScripts       []string            `yaml:"siteScripts"`
-	Author            string              `yaml:"author"`
-	Copyright         string              `yaml:"copyright"`
-	ThemeURL          string              `yaml:"themeURL"`
-	Socials           []map[string]string `yaml:"socials"`
-	CollectionLayouts []map[string]string `yaml:"collectionLayouts"`
+	Navbar            []map[string]string `json:"navbar"`
+	BaseURL           string              `json:"baseURL"`
+	SiteTitle         string              `json:"siteTitle"`
+	SiteScripts       []string            `json:"siteScripts"`
+	Author            string              `json:"author"`
+	Copyright         string              `json:"copyright"`
+	ThemeURL          string              `json:"themeURL"`
+	Socials           map[string]string   `json:"socials"`
+	CollectionLayouts map[string]string   `json:"collectionLayouts"`
 }
 
 type Frontmatter struct {
@@ -275,8 +276,9 @@ func (p *Parser) ParseConfig(inFilePath string) {
 		p.ErrorLogger.Fatal(err)
 	}
 
-	err = yaml.Unmarshal(configFile, &p.LayoutConfig)
+	err = json.Unmarshal(configFile, &p.LayoutConfig)
 	if err != nil {
+		p.ErrorLogger.Println("Error at: ", inFilePath)
 		p.ErrorLogger.Fatal(err)
 	}
 
@@ -380,9 +382,7 @@ func (p *Parser) collectionsParser(page TemplateData) {
 }
 
 func (p *Parser) parseCollectionLayoutEntries() {
-	for _, pair := range p.LayoutConfig.CollectionLayouts {
-		for collectionURL, layoutName := range pair {
-			p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
-		}
+	for collectionURL, layoutName := range p.LayoutConfig.CollectionLayouts {
+		p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
 	}
 }

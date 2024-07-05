@@ -8,6 +8,10 @@ serve:
 	@echo "anna: serving site"
 	@go build
 	@./anna -s "site/"
+wizard:
+	@echo "anna: running wizard"
+	@go build
+	@./anna -w
 tests:
 	@echo "anna: running all tests"
 	@go test ./...

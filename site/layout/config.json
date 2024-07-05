@@ -1,0 +1,40 @@
+{
+  "navbar": [
+    {
+      "Index": "index.html"
+    },
+    {
+      "Quick Start": "quick-start.html"
+    },
+    {
+      "Docs": "docs.html"
+    },
+    {
+      "Dev Guide": "developer-guide.html"
+    },
+    {
+      "Tags": "tags.html"
+    },
+    {
+      "Collections": "collections.html"
+    },
+    {
+      "Posts": "collections/posts.html"
+    },
+    {
+      "Anna Blog": "posts/building-anna/index.html"
+    }
+  ],
+  "baseURL": "https://anna-docs.netlify.app",
+  "siteTitle": "anna-docs",
+  "siteScripts": null,
+  "author": "anna",
+  "themeURL": "/static/style.css",
+  "copyright": "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.",
+  "socials": {
+    "Github": "https://github.com/anna-ssg/anna"
+  },
+  "collectionLayouts": {
+    "collections/posts.html": "all-posts"
+  }
+}

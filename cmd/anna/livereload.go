@@ -35,7 +35,7 @@ func newLiveReload(siteDataPath string) *liveReload {
 		errorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		fileTimes:    make(map[string]time.Time),
 		rootDirs:     []string{siteDataPath},
-		extensions:   []string{".go", ".md", ".yml"},
+		extensions:   []string{".go", ".md", ".json"},
 		siteDataPath: siteDataPath,
 	}
 	return &lr

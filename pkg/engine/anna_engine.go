@@ -81,6 +81,9 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	e.DeepDataMerge.Tags = make(map[template.URL]parser.TemplateData)
 
 	for tag := range e.DeepDataMerge.TagsMap {
+		slices.SortFunc(e.DeepDataMerge.TagsMap[tag], func(a, b parser.TemplateData) int {
+			return cmp.Compare(b.Date, a.Date)
+		})
 		tagString := string(tag)
 		tagString, _ = strings.CutPrefix(tagString, "tags/")
 		tagString, _ = strings.CutSuffix(tagString, ".html")
@@ -139,7 +142,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 		CollectionNames: collectionNames,
 	}
 
-	// Rendering the page displaying all tags
+	// Rendering the page displaying all collections
 	err := templ.ExecuteTemplate(&collectionsBuffer, "all-collections", collectionTemplateData)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
@@ -157,6 +160,10 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 	e.DeepDataMerge.Collections = make(map[template.URL]parser.TemplateData)
 
 	for collection := range e.DeepDataMerge.CollectionsMap {
+		slices.SortFunc(e.DeepDataMerge.CollectionsMap[collection], func(a, b parser.TemplateData) int {
+			return cmp.Compare(b.Date, a.Date)
+		})
+
 		collectionString := string(collection)
 		collectionString, _ = strings.CutPrefix(collectionString, "collections/")
 		collectionString, _ = strings.CutSuffix(collectionString, ".html")
@@ -297,7 +304,6 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("   <lastBuildDate>" + time.Now().Format(time.RFC1123Z) + "</lastBuildDate>\n")
 	buffer.WriteString("   <atom:link href=\"" + e.DeepDataMerge.LayoutConfig.BaseURL + "/feed.xml\" rel=\"self\" type=\"application/rss+xml\" />\n")
 
-	// slice
 	var posts []parser.TemplateData
 	for _, templateData := range e.DeepDataMerge.Templates {
 		if !templateData.Frontmatter.Draft {
@@ -306,8 +312,8 @@ func (e *Engine) GenerateFeed() {
 	}
 
 	// sort by publication date
-	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Date > posts[j].Date // assuming Date is Unix timestamp
+	slices.SortFunc(posts, func(a, b parser.TemplateData) int {
+		return cmp.Compare(b.Date, a.Date) // assuming Date is Unix timestamp
 	})
 
 	// Iterate over sorted posts

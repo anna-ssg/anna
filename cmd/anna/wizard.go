@@ -4,43 +4,47 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v3"
+	"github.com/anna-ssg/anna/v2/pkg/parser"
 )
 
-type Config struct {
-	BaseURL     string   `yaml:"baseURL"`
-	SiteTitle   string   `yaml:"siteTitle"`
-	SiteScripts []string `yaml:"siteScripts"`
-	Author      string   `yaml:"author"`
-	ThemeURL    string   `yaml:"themeURL"`
-	Navbar      []string `yaml:"navbar"`
+type WizardServer struct {
+	server   *http.Server
+	serveMux *http.ServeMux
+
+	// Common logger for all parser functions
+	InfoLogger *log.Logger
+	// Common logger for all parser functions
+	ErrorLogger *log.Logger
 }
 
-type WizardServer struct {
-	server *http.Server
-}
+var FormSubmittedCh = make(chan struct{})
 
 func NewWizardServer(addr string) *WizardServer {
-	return &WizardServer{
-		server: &http.Server{
-			Addr: addr,
-		},
+	serveMuxLocal := http.NewServeMux()
+
+	wizardServer := WizardServer{
+		serveMux:    serveMuxLocal,
+		server:      &http.Server{Addr: addr, Handler: serveMuxLocal},
+		InfoLogger:  log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime),
+		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
+
+	return &wizardServer
 }
 
 func (ws *WizardServer) Start() {
-	http.HandleFunc("/submit", ws.handleSubmit)
+	ws.serveMux.HandleFunc("/submit", ws.handleSubmit)
 	fs := http.FileServer(http.Dir("./site/static/wizard"))
-	http.Handle("/", fs)
-	fmt.Printf("Wizard is running at: http://localhost%s\n", ws.server.Addr)
+	ws.serveMux.Handle("/", fs)
+	ws.InfoLogger.Printf("Wizard is running at: http://localhost%s\n", ws.server.Addr)
+
 	if err := ws.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("Could not start server: %v", err)
+		ws.ErrorLogger.Fatalf("Could not start server: %v", err)
 	}
 }
 
@@ -51,44 +55,47 @@ func (ws *WizardServer) Stop() error {
 func (ws *WizardServer) handleSubmit(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		ws.ErrorLogger.Println("Method not allowed")
 		return
 	}
-	var config Config
+
+	var config parser.LayoutConfig
 	err := json.NewDecoder(r.Body).Decode(&config)
+
+	err = ws.writeConfigToFile(config)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	err = writeConfigToFile(config)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ws.ErrorLogger.Println(err)
 		return
 	}
 	FormSubmittedCh <- struct{}{}
 }
 
-func writeConfigToFile(config Config) error {
-	configFilePath := "./site/layout/config.yml"
+func (ws *WizardServer) writeConfigToFile(config parser.LayoutConfig) error {
+	configFilePath := "./site/layout/config.json"
 	if err := os.MkdirAll(filepath.Dir(configFilePath), 0755); err != nil {
 		return err
 	}
 
-	file, err := os.Create(configFilePath)
+	marshaledJsonConfig, err := json.Marshal(config)
+	if err != nil {
+		ws.ErrorLogger.Fatal(err)
+	}
+
+	configFile, err := os.Create(configFilePath)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		err = file.Close()
+		err = configFile.Close()
 		if err != nil {
-			log.Fatal(err)
+			ws.ErrorLogger.Fatal(err)
 		}
 	}()
+	os.WriteFile(configFilePath, marshaledJsonConfig, 0666)
 
-	// Encode the config into YAML format and write it to the file.
-	if err := yaml.NewEncoder(file).Encode(&config); err != nil {
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
-
-var FormSubmittedCh = make(chan struct{})
