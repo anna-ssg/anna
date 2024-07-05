@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 const slides = document.querySelectorAll(".content");
 let currentSlide = 0;
-
-// Declare global variables
 let author, siteTitle, baseURL, themeURL;
 
 function showSlide(index) {
@@ -50,19 +48,14 @@ function checkFormValidity() {
   siteTitle = document.getElementById("siteTitle").value;
   baseURL = document.getElementById("baseURL").value;
   themeURL = document.getElementById("themeURL").value;
-
   const nameRegex = /^[a-zA-Z0-9\s]+$/;
   const urlRegex = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})(\/[^\/\s]+)*$/;
-
   const authorButton = document.getElementById("authorButton");
   const siteTitleButton = document.getElementById("siteTitleButton");
   const baseURLButton = document.getElementById("baseURLButton");
-
   authorButton.disabled = !(author && author.match(nameRegex));
   siteTitleButton.disabled = !(siteTitle && siteTitle.match(nameRegex));
   baseURLButton.disabled = !(baseURL && baseURL.match(urlRegex));
-
-  // Add or remove 'valid' class based on validity
   document.getElementById("author").classList.toggle("valid", author && author.match(nameRegex));
   document.getElementById("siteTitle").classList.toggle("valid", siteTitle && siteTitle.match(nameRegex));
   document.getElementById("baseURL").classList.toggle("valid", baseURL && baseURL.match(urlRegex));
@@ -86,31 +79,41 @@ function submitForm() {
     navbar: navbarOptions,
   });
 
-  console.log(formData);
+  const confettiSettings = {
+    particles: {
+      number: {
+        value: 10,
+      },
+      size: {
+        value: 2,
+      },
+      shape: {
+        type: "circle",
+      },
+      move: {
+        speed: 6,
+      },
+      color: {
+        value: "#00FFFF",
+      },
+      opacity: {
+        value: 0.8,
+      },
+    },
+  };
 
+  tsParticles.load("confetti", confettiSettings);
   showSlide(slides.length - 1);
+
+  setTimeout(() => {
+    window.location.href = "http://localhost:8000"; // Change URL as needed
+  }, 2000); // 2 seconds delay before redirecting
+
   fetch("/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: formData
   })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Submit response:', data);
-      // Redirect after successful submission (example: reload or redirect to another page)
-      setTimeout(() => {
-        window.location.href = "http://localhost:8000"; // Change URL as needed
-      }, 2000); // 2 seconds delay before redirecting
-    })
-    .catch(error => {
-      console.error('Error submitting form:', error);
-      // Handle errors here
-    });
 }
 
 // Initialize the wizard by showing the first slide
@@ -121,30 +124,3 @@ document.getElementById("author").addEventListener("input", checkFormValidity);
 document.getElementById("siteTitle").addEventListener("input", checkFormValidity);
 document.getElementById("baseURL").addEventListener("input", checkFormValidity);
 document.getElementById("themeURL").addEventListener("input", checkFormValidity);
-
-// Confetti animation
-const confettiSettings = {
-  particles: {
-    number: {
-      value: 10,
-    },
-    size: {
-      value: 2,
-    },
-    shape: {
-      type: "circle",
-    },
-    move: {
-      speed: 6,
-    },
-    color: {
-      value: "#00FFFF",
-    },
-    opacity: {
-      value: 0.8,
-    },
-  },
-};
-
-// Load confetti particles
-tsParticles.load("confetti", confettiSettings);
