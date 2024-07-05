@@ -11,9 +11,7 @@ import (
 	"time"
 )
 
-var reloadPage = make(chan struct{})
-
-var countRequests atomic.Int32
+var reloadPageBool atomic.Bool
 
 type liveReload struct {
 	errorLogger *log.Logger
@@ -50,7 +48,7 @@ func (cmd *Cmd) StartLiveReload(siteDataPath string) {
 		for _, rootDir := range lr.rootDirs {
 			if lr.traverseDirectory(rootDir) {
 				cmd.VanillaRender(lr.siteDataPath)
-				reloadPage <- struct{}{}
+				reloadPageBool.CompareAndSwap(false, true)
 			}
 		}
 		if !lr.serverRunning {
@@ -115,8 +113,6 @@ func (lr *liveReload) startServer(addr string) {
 }
 
 func eventsHandler(w http.ResponseWriter, r *http.Request) {
-	countRequests.Add(1)
-
 	// Set CORS headers to allow all origins.
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Expose-Headers", "Content-Type")
@@ -125,10 +121,7 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	if countRequests.Load() == 1 {
-		<-reloadPage
-	} else {
-		countRequests.Store(countRequests.Load() - 1)
+	if !reloadPageBool.Load() {
 		return
 	}
 
@@ -139,5 +132,5 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.(http.Flusher).Flush()
 
-	countRequests.Store(countRequests.Load() - 1)
+	reloadPageBool.CompareAndSwap(true, false)
 }
