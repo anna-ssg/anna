@@ -40,7 +40,6 @@ type Frontmatter struct {
 	Date         string              `yaml:"date"`
 	Draft        bool                `yaml:"draft"`
 	JSFiles      []string            `yaml:"scripts"`
-	Type         string              `yaml:"type"`
 	Description  string              `yaml:"description"`
 	PreviewImage string              `yaml:"previewimage"`
 	Tags         []string            `yaml:"tags"`
@@ -49,10 +48,6 @@ type Frontmatter struct {
 	Collections  []string            `yaml:"collections"`
 	Layout       string              `yaml:"layout"`
 	CustomFields []map[string]string `yaml:"customFields"`
-
-	// Head is specifically used for
-	// mentioning the head of the notes
-	Head bool `yaml:"head"`
 }
 
 // TemplateData This struct holds all of the data required to render any page of the site
@@ -83,10 +78,6 @@ type Parser struct {
 	// Stores data parsed from layout/config.yml
 	LayoutConfig LayoutConfig
 
-	// Stores all the notes
-	Notes map[template.URL]Note
-
-	// TODO: Look into the two below fields into a single one
 	MdFilesName []string
 	MdFilesPath []string
 
@@ -172,34 +163,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	}
 
 	p.collectionsParser(page)
-
-	if frontmatter.Type == "note" {
-		markdownContent = strings.TrimFunc(markdownContent, func(r rune) bool {
-			return r == '\n' || r == '\t'
-		})
-
-		// trim the content up to n characters
-
-		if len(markdownContent) > 200 {
-			markdownContent = markdownContent[:200]
-		}
-
-		note := Note{
-			CompleteURL:  template.URL(url),
-			Date:         date,
-			Frontmatter:  frontmatter,
-			Body:         template.HTML(body),
-			MarkdownBody: markdownContent,
-			// preallocating the slice
-			LinkedNoteURLs: make([]template.URL, 0, 5),
-			LiveReload:     p.LiveReload,
-		}
-
-		p.Notes[note.CompleteURL] = note
-
-		// NOTE: not adding the template urls of referenced ntoes
-		// rather, will populate it while links
-	}
 }
 
 func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmatter, string, string, bool) {

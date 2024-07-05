@@ -303,8 +303,7 @@ h6 {
     padding: 0.3rem;
 }
 
-.posts,
-.notes {
+.posts {
     display: flex;
     flex-direction: column;
     /* align-items: center; */
@@ -338,8 +337,7 @@ h6 {
     margin-bottom: 1rem;
 }
 
-.post-card-div,
-.notes-card-div {
+.post-card-div {
     color: var(--color-text-dim);
     display: grid;
 

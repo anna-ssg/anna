@@ -5,7 +5,6 @@
 
     <article>
         <section class="body">
-            {{ if eq $PageData.Frontmatter.Type "post" }}
             <div class="post-description">
                 <h1>{{ $PageData.Frontmatter.Title }}</h1>
                 <div class="authors-paceholder">
@@ -29,8 +28,6 @@
                     {{end}}
                 </div>
             </div>
-            {{ else }}
-            {{ end }}
             {{$PageData.Body}}
         </section>
     </article>

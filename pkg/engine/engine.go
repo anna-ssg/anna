@@ -34,12 +34,6 @@ type DeepDataMerge struct {
 	// K-V pair storing the template layout name for a particular collection in the site
 	CollectionsSubPageLayouts map[template.URL]string
 
-	//Stores all the notes
-	Notes map[template.URL]parser.Note
-
-	//Stores the links of each note to other notes
-	LinkStore map[template.URL][]*parser.Note
-
 	// Stores the index generated for search functionality
 	JSONIndex map[template.URL]JSONIndexTemplate
 }

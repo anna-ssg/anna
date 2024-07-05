@@ -185,7 +185,6 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 		TagsMap:                   make(map[template.URL][]parser.TemplateData, 10),
 		CollectionsMap:            make(map[template.URL][]parser.TemplateData, 10),
 		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
-		Notes:                     make(map[template.URL]parser.Note, 10),
 		SiteDataPath:              siteDirPath,
 		ErrorLogger:               log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		RenderDrafts:              cmd.RenderDrafts,
@@ -199,8 +198,6 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
 	e.DeepDataMerge.CollectionsMap = make(map[template.URL][]parser.TemplateData, 10)
-	e.DeepDataMerge.Notes = make(map[template.URL]parser.Note, 10)
-	e.DeepDataMerge.LinkStore = make(map[template.URL][]*parser.Note, 10)
 
 	helper := helpers.Helper{
 		ErrorLogger: e.ErrorLogger,
@@ -216,15 +213,11 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 
 	templ := p.ParseLayoutFiles()
 
-	// Generate backlinks and validations for notes
-	p.BackLinkParser()
-
 	e.DeepDataMerge.Templates = p.Templates
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
 	e.DeepDataMerge.CollectionsSubPageLayouts = p.CollectionsSubPageLayouts
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
-	e.DeepDataMerge.Notes = p.Notes
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(siteDirPath+"static/", siteDirPath+"rendered/static/")
@@ -248,11 +241,6 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	e.GenerateFeed()
 	e.GenerateJSONIndex(siteDirPath)
 
-	e.GenerateLinkStore()
-	e.GenerateNoteJSONIdex(siteDirPath)
-
-	e.RenderNotes(siteDirPath, templ)
-	e.GenerateNoteRoot(siteDirPath, templ)
 	e.RenderUserDefinedPages(siteDirPath, templ)
 	e.RenderTags(siteDirPath, templ)
 	e.RenderCollections(siteDirPath, templ)

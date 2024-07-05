@@ -36,9 +36,6 @@ site1
 ├── content
 │   ├── docs.md
 │   ├── index.md*
-│   ├── notes
-│   │   └── anna
-│   │       └── zettelkasten.md
 │   ├── sub0folder
 │   │   ├── bench.md
 │   │   ├── building-anna
@@ -54,8 +51,6 @@ site1
 │   ├── collection-subpage.html*
 │   ├── collections.html*
 │   ├── config.yml*
-│   ├── note.html*
-│   ├── notes.html*
 │   ├── page.html*
 │   ├── partials
 │   │   ├── head.html
@@ -93,7 +88,6 @@ Anna must be run from the parent of the site/ dir
 
 - The markdown content for the site is stored in `content/`. It can contain subdirectories along with images as the folder is recursively rendered.
   - The contents of this dir is rendered to the root of `rendered/`
-  - The `notes/` folder holds markdown notes which are rendered by a different process and include various note-specific features
 - Static assets such as fonts are stored in `static/`
 - Scripts are stored in the `scripts/` dir in `static/`
 - The layout of the site is configured using html files in `layout/`
@@ -131,8 +125,6 @@ The `{{.PageURL}}` is of the form `index.html`, `collections/tech/go.html` and s
 - `{{.DeepDataMerge.CollectionsMap}}` - A map that stores a slice of templates of all pages for a particular collection url
 - `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site (primarily used for search and graphing of tags)
 - `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.yml`
-- `{{.DeepDataMerge.LinkStore}}` - Stores a map which contains a slice of pointers to the _linked notes_.
-- `{{.DeepDataMerge.Notes}}` - Stores a slice of the template data of all notes
 - `{{.DeepDataMerge.Templates}}` - A map that stores the template data of all the pages of the site for the particular url(the URL is the PageURL for the speicified page)
 - `{{.DeepDataMerge.Tags}}` - A map that stores the template data of the tag sub-pages for a particular tag url
 - `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all pages for a particular tag url
@@ -193,16 +185,12 @@ anna will throw an error if a page does not contain frontmatter or if the `title
 - `date`: The date of the current page
 - `description`: Stores the description of the current post previewed in html layouts
 - `draft`: When set to 'true', the current page is not rendered unless the '-d' flag is used
-- `head`: Users need to manually specify head of the zettel in the frontmatter. Only head notes will be a part of `notes.html`
 - `layout`: Stores the layout file (\*.html) to be used to render the current page
 - `previewimage`: Stores the preview image of the current page
 - `scripts`: Stores the page-level scripts to be added
 - `tags`: Stores the tags of the particular page
 - `title` : The title of the current page
 - `toc`: When set to 'true', a table of contents is rendered for the current page
-- `type`:
-  - Sets the type of the page
-  - Use type `note` for notes
 
 ---
 
@@ -270,7 +258,6 @@ navbar:
   - Dev Guide: developer-guide.html
   - Tags: tags.html
   - Collections: collections.html
-  - Notes: notes.html
   - Posts: collections/posts.html
   - Anna Blog: posts/building-anna/index.html
 
@@ -294,30 +281,5 @@ copyright: "This work is licensed under a Creative Commons Attribution-NonCommer
 collectionLayouts:
   - collections/posts.html: all-posts
 ```
-
----
-
-## Notes
-
-Anna provides users with functionality of maintaining notes and sharing them. Notes opens another set of functionality for anna. Users can create under the `site/notes` directory. Besides similar use cases as a post, notes can be short snippets of information, code or even some kind of list that the users want. It supports some important aspects of [zettelkasten](https://zettelkasten.de/overview/) where users can link notes to each other, and organise similar pages in a zettel.
-
-We aren't trying to re-invent the process of making an editor that helps users maintain these zettels as there are already some fantastic applications, namely [Obsidian](https://obsidian.md/), [Ginko Writer](https://app.gingkowriter.com) and [Evergreen Notes](https://evergreennotes.com/). Our application as a rather needs to provide a generator to stitch these notes together to make it accessible on the site.
-
-### Notes directory structure
-
-```text
-/notes
-├── /zettel A
-└── /zettel B
-    ├── note A
-    ├── note B
-    └── note C
-```
-
-### Linking Notes
-
-Notes can be linked by using callouts in markdown files such as `[[]]`. The parser will validate these links during the runtime. It checks whether there are existing valid notes with a title matching the content of the callout. If not an error is thrown and you wont be able to compile the site.
-
-For example. If you have a note with the title `Note A` and you would like to reference it else where in another note (could even be part of another zettel). Then `[[Note A]]` would be the appropriate callout to use it.
 
 ---
