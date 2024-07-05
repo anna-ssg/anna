@@ -12,7 +12,7 @@ import (
 
 var (
 	baseURL = "https://github.com/anna-ssg/themes/releases/download"
-	tagVer  = "v2.0"
+	tagVer  = "v3.0"
 	destDir = "site"
 )
 

@@ -67,6 +67,13 @@ func (ws *WizardServer) handleSubmit(w http.ResponseWriter, r *http.Request) {
 		ws.ErrorLogger.Println(err)
 		return
 	}
+	// Call DownloadTheme function from theme.go
+	err = DownloadTheme(config.ThemeURL)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		ws.ErrorLogger.Println("Error downloading and extracting theme:", err)
+		return
+	}
 	FormSubmittedCh <- struct{}{}
 }
 
