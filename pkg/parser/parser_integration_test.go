@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/anna-ssg/anna/v2/pkg/parser"
+	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
 func TestParseMDDir(t *testing.T) {

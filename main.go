@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/anna-ssg/anna/v2/cmd/anna"
+	"github.com/anna-ssg/anna/v3/cmd/anna"
 	"github.com/spf13/cobra"
 )
 

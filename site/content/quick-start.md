@@ -43,7 +43,7 @@ anna
 If you have the Go toolchain installed, run the below command to download and build anna:
 
 ```sh
-go run github.com/anna-ssg/anna@v2.0.0
+go run github.com/anna-ssg/anna@v3.0.0
 ```
 
 ---

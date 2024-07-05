@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/anna-ssg/anna/v2/pkg/engine"
-	"github.com/anna-ssg/anna/v2/pkg/helpers"
-	"github.com/anna-ssg/anna/v2/pkg/parser"
+	"github.com/anna-ssg/anna/v3/pkg/engine"
+	"github.com/anna-ssg/anna/v3/pkg/helpers"
+	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
 type Cmd struct {
