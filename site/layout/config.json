@@ -31,7 +31,7 @@
   "author": "anna",
   "themeURL": "/static/style.css",
   "copyright": "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.",
-  "socials": {
+  "customFields": {
     "Github": "https://github.com/anna-ssg/anna"
   },
   "collectionLayouts": {

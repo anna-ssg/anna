@@ -11,18 +11,21 @@ collections:
 
 ## Anna configuration
 
-Define an `anna.yml` file to configure the various sites and paths to be rendered and served by anna.
+Define an `anna.json` file to configure the various sites and paths to be rendered and served by anna.
 
 It contains the following fields:
 
-- `siteDataPaths`: Stores all the site and their directory paths to be rendered or served
+- `siteDataPaths`: Stores the sites and their directory paths
 
-### Sample `anna.yml`
+### Sample `anna.json`
 
-```yml
-siteDataPaths:
-  - site: site/
-  - site-test: site-test/
+```json
+{
+  "siteDataPaths": {
+    "site": "site/",
+    "site-test": "site-test/"
+  }
+}
 ```
 
 ---
@@ -50,7 +53,7 @@ site1
 ├── layout
 │   ├── collection-subpage.html*
 │   ├── collections.html*
-│   ├── config.yml*
+│   ├── config.json*
 │   ├── page.html*
 │   ├── partials
 │   │   ├── head.html
@@ -91,7 +94,7 @@ Anna must be run from the parent of the site/ dir
 - Static assets such as fonts are stored in `static/`
 - Scripts are stored in the `scripts/` dir in `static/`
 - The layout of the site is configured using html files in `layout/`
-  - The `config.yml` file stores the configuration of the site and includes details such as the baseURL
+  - The `config.json` file stores the configuration of the site and includes details such as the baseURL
   - The `collections.html`, `collection-subpage.html`, `tags.html` and other necessary layouts define the structure of the various pages of the site such as `collections.html`, `collections/[[sub-page]].html` and other SSG generated pages
   - Additional layouts can be created and set for various pages of the site using the `layout` frontmatter field
   - The layout files can be composed of smaller html files which are stored in the `partials/` folder
@@ -124,7 +127,7 @@ The `{{.PageURL}}` is of the form `index.html`, `collections/tech/go.html` and s
 - `{{.DeepDataMerge.Collections}}` - A map that stores the template data of the collection sub-pages for a particular collection url
 - `{{.DeepDataMerge.CollectionsMap}}` - A map that stores a slice of templates of all pages for a particular collection url
 - `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site (primarily used for search and graphing of tags)
-- `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.yml`
+- `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.json`
 - `{{.DeepDataMerge.Templates}}` - A map that stores the template data of all the pages of the site for the particular url(the URL is the PageURL for the speicified page)
 - `{{.DeepDataMerge.Tags}}` - A map that stores the template data of the tag sub-pages for a particular tag url
 - `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all pages for a particular tag url
@@ -235,7 +238,7 @@ CSS can be added in the following ways:
 
 ## Site configuration
 
-The config.yml file stores additional information regarding the layout of the site
+The config.json file stores additional information regarding the layout of the site
 It contains the following fields:
 
 - `navbar`: Stores the links to be added to the navbar (same name as the markdown files)
@@ -245,41 +248,64 @@ It contains the following fields:
 - `author`: Stores the author of the site
 - `copyright`: Stores the copyright information of the site
 - `themeURL`: Stores the link to the common stylesheet
-- `socials`: Stores the links to socials
+- `customFields`: Stores a set of arbitrary key-value pairs as required by the user
 - `collectionLayouts`: Stores the names of the layouts to be used for a particular collection subpage
 
-### Sample `config.yml`
+### Sample `config.json`
 
-```yml
-navbar:
-  - Index: index.html
-  - Quick Start: quick-start.html
-  - Docs: docs.html
-  - Dev Guide: developer-guide.html
-  - Tags: tags.html
-  - Collections: collections.html
-  - Posts: collections/posts.html
-  - Anna Blog: posts/building-anna/index.html
+```json
+  {
+    "navbar": [
+      {
+        "Index": "index.html"
+      },
+      {
+        "Quick Start": "quick-start.html"
+      },
+      {
+        "Docs": "docs.html"
+      },
+      {
+        "Dev Guide": "developer-guide.html"
+      },
+      {
+        "Tags": "tags.html"
+      },
+      {
+        "Collections": "collections.html"
+      },
+      {
+        "Posts": "collections/posts.html"
+      },
+      {
+        "Anna Blog": "posts/building-anna/index.html"
+      }
+    ],
+    "CustomFields": [
+      {
+        "Github": "https://github.com/anna-ssg/anna"
+      }
+    ],
 
-socials:
-  - Github: https://github.com/anna-ssg/anna
 
-# make sure no trailing slash com/
-baseURL: https://example.com
+    # make sure no trailing slash com/
+    "baseURL": "https://example.com",
 
-# Replace this with the actual canonical-url of your site
-# baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet.
-# It's also embeded in your sitemap / atom feed and can be used to change metadata about your site.
+    # Replace this with the actual canonical-url of your site
+    # baseURL tells search-engines (SEO), web-crawlers (robots.txt) so people can discover your site on the internet.
+    # It's also embeded in your sitemap / atom feed and can be used to change metadata about your site.
 
-siteTitle: anna
-siteScripts:
-author: Anna
-themeURL: "/static/style.css"
-copyright: "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International."
+    "siteTitle": "anna",
+    "siteScripts": null,
+    "author": "Anna",
+    "themeURL": "/static/style.css",
+    "copyright": "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.",
 
-# Here, `all-posts` is the name of the layout template to be used to render the `collection/posts.html` subpage
-collectionLayouts:
-  - collections/posts.html: all-posts
+    # Here, `all-posts` is the name of the layout template to be used to render the `collection/posts.html` subpage
+    "collectionLayouts": {
+        "collections/posts.html": "all-posts"
+      }
+  }
 ```
 
 ---
