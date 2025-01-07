@@ -42,7 +42,7 @@ hugo new site /tmp/bench/hugo; cd /tmp/bench/hugo
 hugo new theme mytheme; echo "theme = 'mytheme'" >> hugo.toml; cd /tmp/bench
 
 ## setup 11ty
-mkdir /tmp/bench/11ty -p
+#mkdir /tmp/bench/11ty -p
 
 # clean content/* dirs
 echo "Cleaning content directories"
@@ -50,7 +50,7 @@ rm -rf /tmp/bench/anna/site/content/posts/*
 rm -rf /tmp/bench/saaru/docs/src/*
 rm -rf /tmp/bench/sapling/benchmark/content/blog/*
 rm -rf /tmp/bench/hugo/content/*
-rm -rf /tmp/bench/11ty/*
+#rm -rf /tmp/bench/11ty/*
 
 # create multiple copies of the test file
 echo "Spawning $files different markdown files..."
@@ -59,7 +59,7 @@ for ((i = 0; i < files; i++)); do
     cp /tmp/bench/test.md "/tmp/bench/saaru/docs/src/test_$i.md"
     cp /tmp/bench/test.md "/tmp/bench/sapling/benchmark/content/blogs/test_$i.md"
     cp /tmp/bench/test.md "/tmp/bench/hugo/content/test_$i.md"
-    cp /tmp/bench/test.md "/tmp/bench/11ty/test_$i.md"
+#    cp /tmp/bench/test.md "/tmp/bench/11ty/test_$i.md"
 done
 
 # run hyperfine
@@ -67,7 +67,7 @@ echo -e "\n"
 echo "running benchmark: $files md files and $warm warmup runs"
 echo -e "\n"
 hyperfine -p 'sync' -w $warm \
-  "cd /tmp/bench/11ty && npx @11ty/eleventy" \
+#  "cd /tmp/bench/11ty && npx @11ty/eleventy" \
   "cd /tmp/bench/hugo && hugo" \
   "cd /tmp/bench/anna && ./anna -r \"site/\"" \
   "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
