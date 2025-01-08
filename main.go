@@ -19,7 +19,7 @@ func main() {
 	var validateHTMLLayouts bool
 	var renderSpecificSite string
 
-	Version := "v2.0.0" // to be set at build time $(git describe --tags)
+	Version := "v3.0.0" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",

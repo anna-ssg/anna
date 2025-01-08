@@ -1,11 +1,7 @@
-# Benchmark anna v/s other SSGs
 name: Benchmark
-
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - '*'
+  workflow_dispatch:
 
 jobs:
   benchmark:
@@ -15,7 +11,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Hyperfine
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y hyperfine
@@ -25,55 +21,17 @@ jobs:
         with:
           hugo-version: 'latest'
 
-  #    - name: Setup Node
-  #     uses: actions/setup-node@v4.0.2
-  #      with:
-  #        node-version: 'latest'
-
-  #    - name: Cache npm
-  #      uses: actions/cache@v4.0.2
-  #      with:
-  #        path: ~/.npm
-  #        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
-
-   #   - name: Cache Eleventy .cache
-    #    uses: actions/cache@v4.0.2
-    #    with:
-    #      path: ./.cache
-    #      key: ${{ runner.os }}-eleventy-fetch-cache
-          
-   #   - run: npm install @11ty/eleventy    
-
       - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
-              
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/.cargo
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-  
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get install -y curl git
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          export PATH="$HOME/.cargo/bin:$PATH"
-          rustup default stable
-          rustup update
-          rustc --version
-          cargo --version
-          go version
-
       - name: Run Benchmark
         run: |
-          chmod +x test/bench.sh
           ./test/bench.sh
