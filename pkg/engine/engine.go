@@ -5,7 +5,8 @@ import (
 	"html/template"
 	"log"
 	"os"
-	"strings"
+	"path/filepath"
+	"sync"
 
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
@@ -62,6 +63,12 @@ type JSONIndexTemplate struct {
 	Tags        []string
 }
 
+var renderPool = sync.Pool{
+	New: func() any {
+		return new(bytes.Buffer)
+	},
+}
+
 /*
 RenderPage
 fileOutPath - stores the parent directory to store rendered files, usually `site/`
@@ -73,38 +80,72 @@ template - stores the HTML templates parsed from the layout/ directory
 
 templateStartString - stores the name of the template to be passed to ExecuteTemplate()
 */
-func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template *template.Template, templateStartString string) {
-	// Creating subdirectories if the filepath contains '/'
-	if strings.Contains(string(pagePath), "/") {
-		// Extracting the directory path from the page path
-		splitPaths := strings.Split(string(pagePath), "/")
-		filename := splitPaths[len(splitPaths)-1]
-		pagePathWithoutFilename, _ := strings.CutSuffix(string(pagePath), filename)
+// func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template *template.Template, templateStartString string) {
+// 	// Creating subdirectories if the filepath contains '/'
+// 	if strings.Contains(string(pagePath), "/") {
+// 		// Extracting the directory path from the page path
+// 		splitPaths := strings.Split(string(pagePath), "/")
+// 		filename := splitPaths[len(splitPaths)-1]
+// 		pagePathWithoutFilename, _ := strings.CutSuffix(string(pagePath), filename)
 
-		err := os.MkdirAll(fileOutPath+"rendered/"+pagePathWithoutFilename, 0750)
-		if err != nil {
-			e.ErrorLogger.Fatal(err)
-		}
+// 		err := os.MkdirAll(fileOutPath+"rendered/"+pagePathWithoutFilename, 0750)
+// 		if err != nil {
+// 			e.ErrorLogger.Fatal(err)
+// 		}
+// 	}
+
+// 	filepath := fileOutPath + "rendered/" + string(pagePath)
+// 	var buffer bytes.Buffer
+
+// 	pageData := PageData{
+// 		DeepDataMerge: e.DeepDataMerge,
+// 		PageURL:       pagePath,
+// 	}
+
+// 	// Storing the rendered HTML file to a buffer
+// 	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
+// 	if err != nil {
+// 		e.ErrorLogger.Println("Error at path: ", pagePath)
+// 		e.ErrorLogger.Fatal(err)
+// 	}
+
+// 	// Flushing data from the buffer to the disk
+// 	err = os.WriteFile(filepath, buffer.Bytes(), 0666)
+// 	if err != nil {
+// 		e.ErrorLogger.Fatal(err)
+// 	}
+// }
+
+func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template *template.Template, templateStartString string) {
+	outPath := filepath.Join(fileOutPath, "rendered", string(pagePath))
+	outDir := filepath.Dir(outPath)
+	if err := os.MkdirAll(outDir, 0750); err != nil {
+		e.ErrorLogger.Fatal(err)
 	}
 
-	filepath := fileOutPath + "rendered/" + string(pagePath)
-	var buffer bytes.Buffer
+	buf := renderPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer renderPool.Put(buf)
 
-	pageData := PageData{
+	PageData := PageData{
 		DeepDataMerge: e.DeepDataMerge,
 		PageURL:       pagePath,
 	}
 
-	// Storing the rendered HTML file to a buffer
-	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
-	if err != nil {
+	if err := template.ExecuteTemplate(buf, templateStartString, PageData); err != nil {
 		e.ErrorLogger.Println("Error at path: ", pagePath)
 		e.ErrorLogger.Fatal(err)
 	}
 
-	// Flushing data from the buffer to the disk
-	err = os.WriteFile(filepath, buffer.Bytes(), 0666)
+	f, err := os.Create(outPath)
 	if err != nil {
+		e.ErrorLogger.Fatal(err)
+	}
+	if _, err := buf.WriteTo(f); err != nil {
+		_ = f.Close()
+		e.ErrorLogger.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
 }
