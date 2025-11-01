@@ -19,7 +19,6 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"go.abhg.dev/goldmark/anchor"
-	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/toc"
 	"gopkg.in/yaml.v3"
 )
@@ -220,9 +219,6 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 				&toc.Extender{
 					Compact: true,
 				},
-				&mermaid.Extender{
-					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
-				},
 				&anchor.Extender{
 					Texter: anchor.Text("#"),
 				},
@@ -237,9 +233,6 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 			goldmark.WithExtensions(
 				extension.TaskList,
 				figure.Figure,
-				&mermaid.Extender{
-					RenderMode: mermaid.RenderModeClient, // or RenderModeClient
-				},
 			),
 			goldmark.WithRendererOptions(
 				html.WithUnsafe(),
