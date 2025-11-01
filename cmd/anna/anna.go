@@ -110,22 +110,6 @@ func (cmd *Cmd) ValidateHTMLManager() {
 	if err != nil {
 		cmd.ErrorLogger.Fatal(err)
 	}
-
-	// Validating sites
-	validatedSites := false
-
-	for _, sitePath := range annaConfig.SiteDataPaths {
-		cmd.ValidateHTMLContent(sitePath)
-		if !validatedSites {
-			validatedSites = true
-		}
-	}
-
-	// If no site has been validated due to empty "anna.yml", validate the default "site/" path
-	if !validatedSites {
-		cmd.ValidateHTMLContent("site/")
-	}
-
 }
 
 func (cmd *Cmd) LiveReloadManager() {

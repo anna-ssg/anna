@@ -1,4 +1,4 @@
-anna
+anna*
 !anna/
 *.exe
 
@@ -6,7 +6,7 @@ anna
 **/.DS_Store
 *.prof
 anna.test
-pprof.cpu
+*.cpu
 dist/
 .idea/
 
