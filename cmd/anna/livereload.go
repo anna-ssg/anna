@@ -30,7 +30,7 @@ type liveReload struct {
 
 func newLiveReload(siteDataPath string) *liveReload {
 	lr := liveReload{
-		errorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		errorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
 		fileTimes:    make(map[string]time.Time),
 		rootDirs:     []string{siteDataPath},
 		extensions:   []string{".md"},
@@ -102,11 +102,11 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 }
 
 func (lr *liveReload) startServer(addr string) {
-	fmt.Print("Serving content at: http://localhost:", addr, "\n")
-	fmt.Print("Profile data can be viewed at: http://localhost:", addr, "/debug/pprof", "\n")
+	fmt.Printf("Serving content at address: http://%s\n", addr)
+	fmt.Printf("Profile data can be viewed at: http://%s\n", addr+"/debug/pprof")
 	http.Handle("/", http.FileServer(http.Dir(lr.siteDataPath+"./rendered")))
 	http.HandleFunc("/events", eventsHandler)
-	err := http.ListenAndServe(":"+addr, nil)
+	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		lr.errorLogger.Fatal(err)
 	}

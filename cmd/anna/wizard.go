@@ -31,7 +31,7 @@ func NewWizardServer(addr string) *WizardServer {
 		serveMux:    serveMuxLocal,
 		server:      &http.Server{Addr: addr, Handler: serveMuxLocal},
 		InfoLogger:  log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime),
-		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
 	}
 
 	return &wizardServer

@@ -7,35 +7,12 @@ collections:
   - guide
 ---
 
----
-
-## Anna configuration
-
-Define an `anna.json` file to configure the various sites and paths to be rendered and served by anna.
-
-It contains the following fields:
-
-- `siteDataPaths`: Stores the sites and their directory paths
-
-### Sample `anna.json`
-
-```json
-{
-  "siteDataPaths": {
-    "site": "site/",
-    "site-test": "site-test/"
-  }
-}
-```
-
----
-
 ## Directory structure
 
 anna requires the following directory structure
 
 ```text
-site1
+site
 ├── content
 │   ├── docs.md
 │   ├── index.md*
@@ -72,16 +49,9 @@ site1
     ├── style.css
     ├── styles
        └── tokyo-dark.css
-
-site2
-├── content
-...
-
 ```
 
 Files marked \* are required and cannot be omitted
-
-Anna must be run from the parent of the site/ dir
 
 ---
 
@@ -207,8 +177,6 @@ A few useful goldmark extensions have been included:
   - adds support for anchors next to all headers
 - [figure](https://github.com/mangoumbrella/goldmark-figure)
   - parse markdown paragraphs that start with an image into HTML `<figure>` elements
-- [mermaid](https://github.com/abhinav/goldmark-mermaid)
-  - adds support for [Mermaid](https://mermaid.js.org) diagrams
 - [toc](https://github.com/abhinav/goldmark-toc)
   - adds support for rendering a table-of-contents
 

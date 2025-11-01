@@ -11,21 +11,6 @@ collections: ["anna"]
 
 ## Installation
 
-### Installing anna from releases
-
-Run this in the appropriate folder.
-
-If a site directory with the pre-requisite layout template has not been defined, anna proceeds to fetch the default site directory from the anna github repository
-
-```sh
-curl -L https://github.com/anna-ssg/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
-tar -xvf anna.tar.gz # unzip the tar file
-rm anna.tar.gz # removing the tar file
-
-# here you could add anna to your path if you want and use in in any directory
-./anna # runs anna. The instructions are given below
-```
-
 ### Brew taps for macOS
 
 To install anna on macOS via brew, run the below commands:
@@ -36,6 +21,17 @@ brew install anna
 
 # to run anna
 anna
+```
+
+### Installing anna from releases
+
+```sh
+curl -L https://github.com/anna-ssg/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
+tar -xvf anna.tar.gz # unzip the tar file
+rm anna.tar.gz # removing the tar file
+
+# here you could add anna to your path if you want and use in in any directory
+./anna # runs anna. The instructions are given below
 ```
 
 ### Installing anna with go
@@ -52,20 +48,6 @@ go run github.com/anna-ssg/anna@v3.0.0
 
 ### Running anna
 
-1. To run anna, create an `anna.yml` file to configure how sites are rendered and served
-
-#### Sample `anna.yml`
-
-```yml
-siteDataPaths:
-  - site: site/
-  - site-test: site-test/
-```
-
-2. Run the render command
-
-- Render all sites
-
 ```sh
 anna
 ```
@@ -73,36 +55,24 @@ anna
 - Render the site located at `site_path`
 
 ```sh
-anna -r [site_path]
+anna -p [site_path]
 ```
 
-### Serving the site with live-reload
+### Serving the site with live reload to watch for file updates
 
-1. To serve the site, create an `anna.yml` file to configure how sites are rendered and served
-
-#### Sample `anna.yml`
-
-```yml
-siteDataPaths:
-  - site: site/
-  - site-test: site-test/
+```sh
+anna -s
 ```
-
----
-
-2. Run the serve command
 
 - Serve the site located in `site_path`
 
 ```sh
-anna -s [site_path]
+anna -s -p [site_path]
 ```
-
-Note: Running `anna -s` without specifying the site_path will throw an error
 
 ### Other commands and flags
 
-To view allthe commands and flags available, run the below command:
+To view all the commands and flags available, run the below command:
 
 ```sh
   anna -h
