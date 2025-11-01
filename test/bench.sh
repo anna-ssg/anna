@@ -36,6 +36,7 @@ echo ""
 echo "build SSGs"
 echo ""
 cd /tmp/bench/anna && go build && cd /tmp/bench
+cd /tmp/bench/anna && GOEXPERIMENT=greenteagc go build -o anna_greentea && cd /tmp/bench
 
 # build rust based SSGs (edit this block if they are already installed)
 cd /tmp/bench/sapling && cargo build --release && mv target/release/sapling .
@@ -73,6 +74,7 @@ echo ""
 hyperfine -p 'sync' -w $warm \
   "cd /tmp/bench/hugo && hugo" \
   "cd /tmp/bench/anna && ./anna -r \"site/\"" \
+  "cd /tmp/bench/anna && ./anna_greentea -r \"site/\"" \
   "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
   "cd /tmp/bench/sapling/benchmark && ./../sapling run"
 echo ""
