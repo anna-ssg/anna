@@ -41,6 +41,22 @@ archives:
     files:
       - LICENSE*
 
+brews:
+  - name: anna
+    repository:
+      owner: anna-ssg
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: https://github.com/anna-ssg/anna
+    description: "Anna Static Site Generator"
+    license: MIT
+    skip_upload: false
+    test: |
+      system "#{bin}/anna version"
+    install: |
+      bin.install "anna"
+
 changelog:
   sort: asc
   filters:
