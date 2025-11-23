@@ -28,8 +28,7 @@ Pronounced: `/ɐnːɐ/` which means rice 🍚 in Kannada
 ## Get Started
 
 ```sh
-go run github.com/anna-ssg/anna/v3@v3.0.0
-
+go run github.com/anna-ssg/anna/v3@v3.0.0 -s './'
 ```
 
 [Quick start](https://anna-docs.netlify.app/quick-start)
