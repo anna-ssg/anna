@@ -36,6 +36,31 @@ go run github.com/anna-ssg/anna/v3@v3.0.0
 
 <!-- > If you don't have a site directory with the pre-requisite layout template; anna proceeds to fetch the default site dir from our GitHub repository -->
 
+## 📁 Required Site Structure
+As of now, Anna is slightly opinionated about how your site must be structured. Currently, Anna expects your site directory to follow the layout shown below:
+
+site/
+ ├── content/
+ │    ├── index.md
+ │    └── posts/
+ │         └── sample.md
+ │
+ ├── layouts/
+ │    ├── config.json        # Required
+ │    ├── page.html          # Required
+ │    ├── posts.html         # Optional (only if you want a posts list page)
+ │    └── partials/
+ │         └── ...html       # Reusable components such as header/footer
+ │
+ ├── static/
+ │    ├── fonts/
+ │    ├── images/
+ │    ├── scripts/
+ │    ├── style.css
+ │    └── plane.jpg          # Example static asset
+ │
+ └── assets/                 # Optional
+
 ## Contributing to Anna
 
 If you have git installed, clone our repository and build against the latest commit
