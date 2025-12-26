@@ -6,6 +6,10 @@ on:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout Repository
@@ -32,6 +36,16 @@ jobs:
           profile: minimal
           toolchain: stable
 
+      - name: Cache Rust builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/bench/saaru/target
+            /tmp/bench/sapling/target
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('/tmp/bench/saaru/Cargo.lock', '/tmp/bench/sapling/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-target-
+
       - name: Run Benchmark
         run: |
           ./test/bench.sh 2>&1 | tee full_output.txt
@@ -41,19 +55,21 @@ jobs:
             exit $exit_code
           fi
           sed -n '/Begin Benchmark/,/End Benchmark/p' full_output.txt > bench_results.txt
+          echo "## Benchmark Results" > comment_body.txt
+          echo "" >> comment_body.txt
+          echo "\`\`\`" >> comment_body.txt
+          cat bench_results.txt >> comment_body.txt
+          echo "" >> comment_body.txt
+          echo "\`\`\`" >> comment_body.txt
 
       - name: Post Benchmark Results
         if: github.event_name == 'pull_request'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "## Benchmark Results
-
-          \`\`\`
-          $(cat bench_results.txt)
-          \`\`\`" --create-if-none --edit-last
+          gh pr comment ${{ github.event.pull_request.number }} --body-file comment_body.txt --create-if-none --edit-last
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-
+          
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
