@@ -12,41 +12,43 @@ jobs:
       contents: read
 
     steps:
+      # Checkout
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Install System Dependencies
+      # System Dependencies
+      - name: Dependencies: Install Hyperfine
         run: |
-          sudo apt-get update
-          sudo apt-get install -y hyperfine
+          sudo apt-get update; sudo apt-get install -y hyperfine
 
-      - name: Setup Hugo
+      # Tool Setup
+      - name: Tools: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Install Go
+      - name: Tools: Install Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
 
-      - name: Install Rust
+      - name: Tools: Install Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
 
-      - name: Cache Rust builds
-        uses: actions/cache@v4
+      # Caching
+      - name: Cache: Rust Builds
+        uses: actions/cache@v5
         with:
           path: |
             /tmp/bench/saaru/target
             /tmp/bench/sapling/target
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('/tmp/bench/saaru/Cargo.lock', '/tmp/bench/sapling/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-target-
+          key: ${{ runner.os }}-rust-target
 
-      - name: Run Benchmark
+      # Execution
+      - name: Execution: Run Benchmark
         run: |
           ./test/bench.sh 2>&1 | tee full_output.txt
           exit_code=${PIPESTATUS[0]}
@@ -54,7 +56,7 @@ jobs:
             echo "Benchmark script failed with exit code $exit_code"
             exit $exit_code
           fi
-          sed -n '/Begin Benchmark/,/End Benchmark/p' full_output.txt > bench_results.txt
+          sed -n '/Begin Benchmark/,/End Benchmark/{ /Begin Benchmark/d; /End Benchmark/d; p; }' full_output.txt > bench_results.txt
           echo "## Benchmark Results" > comment_body.txt
           echo "" >> comment_body.txt
           echo "\`\`\`" >> comment_body.txt
@@ -62,7 +64,8 @@ jobs:
           echo "" >> comment_body.txt
           echo "\`\`\`" >> comment_body.txt
 
-      - name: Post Benchmark Results
+      # Results
+      - name: Results: Post Benchmark
         if: github.event_name == 'pull_request'
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body-file comment_body.txt --create-if-none --edit-last
@@ -70,7 +73,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           
-      - name: Upload Benchmark Results
+      - name: Results: Upload Benchmark
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
