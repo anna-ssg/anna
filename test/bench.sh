@@ -3,12 +3,6 @@ files=1000
 warm=10
 BASE_DIR=$(pwd)
 
-cleanup() {
-    echo "cleaning up"
-    rm -rf $BASE_DIR/tmp/bench
-}
-trap cleanup EXIT
-
 # deps
 if ! command -v hyperfine &>/dev/null; then
     echo "hyperfine is not installed. Please install hyperfine to continue."
