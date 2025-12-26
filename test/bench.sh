@@ -30,9 +30,12 @@ clone_or_pull() {
   local repo=$1
   local dir=$2
   if [ "$repo" = "https://github.com/anna-ssg/anna" ]; then
-    # For Anna, use current source code instead of fresh clone
+    # For Anna, use current source code
     rm -rf "$dir"
-    cp -r "$REPO_ROOT" "$dir"
+    mkdir -p "$dir"
+    cp -r "$REPO_ROOT/site" "$dir/"
+    cd "$REPO_ROOT" && go build -o "$dir/anna"
+    cd "$REPO_ROOT" && GOEXPERIMENT=greenteagc go build -o "$dir/anna_greentea"
   else
     # For others, always fresh clone
     rm -rf "$dir"
@@ -57,8 +60,6 @@ cp $REPO_ROOT/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
 echo ""
 echo "build SSGs"
 echo ""
-cd $BASE_DIR/tmp/bench/anna && go build && cd ../..
-cd $BASE_DIR/tmp/bench/anna && GOEXPERIMENT=greenteagc go build -o anna_greentea && cd ../..
 cd $BASE_DIR/tmp/bench/sapling && cargo build --release && mv target/release/sapling .
 cd $BASE_DIR/tmp/bench/saaru && cargo build --release && mv target/release/saaru .
 
