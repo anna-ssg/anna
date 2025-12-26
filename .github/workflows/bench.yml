@@ -1,37 +1,68 @@
 name: Benchmark
 on:
-  push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
 
     steps:
+      # Checkout
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Install System Dependencies
+      # System Dependencies
+      - name: Dependencies/Hyperfine
         run: |
-          sudo apt-get update
-          sudo apt-get install -y hyperfine
+          sudo apt-get update; sudo apt-get install -y hyperfine
 
-      - name: Setup Hugo
+      # Tool Setup
+      - name: Tools/Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Install Go
+      - name: Tools/Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
 
-      - name: Install Rust
+      - name: Tools/Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
 
-      - name: Run Benchmark
+      # Execution
+      - name: Execution Run Benchmark
         run: |
           ./test/bench.sh
+          cd /home/runner/work/anna/anna/tmp/bench
+          echo "## Benchmark Results" > ~/comment_body.txt
+          echo "" >> ~/comment_body.txt
+          echo "\`\`\`" >> ~/comment_body.txt
+          cat bench_results.txt >> ~/comment_body.txt
+          echo "" >> ~/comment_body.txt
+          echo "\`\`\`" >> ~/comment_body.txt
+          echo " ## Commit Hashes" >> ~/comment_body.txt
+          cat commit_hashes.txt >> ~/comment_body.txt
+
+      # Results
+      - name: Results Post Benchmark
+        if: github.event_name == 'pull_request'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file ~/comment_body.txt --create-if-none --edit-last
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          
+      - name: Results Upload Benchmark
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: bench_results.txt

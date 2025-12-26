@@ -1,81 +1,76 @@
 #!/bin/bash
-# parameters
 files=1000
 warm=10
+REPO_ROOT=$(pwd)
+BENCH_DIR=$REPO_ROOT/tmp/bench
+rm -rf $BENCH_DIR
 
-# cleanup
-cleanup() {
-    echo "cleaning up"
-    rm -rf /tmp/bench
-}
-trap cleanup EXIT
+# build anna
+mkdir -p $BENCH_DIR/anna
+cp -r site/ $BENCH_DIR/anna/site
+go build -o $BENCH_DIR/anna/anna
+GOEXPERIMENT=greenteagc go build -o $BENCH_DIR/anna/anna_greentea
 
-# check if hyperfine is installed
+# deps
 if ! command -v hyperfine &>/dev/null; then
-    echo "hyperfine is not installed. Please install hyperfine to continue."
-    exit 1
+    echo "hyperfine is not installed. Please install hyperfine to continue." && exit 1
 fi
-
-# check if hugo is installed
 if ! command -v hugo &>/dev/null; then
     echo "hugo is not installed. Please install hugo to continue."
 fi
 
 # cloning candidates
-echo ""
 echo "clone SSGs"
-echo ""
-git clone --depth=1 https://github.com/anna-ssg/anna /tmp/bench/anna
-git clone --depth=1 https://github.com/anirudhRowjee/saaru /tmp/bench/saaru
-git clone --depth=1 https://github.com/NavinShrinivas/sapling /tmp/bench/sapling
 
-# copy benchmark file
-cp /tmp/bench/anna/site/content/posts/bench.md /tmp/bench/test.md
+# Saaru & Sapling: fresh clones
+git clone --depth=1 https://github.com/anirudhRowjee/saaru $BENCH_DIR/saaru
+git clone --depth=1 https://github.com/NavinShrinivas/sapling $BENCH_DIR/sapling
 
-echo ""
+# show commit hashes
+get_commit_info() {
+  local repo_dir=$1
+  local name=$2
+  local url=$3
+  INFO=$(cd $repo_dir && git log --oneline -1)
+  HASH=$(echo $INFO | cut -d' ' -f1)
+  MSG=$(echo $INFO | cut -d' ' -f2-)
+  FULL_HASH=$(cd $repo_dir && git log --format=%H -1)
+  echo "$name: [\`$HASH\`]($url/commit/$FULL_HASH) $MSG"
+}
+
+echo "commit hashes:"
+get_commit_info $REPO_ROOT "anna" "https://github.com/anna-ssg/anna" > $BENCH_DIR/commit_hashes.txt
+get_commit_info $BENCH_DIR/saaru "saaru" "https://github.com/anirudhRowjee/saaru" >> $BENCH_DIR/commit_hashes.txt
+get_commit_info $BENCH_DIR/sapling "sapling" "https://github.com/NavinShrinivas/sapling" >> $BENCH_DIR/commit_hashes.txt
+cat $BENCH_DIR/commit_hashes.txt
+
 echo "build SSGs"
-echo ""
-cd /tmp/bench/anna && go build && cd /tmp/bench
-cd /tmp/bench/anna && GOEXPERIMENT=greenteagc go build -o anna_greentea && cd /tmp/bench
-
-# build rust based SSGs (edit this block if they are already installed)
-cd /tmp/bench/sapling && cargo build --release && mv target/release/sapling .
-cd /tmp/bench/saaru && cargo build --release && mv target/release/saaru .
+cargo build --release --manifest-path $BENCH_DIR/sapling/Cargo.toml
+cargo build --release --manifest-path $BENCH_DIR/saaru/Cargo.toml
 
 ## setup hugo
-hugo new site /tmp/bench/hugo; cd /tmp/bench/hugo
-hugo new theme mytheme; echo "theme = 'mytheme'" >> hugo.toml; cd /tmp/bench
-
-## setup 11ty
+hugo new site $BENCH_DIR/hugo; cd $BENCH_DIR/hugo; hugo new theme mytheme
+echo "theme = 'mytheme'" >> hugo.toml
 
 # clean content/* dirs
-echo ""
-echo "Cleaning content directories"
-echo ""
-rm -rf /tmp/bench/anna/site/content/posts/*
-rm -rf /tmp/bench/saaru/docs/src/*
-rm -rf /tmp/bench/sapling/benchmark/content/blog/*
-rm -rf /tmp/bench/hugo/content/*
+rm -rf $BENCH_DIR/anna/site/content && mkdir -p $BENCH_DIR/anna/site/content/posts
+rm -rf $BENCH_DIR/saaru/docs/src/*
+rm -rf $BENCH_DIR/sapling/benchmark/content/blogs/*
+rm -rf $BENCH_DIR/hugo/content/*
 
-# create multiple copies of the test file
-echo ""
-echo "Spawning $files different markdown files..."
+# populate with test files
+cp $REPO_ROOT/site/content/posts/bench.md $BENCH_DIR/test.md
 for ((i = 0; i < files; i++)); do
-    cp /tmp/bench/test.md "/tmp/bench/anna/site/content/posts/test_$i.md"
-    cp /tmp/bench/test.md "/tmp/bench/saaru/docs/src/test_$i.md"
-    cp /tmp/bench/test.md "/tmp/bench/sapling/benchmark/content/blogs/test_$i.md"
-    cp /tmp/bench/test.md "/tmp/bench/hugo/content/test_$i.md"
+    cp $BENCH_DIR/test.md "$BENCH_DIR/anna/site/content/posts/test_$i.md"
+    cp $BENCH_DIR/test.md "$BENCH_DIR/saaru/docs/src/test_$i.md"
+    cp $BENCH_DIR/test.md "$BENCH_DIR/sapling/benchmark/content/blogs/test_$i.md"
+    cp $BENCH_DIR/test.md "$BENCH_DIR/hugo/content/test_$i.md"
 done
 
-# run hyperfine
-echo ""
-echo "running benchmark: $files md files and $warm warmup runs"
-echo ""
+echo "running benchmark: $files md files and $warm warmup runs" | tee $BENCH_DIR/bench_results.txt
 hyperfine -p 'sync' -w $warm \
-  "cd /tmp/bench/hugo && hugo" \
-  "cd /tmp/bench/anna && ./anna -r \"site/\"" \
-  "cd /tmp/bench/anna && ./anna_greentea -r \"site/\"" \
-  "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
-  "cd /tmp/bench/sapling/benchmark && ./../sapling run"
-echo ""
-
+  "cd $BENCH_DIR/saaru && ./target/release/saaru --base-path ./docs" \
+  "cd $BENCH_DIR/sapling/benchmark && ./../target/release/sapling run" \
+  "cd $BENCH_DIR/anna && ./anna_greentea" \
+  "cd $BENCH_DIR/anna && ./anna" \
+  "cd $BENCH_DIR/hugo && hugo" | tee -a $BENCH_DIR/bench_results.txt
