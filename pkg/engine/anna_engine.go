@@ -322,7 +322,7 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("      <title>")
 		xml.EscapeText(&buffer, []byte(templateData.Frontmatter.Title))
 		buffer.WriteString("</title>\n")
-		buffer.WriteString("      <link>" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL) + "/</link>\n")
+		buffer.WriteString("      <link>" + e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL) + "</link>\n")
 		buffer.WriteString("      <pubDate>" + time.Unix(templateData.Date, 0).Format(time.RFC1123Z) + "</pubDate>\n")
 		buffer.WriteString("      <author>")
 		xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Author))
