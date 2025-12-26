@@ -2,6 +2,7 @@
 files=1000
 warm=10
 BASE_DIR=$(pwd)
+REPO_ROOT=$(cd $BASE_DIR/.. && pwd)
 
 # deps
 if ! command -v hyperfine &>/dev/null; then
@@ -19,15 +20,14 @@ echo ""
 clone_or_pull() {
   local repo=$1
   local dir=$2
-  if [ ! -d "$dir" ]; then
-    git clone --depth=1 "$repo" "$dir"
+  if [ "$repo" = "https://github.com/anna-ssg/anna" ]; then
+    # For Anna, use current source code instead of fresh clone
+    rm -rf "$dir"
+    cp -r "$REPO_ROOT" "$dir"
   else
-    cd "$dir" && git pull --depth=1 --ff-only
-    if [ $? -ne 0 ]; then
-      cd "$(dirname "$dir")"
-      rm -rf "$dir"
-      git clone --depth=1 "$repo" "$dir"
-    fi
+    # For others, always fresh clone
+    rm -rf "$dir"
+    git clone --depth=1 "$repo" "$dir"
   fi
 }
 
@@ -43,7 +43,7 @@ echo "saaru: $(cd $BASE_DIR/tmp/bench/saaru && git rev-parse HEAD)"
 echo "sapling: $(cd $BASE_DIR/tmp/bench/sapling && git rev-parse HEAD)"
 echo ""
 
-cp $BASE_DIR/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
+cp $REPO_ROOT/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
 
 echo ""
 echo "build SSGs"
