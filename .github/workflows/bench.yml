@@ -17,29 +17,29 @@ jobs:
         uses: actions/checkout@v6
 
       # System Dependencies
-      - name: Dependencies Install Hyperfine
+      - name: Dependencies/Hyperfine
         run: |
           sudo apt-get update; sudo apt-get install -y hyperfine
 
       # Tool Setup
-      - name: Tools Setup Hugo
+      - name: Tools/Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Tools Install Go
+      - name: Tools/Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
 
-      - name: Tools Install Rust
+      - name: Tools/Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
 
       # Caching
-      - name: Cache Rust Builds
+      - name: Cache Repos
         uses: actions/cache@v5
         with:
           path: tmp/bench
