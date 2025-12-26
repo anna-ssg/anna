@@ -35,7 +35,7 @@ clone_or_pull https://github.com/anna-ssg/anna $BASE_DIR/tmp/bench/anna
 clone_or_pull https://github.com/anirudhRowjee/saaru $BASE_DIR/tmp/bench/saaru
 clone_or_pull https://github.com/NavinShrinivas/sapling $BASE_DIR/tmp/bench/sapling
 
-cp $BASE_DIR/tmp/bench/anna/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
+cp $BASE_DIR/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
 
 echo ""
 echo "build SSGs"
