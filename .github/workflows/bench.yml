@@ -42,6 +42,7 @@ jobs:
       - name: Execution Run Benchmark
         run: |
           ./test/bench.sh
+          cd /home/runner/work/anna/anna/tmp/bench
           echo "## Benchmark Results" > comment_body.txt
           echo "" >> comment_body.txt
           echo "\`\`\`" >> comment_body.txt

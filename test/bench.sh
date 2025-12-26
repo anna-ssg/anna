@@ -20,26 +20,31 @@ if ! command -v hugo &>/dev/null; then
 fi
 
 # cloning candidates
-echo "\n clone SSGs"
+echo "clone SSGs"
 
 # Saaru & Sapling: fresh clones
 git clone --depth=1 https://github.com/anirudhRowjee/saaru $BENCH_DIR/saaru
 git clone --depth=1 https://github.com/NavinShrinivas/sapling $BENCH_DIR/sapling
 
 # show commit hashes
-echo "\n Commit hashes:"
-ANNA_HASH=$(cd $REPO_ROOT && git log --format=%h -1)
-echo "anna: [\`$ANNA_HASH\`](https://github.com/anna-ssg/anna/commit/$(cd $REPO_ROOT && git log --format=%H -1))" > $BENCH_DIR/commit_hashes.txt
+get_commit_info() {
+  local repo_dir=$1
+  local name=$2
+  local url=$3
+  INFO=$(cd $repo_dir && git log --oneline -1)
+  HASH=$(echo $INFO | cut -d' ' -f1)
+  MSG=$(echo $INFO | cut -d' ' -f2-)
+  FULL_HASH=$(cd $repo_dir && git log --format=%H -1)
+  echo "$name: [\`$HASH\`]($url/commit/$FULL_HASH) $MSG"
+}
 
-SAARU_HASH=$(cd $BENCH_DIR/saaru && git log --format=%h -1)
-echo "saaru: [\`$SAARU_HASH\`](https://github.com/anirudhRowjee/saaru/commit/$(cd $BENCH_DIR/saaru && git log --format=%H -1))" >> $BENCH_DIR/commit_hashes.txt
-
-SAPLING_HASH=$(cd $BENCH_DIR/sapling && git log --format=%h -1)
-echo "sapling: [\`$SAPLING_HASH\`](https://github.com/NavinShrinivas/sapling/commit/$(cd $BENCH_DIR/sapling && git log --format=%H -1))" >> $BENCH_DIR/commit_hashes.txt
-
+echo "commit hashes:"
+get_commit_info $REPO_ROOT "anna" "https://github.com/anna-ssg/anna" > $BENCH_DIR/commit_hashes.txt
+get_commit_info $BENCH_DIR/saaru "saaru" "https://github.com/anirudhRowjee/saaru" >> $BENCH_DIR/commit_hashes.txt
+get_commit_info $BENCH_DIR/sapling "sapling" "https://github.com/NavinShrinivas/sapling" >> $BENCH_DIR/commit_hashes.txt
 cat $BENCH_DIR/commit_hashes.txt
 
-echo "\n build SSGs"
+echo "build SSGs"
 cargo build --release --manifest-path $BENCH_DIR/sapling/Cargo.toml
 cargo build --release --manifest-path $BENCH_DIR/saaru/Cargo.toml
 
