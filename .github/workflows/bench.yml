@@ -17,38 +17,36 @@ jobs:
         uses: actions/checkout@v6
 
       # System Dependencies
-      - name: Dependencies: Install Hyperfine
+      - name: Dependencies Install Hyperfine
         run: |
           sudo apt-get update; sudo apt-get install -y hyperfine
 
       # Tool Setup
-      - name: Tools: Setup Hugo
+      - name: Tools Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Tools: Install Go
+      - name: Tools Install Go
         uses: actions/setup-go@v5
         with:
           go-version-file: "go.mod"
 
-      - name: Tools: Install Rust
+      - name: Tools Install Rust
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
 
       # Caching
-      - name: Cache: Rust Builds
+      - name: Cache Rust Builds
         uses: actions/cache@v5
         with:
-          path: |
-            /tmp/bench/saaru/target
-            /tmp/bench/sapling/target
-          key: ${{ runner.os }}-rust-target
+          path: tmp/bench
+          key: ${{ runner.os }}-bench
 
       # Execution
-      - name: Execution: Run Benchmark
+      - name: Execution Run Benchmark
         run: |
           ./test/bench.sh 2>&1 | tee full_output.txt
           exit_code=${PIPESTATUS[0]}
@@ -65,7 +63,7 @@ jobs:
           echo "\`\`\`" >> comment_body.txt
 
       # Results
-      - name: Results: Post Benchmark
+      - name: Results Post Benchmark
         if: github.event_name == 'pull_request'
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body-file comment_body.txt --create-if-none --edit-last
@@ -73,7 +71,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           
-      - name: Results: Upload Benchmark
+      - name: Results Upload Benchmark
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
