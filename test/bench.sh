@@ -35,6 +35,14 @@ clone_or_pull https://github.com/anna-ssg/anna $BASE_DIR/tmp/bench/anna
 clone_or_pull https://github.com/anirudhRowjee/saaru $BASE_DIR/tmp/bench/saaru
 clone_or_pull https://github.com/NavinShrinivas/sapling $BASE_DIR/tmp/bench/sapling
 
+# show commit hashes
+echo ""
+echo "Commit hashes:"
+echo "anna: $(cd $BASE_DIR/tmp/bench/anna && git rev-parse HEAD)"
+echo "saaru: $(cd $BASE_DIR/tmp/bench/saaru && git rev-parse HEAD)"
+echo "sapling: $(cd $BASE_DIR/tmp/bench/sapling && git rev-parse HEAD)"
+echo ""
+
 cp $BASE_DIR/site/content/posts/bench.md $BASE_DIR/tmp/bench/test.md
 
 echo ""
@@ -46,8 +54,12 @@ cd $BASE_DIR/tmp/bench/sapling && cargo build --release && mv target/release/sap
 cd $BASE_DIR/tmp/bench/saaru && cargo build --release && mv target/release/saaru .
 
 ## setup hugo
-hugo new site $BASE_DIR/tmp/bench/hugo; cd $BASE_DIR/tmp/bench/hugo
-hugo new theme mytheme; echo "theme = 'mytheme'" >> hugo.toml; cd ../..
+rm -rf $BASE_DIR/tmp/bench/hugo
+hugo new site $BASE_DIR/tmp/bench/hugo
+cd $BASE_DIR/tmp/bench/hugo
+hugo new theme mytheme
+echo "theme = 'mytheme'" >> hugo.toml
+cd ../..
 
 # clean content/* dirs
 rm -rf $BASE_DIR/tmp/bench/anna/site/content/posts/*
