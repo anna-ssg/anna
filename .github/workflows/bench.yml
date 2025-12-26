@@ -64,7 +64,7 @@ jobs:
           echo "## Benchmark Results" > comment_body.txt
           echo "" >> comment_body.txt
           echo "### Versions Tested" >> comment_body.txt
-          echo "- **Anna**: [\`${GITHUB_SHA:0:8}\`](https://github.com/anna-ssg/anna/commit/$GITHUB_SHA)" >> comment_body.txt
+          echo "- **Anna**: [\`$(git rev-parse HEAD | cut -c1-8)\`](https://github.com/anna-ssg/anna/commit/$(git rev-parse HEAD))" >> comment_body.txt
           echo "- **Saaru**: [\`$(cd tmp/bench/saaru && git rev-parse HEAD | cut -c1-8)\`](https://github.com/anirudhRowjee/saaru/commit/$(cd tmp/bench/saaru && git rev-parse HEAD))" >> comment_body.txt
           echo "- **Sapling**: [\`$(cd tmp/bench/sapling && git rev-parse HEAD | cut -c1-8)\`](https://github.com/NavinShrinivas/sapling/commit/$(cd tmp/bench/sapling && git rev-parse HEAD))" >> comment_body.txt
           echo "" >> comment_body.txt
