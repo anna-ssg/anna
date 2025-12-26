@@ -43,20 +43,20 @@ jobs:
         run: |
           ./test/bench.sh
           cd /home/runner/work/anna/anna/tmp/bench
-          echo "## Benchmark Results" > comment_body.txt
-          echo "" >> comment_body.txt
-          echo "\`\`\`" >> comment_body.txt
-          cat bench_results.txt >> comment_body.txt
-          echo "" >> comment_body.txt
-          echo "\`\`\`" >> comment_body.txt
-          echo " ## Commit Hashes" >> comment_body.txt
-          cat commit_hashes.txt >> comment_body.txt
+          echo "## Benchmark Results" > ~/comment_body.txt
+          echo "" >> ~/comment_body.txt
+          echo "\`\`\`" >> ~/comment_body.txt
+          cat bench_results.txt >> ~/comment_body.txt
+          echo "" >> ~/comment_body.txt
+          echo "\`\`\`" >> ~/comment_body.txt
+          echo " ## Commit Hashes" >> ~/comment_body.txt
+          cat commit_hashes.txt >> ~/comment_body.txt
 
       # Results
       - name: Results Post Benchmark
         if: github.event_name == 'pull_request'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file comment_body.txt --create-if-none --edit-last
+          gh pr comment ${{ github.event.pull_request.number }} --body-file ~/comment_body.txt --create-if-none --edit-last
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}

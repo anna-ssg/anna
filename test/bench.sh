@@ -67,10 +67,10 @@ for ((i = 0; i < files; i++)); do
     cp $BENCH_DIR/test.md "$BENCH_DIR/hugo/content/test_$i.md"
 done
 
-echo "running benchmark: $files md files and $warm warmup runs" > $BENCH_DIR/bench_results.txt
+echo "running benchmark: $files md files and $warm warmup runs" | tee $BENCH_DIR/bench_results.txt
 hyperfine -p 'sync' -w $warm \
   "cd $BENCH_DIR/saaru && ./target/release/saaru --base-path ./docs" \
   "cd $BENCH_DIR/sapling/benchmark && ./../target/release/sapling run" \
   "cd $BENCH_DIR/anna && ./anna_greentea" \
   "cd $BENCH_DIR/anna && ./anna" \
-  "cd $BENCH_DIR/hugo && hugo" >> $BENCH_DIR/bench_results.txt
+  "cd $BENCH_DIR/hugo && hugo" | tee -a $BENCH_DIR/bench_results.txt
