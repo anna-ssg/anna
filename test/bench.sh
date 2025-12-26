@@ -2,7 +2,16 @@
 files=1000
 warm=10
 BASE_DIR=$(pwd)
-REPO_ROOT=$(cd $BASE_DIR/.. && pwd)
+
+# Determine repo root
+if [ -d "$BASE_DIR/site" ]; then
+  REPO_ROOT=$BASE_DIR
+else
+  REPO_ROOT=$(cd $BASE_DIR/.. && pwd)
+fi
+
+# Create bench directory
+mkdir -p $BASE_DIR/tmp/bench
 
 # deps
 if ! command -v hyperfine &>/dev/null; then
@@ -38,7 +47,7 @@ clone_or_pull https://github.com/NavinShrinivas/sapling $BASE_DIR/tmp/bench/sapl
 # show commit hashes
 echo ""
 echo "Commit hashes:"
-echo "anna: $(cd $BASE_DIR/tmp/bench/anna && git rev-parse HEAD)"
+echo "anna: $(cd $REPO_ROOT && git rev-parse HEAD)"
 echo "saaru: $(cd $BASE_DIR/tmp/bench/saaru && git rev-parse HEAD)"
 echo "sapling: $(cd $BASE_DIR/tmp/bench/sapling && git rev-parse HEAD)"
 echo ""
