@@ -43,7 +43,7 @@ jobs:
           sed -n '/Begin Benchmark/,/End Benchmark/p' full_output.txt > bench_results.txt
 
       - name: Post Benchmark Results
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'pull_request'
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "## Benchmark Results
 
@@ -53,3 +53,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: bench_results.txt
