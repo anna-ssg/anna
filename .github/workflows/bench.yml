@@ -38,40 +38,18 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      # Caching
-      - name: Cache Build Artifacts
-        uses: actions/cache@v5
-        with:
-          path: |
-            tmp/bench/anna/anna
-            tmp/bench/anna/anna_greentea
-            tmp/bench/saaru/target
-            tmp/bench/saaru/saaru
-            tmp/bench/sapling/target
-            tmp/bench/sapling/sapling
-          key: ${{ runner.os }}-bench-artifacts
-
       # Execution
       - name: Execution Run Benchmark
         run: |
-          ./test/bench.sh 2>&1 | tee full_output.txt
-          exit_code=${PIPESTATUS[0]}
-          if [ $exit_code -ne 0 ]; then
-            echo "Benchmark script failed with exit code $exit_code"
-            exit $exit_code
-          fi
-          sed -n '/Begin Benchmark/,/End Benchmark/{ /Begin Benchmark/d; /End Benchmark/d; p; }' full_output.txt > bench_results.txt
+          ./test/bench.sh
           echo "## Benchmark Results" > comment_body.txt
-          echo "" >> comment_body.txt
-          echo "### Versions Tested" >> comment_body.txt
-          echo "- **Anna**: [\`$(git rev-parse HEAD | cut -c1-8)\`](https://github.com/anna-ssg/anna/commit/$(git rev-parse HEAD))" >> comment_body.txt
-          echo "- **Saaru**: [\`$(cd tmp/bench/saaru && git rev-parse HEAD | cut -c1-8)\`](https://github.com/anirudhRowjee/saaru/commit/$(cd tmp/bench/saaru && git rev-parse HEAD))" >> comment_body.txt
-          echo "- **Sapling**: [\`$(cd tmp/bench/sapling && git rev-parse HEAD | cut -c1-8)\`](https://github.com/NavinShrinivas/sapling/commit/$(cd tmp/bench/sapling && git rev-parse HEAD))" >> comment_body.txt
           echo "" >> comment_body.txt
           echo "\`\`\`" >> comment_body.txt
           cat bench_results.txt >> comment_body.txt
           echo "" >> comment_body.txt
           echo "\`\`\`" >> comment_body.txt
+          echo " ## Commit Hashes" >> comment_body.txt
+          cat commit_hashes.txt >> comment_body.txt
 
       # Results
       - name: Results Post Benchmark
