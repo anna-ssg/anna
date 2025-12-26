@@ -1,6 +1,6 @@
 name: Benchmark
 on:
-  push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -34,4 +34,23 @@ jobs:
 
       - name: Run Benchmark
         run: |
-          ./test/bench.sh
+          output=$(./test/bench.sh 2>&1)
+          exit_code=$?
+          if [ $exit_code -ne 0 ]; then
+            echo "Benchmark script failed with exit code $exit_code"
+            echo "$output"
+            exit $exit_code
+          fi
+          echo "$output" | sed -n '/Begin Benchmark/,/End Benchmark/p' > bench_results.txt
+
+      - name: Post Benchmark Results
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "## Benchmark Results
+
+          \`\`\`
+          $(cat bench_results.txt)
+          \`\`\`" --create-if-none --edit-last
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

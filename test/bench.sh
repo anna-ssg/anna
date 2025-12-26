@@ -67,15 +67,23 @@ for ((i = 0; i < files; i++)); do
     cp /tmp/bench/test.md "/tmp/bench/hugo/content/test_$i.md"
 done
 
+# begin benchmark
+echo ""
+echo "Begin Benchmark"
+echo ""
+
 # run hyperfine
 echo ""
 echo "running benchmark: $files md files and $warm warmup runs"
 echo ""
 hyperfine -p 'sync' -w $warm \
   "cd /tmp/bench/hugo && hugo" \
-  "cd /tmp/bench/anna && ./anna -r \"site/\"" \
-  "cd /tmp/bench/anna && ./anna_greentea -r \"site/\"" \
+  "cd /tmp/bench/anna && ./anna" \
+  "cd /tmp/bench/anna && ./anna_greentea" \
   "cd /tmp/bench/saaru && ./saaru --base-path ./docs" \
   "cd /tmp/bench/sapling/benchmark && ./../sapling run"
 echo ""
 
+echo ""
+echo "End Benchmark"
+echo ""
