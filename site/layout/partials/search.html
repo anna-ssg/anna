@@ -1,55 +1,46 @@
 {{define "search"}}
-<form class="siteSearch" id="searchSite">
-  <input type="text" placeholder="Search Post or Page" id="searchSiteInput" name="searchSite" required autocomplete="off" />
-</form>
-<div id="site_search_result"></div>
+<!-- Overlay search activated with Cmd/Ctrl+K or search icon -->
+<div class="search-overlay" id="searchOverlay" aria-hidden="true">
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="search-input-row">
+      <input id="searchSiteInput" type="text" placeholder="Search posts or pages — fuzzy search" autocomplete="off"
+        aria-label="Search site" />
+      <button id="closeSearch" class="close-search" aria-label="Close search">✕</button>
+    </div>
+    <div class="search-hint">Show fuzzy search — try partial words or titles</div>
+    <div id="site_search_result" class="search-results"></div>
+  </div>
+</div>
 <script>
-  var resultDiv = document.getElementById("site_search_result");
-  document
-    .getElementById("searchSite")
-    .addEventListener("keyup", function (e) {
-      e.preventDefault();
-      const searchValue =
-        document.getElementById("searchSiteInput").value;
+  (function () {
+    const overlay = document.getElementById('searchOverlay');
+    const input = document.getElementById('searchSiteInput');
+    const results = document.getElementById('site_search_result');
+    const openBtn = document.getElementById('openSearch');
+    const closeBtn = document.getElementById('closeSearch');
 
-      const url = "/static/index.json";
+    function show() { overlay.classList.add('open'); overlay.setAttribute('aria-hidden', 'false'); input.focus(); }
+    function hide() { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true'); input.value = ''; results.innerHTML = ''; }
 
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          resultDiv.innerHTML = "";
-          found = 0;
-          if (searchValue != "") {
-            for (key in data) {
-              found += 1;
-              title =
-                data[key]["Frontmatter"]["Title"].toLowerCase();
-              if (title.includes(searchValue.toLowerCase())) {
-                var a = document.createElement("a");
-                a.innerHTML = data[key]["Frontmatter"]["Title"];
-                a.href = `/${data[key]["CompleteURL"]}`;
-                resultDiv.appendChild(a);
-                resultDiv.appendChild(
-                  document.createElement("br"),
-                );
-              }
-            }
-          } else {
-            document.getElementById("site_search_result").innerHTML = "";
-          }
-        })
-        .catch((error) => {
-          // Handle errors
-          console.error(
-            "There was a problem with the fetch operation:",
-            error,
-          );
-        });
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); show(); }
+      if (e.key === 'Escape') { hide(); }
     });
+
+    if (openBtn) openBtn.addEventListener('click', function () { show(); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { hide(); });
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) hide(); });
+
+    // search logic (debounced simple implementation)
+    let timeout; input.addEventListener('input', function () {
+      clearTimeout(timeout); timeout = setTimeout(() => {
+        const q = input.value.trim().toLowerCase(); if (!q) { results.innerHTML = ''; return }
+        fetch('/static/index.json').then(r => r.json()).then(data => {
+          results.innerHTML = ''; let found = false; for (key in data) { const title = data[key]['Frontmatter']['Title'] || ''; if (title.toLowerCase().includes(q)) { found = true; const a = document.createElement('a'); a.textContent = title; a.href = '/' + data[key]['CompleteURL']; a.className = 'search-link'; results.appendChild(a); results.appendChild(document.createElement('br')); } }
+          if (!found) results.textContent = 'No results';
+        }).catch(err => { console.error(err); results.textContent = 'Search unavailable' })
+      }, 180)
+    });
+  })();
 </script>
 {{end}}

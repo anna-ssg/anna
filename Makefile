@@ -1,5 +1,5 @@
 all:
-	@make build
+	@make serve
 build:
 	@echo "anna: building site"
 	@go build

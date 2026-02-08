@@ -3,9 +3,9 @@ module github.com/anna-ssg/anna/v3
 go 1.25.3
 
 require (
-	github.com/mangoumbrella/goldmark-figure v1.3.0
+	github.com/mangoumbrella/goldmark-figure v1.4.0
 	github.com/spf13/cobra v1.10.2
-	github.com/yuin/goldmark v1.7.13
+	github.com/yuin/goldmark v1.7.16
 	go.abhg.dev/goldmark/anchor v0.2.0
 	go.abhg.dev/goldmark/toc v0.12.0
 	gopkg.in/yaml.v3 v3.0.1

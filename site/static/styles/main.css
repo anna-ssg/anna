@@ -1,0 +1,1249 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+:root {
+    --font-family-sans: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-family: var(--font-family-sans);
+}
+
+i,
+em {
+    font-family: "InterItalic", var(--font-family-sans);
+    font-style: normal;
+}
+
+strong,
+b {
+    font-weight: 600;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+    font-size: 1.05rem;
+    font-weight: 400;
+    font-family: var(--font-family-sans);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent horizontal overflow on small viewports */
+html,
+body {
+    min-width: 0;
+}
+
+/* Global text wrapping for headings, paragraphs, lists, anchors and common containers */
+.container,
+.content,
+.site-main,
+.body,
+.posts,
+.tagged-posts,
+.all-tags,
+.post-list-element,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+blockquote,
+figcaption,
+th,
+td,
+a,
+code {
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    white-space: normal;
+}
+
+/* Keep code blocks scrollable but constrained */
+pre,
+code {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+pre {
+    overflow-x: auto;
+}
+
+/* Page container to make a readable docs layout */
+.container {
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 0.75rem;
+    max-width: 36rem;
+}
+
+.site-main {
+    flex: 1 0 auto;
+    padding-top: 0.75rem;
+    padding-bottom: 2rem;
+}
+
+.content {
+    background: transparent;
+}
+
+.body {
+    padding: 0;
+}
+
+/* Wider layout on larger screens */
+@media (min-width: 768px) {
+    .container {
+        max-width: 48rem;
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 1100px) {
+    .container {
+        max-width: 64rem;
+    }
+}
+
+figure {
+    margin: 0;
+
+    &>figcaption>* {
+        margin: 0;
+    }
+}
+
+img {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+
+    margin-top: 0.1rem;
+    margin-bottom: 0.1rem;
+
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center center;
+}
+
+blockquote {
+    margin: 0.25rem 0 0.25rem;
+    padding: 0.05rem 1.2rem 0.05rem;
+    background-color: var(--inline-code-bg);
+
+    &>* {
+        color: var(--color-text);
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    color: var(--color-primary);
+    line-height: 1.2;
+}
+
+/* Improved heading scale for docs (reduced for tighter layout) */
+h1 {
+    font-size: 1.75rem;
+    margin: 1rem 0 0.4rem;
+}
+
+h2 {
+    font-size: 1.25rem;
+    margin: 0.9rem 0 0.35rem;
+}
+
+h3 {
+    font-size: 1.05rem;
+    margin: 0.75rem 0 0.3rem;
+}
+
+/* Anchor link styling (the little '#') */
+.anchor {
+    color: var(--color-text-dim);
+    text-decoration: none;
+    margin-left: 0.4rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.anchor:hover {
+    color: var(--color-primary-dim);
+}
+
+/* Table of Contents styling */
+h1#table-of-contents {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+h1#table-of-contents+ul {
+    margin-top: 0.6rem;
+    margin-bottom: 1.2rem;
+    padding-left: 1.25rem;
+}
+
+h1#table-of-contents+ul li {
+    margin: 0.5rem 0;
+}
+
+h1#table-of-contents+ul a {
+    color: var(--color-primary-dim);
+    text-decoration: none;
+    border-bottom: none;
+}
+
+h1#table-of-contents+ul a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* Content paragraphs and lists spacing */
+p {
+    margin: 0.6rem 0;
+}
+
+ul,
+ol {
+    margin: 0.6rem 0 0.6rem 1.1rem;
+}
+
+/* Horizontal rule styling: lighter than borders, visible in dark mode */
+hr {
+    border: 0;
+    border-top: 1px solid var(--color-hr);
+    margin: 1.2rem 0;
+    height: 0;
+    background: transparent;
+}
+
+/* Code block improvements: render the entire <pre> as a rounded card */
+pre {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    /* keep copy button positioned inside the pre */
+
+    /* visual card */
+    background-color: var(--inline-code-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0.6rem;
+    /* outer padding so copy button doesn't overlap content */
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+}
+
+pre>code {
+    display: block;
+    min-width: 100%;
+    white-space: pre;
+    box-sizing: border-box;
+    background: transparent;
+    /* let the parent <pre> provide the card background */
+    padding: 0;
+    /* inner code lines use parent padding */
+    margin: 0;
+}
+
+p>code,
+li>code,
+dd>code,
+td>code,
+h1>code,
+h2>code,
+h3>code,
+h4>code,
+a>code {
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+}
+
+h1>i,
+h1>em,
+h2>i,
+h2>em,
+h3>i,
+h3>em,
+h4>i,
+h4>em,
+h5>i,
+h5>em,
+h6>i,
+h6>em {
+    font-family: InterItalic, sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--color-primary);
+    line-height: 1.2;
+}
+
+a {
+    /* Make inline links slightly blue for better affordance */
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+
+    &:visited {
+        color: var(--color-primary-dim);
+        text-decoration: none;
+    }
+
+    &:hover {
+        color: var(--color-primary-dim);
+    }
+}
+
+nav {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    padding: 0.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-bottom: none;
+}
+
+/* Underline-only 'diff' style for nav links */
+nav a,
+.site-nav .navitem {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+    text-decoration-color: transparent;
+    margin: 0 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+    background: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    transition: color 0.15s, text-decoration-color 0.15s, transform 0.12s;
+}
+
+nav a:hover,
+.site-nav .navitem:hover {
+    color: var(--color-primary-dim);
+    text-decoration-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* Ensure visited/nav-open/mobile keep usable nav underlines */
+nav a:visited,
+.site-nav .navitem:visited {
+    /* don't inherit the global visited rule that removes underline */
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    color: inherit;
+}
+
+@media (max-width: 700px) {
+
+    /* Mobile: keep nav collapsed by default; reveal in-flow on `nav-open` */
+    .site-nav {
+        display: block;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 0;
+        transition: max-height 0.28s ease, padding 0.18s ease;
+        border-top: none;
+        /* remove top bar */
+    }
+
+    .site-nav a,
+    .site-nav .navitem {
+        display: block;
+        padding: 0.35rem 0.6rem;
+        margin: 0;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 1.2px;
+        text-decoration-color: transparent;
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .site-nav a:hover,
+    .site-nav .navitem:hover {
+        text-decoration-color: var(--color-primary);
+        transform: none;
+        color: var(--color-primary-dim);
+    }
+
+    /* Reveal the nav in-flow when hamburger is toggled */
+    body.nav-open .site-nav {
+        max-height: 480px;
+        /* large enough for typical menus */
+        padding: 0.6rem 0;
+        background: var(--color-surface);
+        border-top: none;
+        box-shadow: none;
+    }
+}
+
+nav>.navigations>.header-element,
+nav>.navigations>.header-element-author {
+    font-family: Inter;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.image-grid {
+    /* margin: 1rem 0 0rem 0; */
+    column-count: 2;
+    column-gap: 0.5rem;
+}
+
+.image-grid>* {
+    display: inline-block;
+    width: 100%;
+    break-inside: avoid;
+}
+
+.image-grid>*>img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0;
+    border-radius: var(--style-border-radius);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.post-list-element {
+    list-style-type: none;
+
+    margin-bottom: 5px;
+
+    &>div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+ul:has(.post-list-element) {
+    padding: 0;
+    margin: 0;
+}
+
+.post-list-element>div>div>.post-list-title {
+    color: var(--color-primary);
+    font-weight: 480;
+}
+
+.post-list-description {
+    color: var(--color-text-dim);
+    padding: 0;
+    margin: 0;
+}
+
+.post-list-date {
+    color: var(--color-text-dim);
+    min-width: 100px;
+    margin-left: 10px;
+}
+
+/* Tags listing - display as chips and grid on mobile */
+.all-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.all-tags a {
+    display: inline-block;
+    padding: 0.42rem 0.8rem;
+    border-radius: 999px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: background 0.12s, color 0.12s, transform 0.08s;
+}
+
+.all-tags a:hover {
+    background: var(--color-primary);
+    color: var(--color-background);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+    .all-tags {
+        gap: 0.4rem;
+        padding: 0.6rem 0;
+    }
+
+    .all-tags a {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Tag subpage list of posts */
+.tagged-posts {
+    display: grid;
+    gap: 0.6rem;
+    max-width: var(--style-container-width);
+    margin: 0 auto;
+    padding: 0.6rem 0;
+}
+
+.tagged-posts a {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.tagged-posts a:hover {
+    background: var(--inline-code-bg);
+}
+
+iframe {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    border: none;
+    color: var(--color-text);
+    background-color: var(--color-background);
+}
+
+/* iframe stylings */
+.twitter-tweet {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    height: auto;
+}
+
+pre {
+    position: relative;
+    overflow: visible;
+    /* ensure button isn't clipped */
+}
+
+pre code {
+    overflow-x: scroll;
+    font-family: JuliaMono, monospace;
+    font-variant-ligatures: common-ligatures;
+    font-feature-settings: "liga" on;
+    background-color: var(--inline-code-bg);
+    line-height: 1.3;
+    font-size: 0.95rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-inline: 0.5rem;
+    padding-inline-end: 3rem;
+    /* leave space for copy button */
+    box-sizing: border-box;
+}
+
+/* Copy button placed inside code blocks (works with highlightjs copy plugin) */
+pre button[class*="copy"],
+pre .hljs-copy,
+pre .copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 0.18rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.08s;
+}
+
+pre button[class*="copy"]:hover,
+pre .hljs-copy:hover,
+pre .copy-button:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        background: rgba(0, 0, 0, 0.35);
+        color: var(--color-text);
+        border-color: rgba(255, 255, 255, 0.06);
+    }
+}
+
+@media (max-width: 700px) {
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        top: 6px;
+        right: 10px;
+        /* pull slightly inwards to avoid edge cropping */
+        font-size: 0.75rem;
+        padding: 0.1rem 0.3rem;
+    }
+
+    /* Ensure code has right padding on mobile so the scroller doesn't hide button */
+    pre code {
+        padding-inline-end: 2.5rem;
+    }
+}
+
+pre>code {
+    display: block;
+    text-indent: 0;
+    /* use pre to preserve whitespace so scrolling is predictable */
+    white-space: pre;
+    box-sizing: border-box;
+}
+
+/* Make code blocks horizontally scrollable inside their own container
+   to prevent page-level horizontal overflow on small screens */
+pre {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    /* keep copy button positioned inside the pre */
+}
+
+pre>code {
+    display: block;
+    min-width: 100%;
+    /* ensure scroller appears for long lines */
+    white-space: pre;
+    box-sizing: border-box;
+}
+
+p>code,
+li>code,
+dd>code,
+td>code,
+h1>code,
+h2>code,
+h3>code,
+h4>code,
+a>code {
+    font-family: JuliaMono, monospace;
+    color: var(--color-heading);
+    background-color: var(--inline-code-bg);
+    /* Allow inline code to wrap on small viewports */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    box-decoration-break: clone;
+    padding: 0.1rem;
+    padding-inline: 0.4rem;
+    font-size: 1.05rem;
+}
+
+.video-container-1610 {
+    position: relative;
+    padding-bottom: 62.5%;
+    height: 0;
+    margin-bottom: 0.5rem;
+}
+
+.video-container-1610 iframe {
+    margin-bottom: 0.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    margin-bottom: 0.5rem;
+}
+
+.video-container iframe {
+    margin-bottom: 0.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Lastfm CSS */
+#lastfm {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#lastfm .lastfm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#lastfm .lastfm-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 0.45rem 0.45rem;
+    border-bottom: 1px solid var(--color-text-low, #e0e0e0);
+}
+
+#lastfm .lastfm-row.now-playing {
+    background-color: var(--inline-code-bg);
+    padding: 0.75rem;
+    padding-left: calc(0.75rem + 10px);
+    padding-right: calc(0.75rem + 10px);
+    border-bottom: none;
+    margin: 0 -10px 0.75rem -10px;
+}
+
+#lastfm .lastfm-row:last-child {
+    border-bottom: none;
+}
+
+#lastfm .cover {
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--color-text-low, #dcdcdc);
+    object-fit: cover;
+    background: var(--color-surface, #f8f8f8);
+    flex-shrink: 0;
+}
+
+#lastfm .meta {
+    min-width: 0;
+    flex: 1;
+}
+
+#lastfm .title {
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-heading, inherit);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+#lastfm .title:hover {
+    text-decoration: underline;
+}
+
+#lastfm .artist {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-dim, #666);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: Inter, sans-serif;
+    font-weight: 400;
+}
+
+#lastfm .time {
+    color: var(--color-text-dim, #999);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    text-align: right;
+    flex-shrink: 0;
+    font-family: Inter, sans-serif;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    #lastfm .lastfm-row {
+        grid-template-columns: 48px 1fr;
+        gap: 0.7rem;
+        padding: 0.5rem 0.45rem;
+    }
+
+    #lastfm .lastfm-row.now-playing {
+        padding: 0.75rem;
+        padding-left: calc(0.75rem + 10px);
+        padding-right: calc(0.75rem + 10px);
+        margin: 0 -10px 0.75rem -10px;
+        border-bottom: none;
+    }
+
+    #lastfm .cover {
+        width: 48px;
+        height: 48px;
+    }
+
+    #lastfm .meta {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #lastfm .time {
+        grid-column: auto;
+        text-align: left;
+        margin-top: 0.15rem;
+        font-size: 0.85rem;
+        order: 3;
+    }
+
+    #lastfm .title {
+        font-size: 0.95rem;
+        margin: 0;
+        order: 1;
+    }
+
+    #lastfm .artist {
+        font-size: 0.9rem;
+        margin: 0.05rem 0 0;
+        order: 2;
+    }
+
+    #lastfm .menu {
+        display: none;
+    }
+}
+
+:root {
+    --color-text: #24292f;
+    --color-text-dim: #656d76;
+    --color-text-low: #656d7690;
+
+    --color-background: #ffffff;
+    --color-background-dim: #ffffff7a;
+    --color-background-low: #ffffff50;
+    --color-background-contrast: #0969da;
+
+    --inline-code-bg: #f6f8fa;
+    --selection-bg: #0969da1a;
+
+    --color-primary: #0969da;
+    --color-primary-dim: #0969daef;
+    --color-primary-low: #0969da1a;
+
+    --color-border: #d1d9e0;
+    /* subtle horizontal rule color (lighter than border) */
+    --color-hr: rgba(2, 6, 23, 0.06);
+    --color-surface: #f6f8fa;
+
+    --style-border-radius: 6px;
+    --style-border-radius-hover: 6px;
+    --style-hover-scale: 1;
+    --style-container-width: 40rem;
+
+    --style-body-font: 1.1rem;
+    --style-body-font-mobile: 1.1rem;
+
+    --animation-bezier: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@font-face {
+    font-family: monospace;
+    src: url(/static/fonts/mono/JuliaMono.ttf);
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Inter;
+    src: url(/static/fonts/others/Inter.ttf);
+    font-display: swap;
+    font-feature-settings:
+        "liga" 1,
+        "calt" 1;
+}
+
+@supports (font-variation-settings: normal) {
+    :root {
+        font-family: Inter;
+    }
+}
+
+@font-face {
+    font-family: InterItalic;
+    src: url(/static/fonts/others/InterItalic.ttf);
+    font-display: swap;
+    font-feature-settings:
+        "liga" 1,
+        "calt" 1;
+}
+
+/* Desktop wide layout handled via .container; remove body max-width to avoid left-alignment */
+@media (min-width: 768px) {
+
+    /* keep container sizing only */
+    .container {
+        max-width: 58rem;
+    }
+}
+
+/* Header spacing */
+.site-header {
+    padding: 0.75rem 0;
+    position: relative;
+    /* allow absolute mobile nav to position relative to header */
+    z-index: 20;
+}
+
+.site-header .container {
+    align-items: center;
+}
+
+/* Header and footer layout */
+.site-header,
+.site-footer {
+    border-bottom: none;
+    background: var(--color-surface);
+}
+
+.header-inner,
+.footer-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand a {
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.brand-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+    margin-right: 0.75rem;
+}
+
+.site-nav {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-self: center;
+    /* keep nav centered in middle column */
+}
+
+/* Replaced by unified underline style above */
+.site-nav .navitem {
+    /* styles handled by nav a, kept for markup compatibility */
+}
+
+.site-nav .navitem:hover {
+    /* hover handled by unified nav styles above */
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.actions button {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    padding: 0.2rem;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.actions button>* {
+    pointer-events: none;
+}
+
+.actions button:hover {
+    transform: translateY(-1px);
+}
+
+@media (min-width: 700px) {
+
+    /* hide mobile hamburger on desktop */
+    .hamburger {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none;
+    }
+}
+
+@media (max-width: 700px) {
+
+    /* make action buttons even smaller on mobile */
+    .actions button {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media (min-width: 700px) {
+
+    /* Ensure any residual `nav-open` state does not trigger the mobile overlay on desktop */
+    body.nav-open .site-nav {
+        display: flex;
+        position: static;
+        box-shadow: none;
+    }
+}
+
+/* Footer tweaks */
+.site-footer {
+    border-top: none;
+    border-bottom: none;
+    padding: 0.75rem 0;
+}
+
+/* Optional subtle separator for very short content pages */
+.site-footer--separated {
+    border-top: 1px solid var(--color-border);
+}
+
+.footer-inner {
+    font-size: 0.95rem;
+    color: var(--color-text-dim);
+}
+
+/* Search overlay and box - center to the page container */
+.search-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    /* subtle backdrop blur for focus */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1000;
+}
+
+.search-overlay.open {
+    display: flex;
+}
+
+/* Slightly smaller search box to match screenshot, centered with fixed positioning */
+.search-box {
+    background: var(--color-background);
+    color: var(--color-text);
+    padding: 0.75rem;
+    border-radius: 10px;
+    width: calc(100% - 2rem);
+    max-width: 46rem;
+    /* match container */
+    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.08);
+    border: 1px solid var(--color-border);
+
+    /* center the dialog relative to the viewport */
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+
+    /* keep the box from overflowing when keyboard opens or on very short viewports */
+    max-height: calc(100vh - 4rem);
+    overflow: auto;
+}
+
+/* prefer the modern dynamic viewport unit when available for mobile browsers */
+@supports (height: 100dvh) {
+    .search-box {
+        max-height: calc(100dvh - 4rem);
+    }
+}
+
+/* Input row: keep input and button aligned */
+.search-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.search-input-row input[type="text"] {
+    flex: 1 1 auto;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: transparent;
+    color: var(--color-text);
+}
+
+.search-box .close-search {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+}
+
+.search-hint {
+    margin-top: 0.45rem;
+    font-size: 0.85rem;
+    color: var(--color-text-dim);
+}
+
+.search-results {
+    margin-top: 0.6rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+    .search-box {
+        max-width: calc(100% - 1.2rem);
+        padding: 0.6rem;
+        /* nudge up from the bottom when virtual keyboard appears */
+        top: 45%;
+        transform: translate(-50%, -45%);
+    }
+
+    .search-input-row input {
+        font-size: 0.95rem;
+        padding: 0.45rem 0.5rem;
+    }
+}
+
+/* Ensure footer container respects alignment; header uses .header-inner grid */
+.site-footer .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #f0f6fc;
+        --color-text-dim: #c9d1d9;
+        --color-text-low: #c9d1d990;
+
+        --color-background: #0d1117;
+        --color-background-dim: #0d11177a;
+        --color-background-low: #0d111750;
+        --color-background-contrast: #79c0ff;
+
+        --inline-code-bg: #161b22;
+        --selection-bg: #79c0ff1a;
+
+        --color-primary: #79c0ff;
+        --color-primary-dim: #79c0ffef;
+        --color-primary-low: #79c0ff1a;
+
+        --color-border: #30363d;
+        /* stronger HR contrast in dark mode */
+        --color-hr: rgba(255, 255, 255, 0.10);
+        --color-surface: #161b22;
+    }
+
+    nav {
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        border-bottom: none;
+    }
+
+    /* Dark-mode: keep underline-only style consistent */
+    nav a,
+    .site-nav .navitem {
+        color: var(--color-primary);
+        text-decoration: underline;
+        text-underline-offset: 6px;
+        text-decoration-thickness: 2px;
+        text-decoration-color: transparent;
+        margin: 0 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: transparent;
+        border: none;
+        padding: 0;
+        border-radius: 0;
+        transition: color 0.15s, text-decoration-color 0.15s, transform 0.12s;
+    }
+
+    nav a:hover,
+    .site-nav .navitem:hover {
+        color: var(--color-primary-dim);
+        text-decoration-color: var(--color-primary);
+        transform: translateY(-1px);
+    }
+}
+
+/* Dark mode via HTML root .dark class (toggled by JS) */
+:root.dark {
+    --color-text: #f0f6fc;
+    --color-text-dim: #c9d1d9;
+    --color-text-low: #c9d1d990;
+
+    --color-background: #0d1117;
+    --color-background-dim: #0d11177a;
+    --color-background-low: #0d111750;
+    --color-background-contrast: #79c0ff;
+
+    --inline-code-bg: #161b22;
+    --selection-bg: #79c0ff1a;
+
+    --color-primary: #79c0ff;
+    --color-primary-dim: #79c0ffef;
+    --color-primary-low: #79c0ff1a;
+
+    --color-border: #30363d;
+    --color-surface: #161b22;
+}

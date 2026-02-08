@@ -2,44 +2,48 @@
 {{$PageData := index .DeepDataMerge.Templates .PageURL}}
 {{ template "head" .}}
 
-<body>
+<body class="site-body">
 
     {{template "header" .}}
-    <article>
-        <section class="body">
+    <main class="container site-main" role="main">
+        <article class="content">
+            <section class="body">
 
-            {{if strSliceContains $PageData.Frontmatter.Collections "posts"}}
-            <div class="post-description">
-                <h1>{{ $PageData.Frontmatter.Title }}</h1>
-                <div class="page-date">
-                    {{ if ne (len $PageData.Frontmatter.Date) 0 }}
-                    Published on {{$PageData.Frontmatter.Date}}
-                    {{end}}
-                </div>
-                <div class="authors-placeholder">
-                    <p>
-                        <!-- if length of frontmatter authors is 0 -->
-                        {{ if ne (len $PageData.Frontmatter.Authors) 0 }}
-                        Authors:
-                        {{range $PageData.Frontmatter.Authors }}
-                        {{ . }} |
-                        {{ end }}
-                        {{ end }}
-                    </p>
-                </div>
-                <div class="tags-placeholder">
-                    {{range $PageData.Frontmatter.Tags}}
-                    <div class="tag">
-                        <a href="/tags/{{.}}.html">{{.}}</a>
+                {{ if ne (len $PageData.Frontmatter.Title) 0 }}
+                <div class="post-description">
+                    <h1>{{ $PageData.Frontmatter.Title }}</h1>
+                    <div class="page-date">
+                        {{ if ne (len $PageData.Frontmatter.Date) 0 }}
+                        Published on {{$PageData.Frontmatter.Date}}
+                        {{end}}
                     </div>
-                    {{end}}
+                    <div class="authors-placeholder">
+                        <p>
+                            <!-- if length of frontmatter authors is 0 -->
+                            {{ if ne (len $PageData.Frontmatter.Authors) 0 }}
+                            Authors:
+                            {{range $PageData.Frontmatter.Authors }}
+                            {{ . }} |
+                            {{ end }}
+                            {{ end }}
+                        </p>
+                    </div>
+                    <div class="tags-placeholder">
+                        {{ if ne (len $PageData.Frontmatter.Tags) 0 }}
+                        {{range $PageData.Frontmatter.Tags}}
+                        <div class="tag">
+                            <a href="/tags/{{.}}.html">{{.}}</a>
+                        </div>
+                        {{end}}
+                        {{ end }}
+                    </div>
                 </div>
-            </div>
-            {{end}}
+                {{ end }}
 
-            {{$PageData.Body}}
-        </section>
-    </article>
+                {{$PageData.Body}}
+            </section>
+        </article>
+    </main>
     {{template "footer" .}}
 </body>
 

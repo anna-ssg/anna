@@ -5,68 +5,75 @@
 
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{{$PageData.Frontmatter.Title}}</title>
-        <link
-            rel="preload stylesheet"
-            href="{{.DeepDataMerge.LayoutConfig.ThemeURL}}"
-            as="style"
-        />
 
-        <!-- External Stylesheets and Plugins -->
-        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-        <!-- <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/tomorrow-night.css"> -->
-        <!-- some issue with it -->
-        <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css"
-        />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{$PageData.Frontmatter.Title}}</title>
 
-        <link
-            rel="alternate"
-            type="application/atom+xml"
-            title="feed"
-            href="/feed.xml"
-        />
+    <!-- Main site stylesheet -->
+    <link rel="stylesheet" href="/static/styles/main.css" />
 
-        <!-- Scripts filled in from plugins -->
-        {{ if $PageData.LiveReload }}
-        <script>
-            const eventSource = new EventSource("http://localhost:8000/events");
-            eventSource.onmessage = function (event) {
-                location.reload();
-            };
-        </script>
-        {{ end }} {{range $PageData.Frontmatter.JSFiles}}
-        <script src="/static/scripts/{{.}}" defer></script>
-        {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts}}
-        <script src="/static/scripts/{{.}}" defer></script>
-        {{end}}
+    <!-- Favicons -->
+    <link rel="icon" href="/static/images/anna.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/anna.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/anna.png" />
+    <link rel="apple-touch-icon" href="/static/images/anna.png" />
+    <meta name="theme-color" content="#ffffff" />
 
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="{{ $PageData.Frontmatter.Title }}" />
-        <meta
-            property="og:description"
-            content="{{ $PageData.Frontmatter.Description }}"
-        />
-        <meta
-            property="og:image"
-            content="{{ $PageData.Frontmatter.PreviewImage }}"
-        />
+    <!-- Highlight.js theme (light and dark variant) -->
+    <link id="hljs-light" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css" />
+    <link id="hljs-dark" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" disabled />
 
-        <meta
-            name="description"
-            content="{{ $PageData.Frontmatter.Description }}"
-        />
+    <!-- External Scripts (highlight.js + copy plugin) -->
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
 
-        <script defer>
-            hljs.highlightAll();
-            hljs.addPlugin(new CopyButtonPlugin());
-        </script>
-    </head>
+    <link rel="alternate" type="application/atom+xml" title="feed" href="/feed.xml" />
+
+    <!-- Scripts filled in from plugins -->
+    {{ if $PageData.LiveReload }}
+    <script>
+        const eventSource = new EventSource("http://localhost:8000/events");
+        eventSource.onmessage = function (event) {
+            location.reload();
+        };
+    </script>
+    {{ end }} {{range $PageData.Frontmatter.JSFiles}}
+    <script src="/static/scripts/{{.}}" defer></script>
+    {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts}}
+    <script src="/static/scripts/{{.}}" defer></script>
     {{end}}
-</html>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{ $PageData.Frontmatter.Title }}" />
+    <meta property="og:description" content="{{ $PageData.Frontmatter.Description }}" />
+    <meta property="og:image" content="{{ $PageData.Frontmatter.PreviewImage }}" />
+
+    <meta name="description" content="{{ $PageData.Frontmatter.Description }}" />
+
+    <script defer>
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightAll();
+            if (typeof CopyButtonPlugin !== 'undefined') {
+                hljs.addPlugin(new CopyButtonPlugin());
+            }
+        }
+
+        // ensure correct highlight theme is enabled on initial load
+        (function () {
+            try {
+                var light = document.getElementById('hljs-light');
+                var dark = document.getElementById('hljs-dark');
+                var isDark = document.documentElement.classList.contains('dark');
+                if (light && dark) {
+                    light.disabled = !!isDark;
+                    dark.disabled = !isDark;
+                }
+            } catch (e) { }
+        })();
+    </script>
+</head>
+{{end}}

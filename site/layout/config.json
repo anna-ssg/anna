@@ -1,9 +1,6 @@
 {
   "navbar": [
     {
-      "Index": "index.html"
-    },
-    {
       "Quick Start": "quick-start.html"
     },
     {
@@ -16,12 +13,6 @@
       "Tags": "tags.html"
     },
     {
-      "Collections": "collections.html"
-    },
-    {
-      "Posts": "collections/posts.html"
-    },
-    {
       "Anna Blog": "posts/building-anna/index.html"
     }
   ],
@@ -29,7 +20,7 @@
   "siteTitle": "anna-docs",
   "siteScripts": null,
   "author": "anna",
-  "themeURL": "/static/style.css",
+  "themeURL": null,
   "copyright": "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.",
   "customFields": {
     "Github": "https://github.com/anna-ssg/anna"

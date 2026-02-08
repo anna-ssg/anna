@@ -1,5 +1,40 @@
 {{define "footer"}}
-<footer>
-    Rendered using <a href="https://github.com/anna-ssg/anna">anna</a> ❤️
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div class="copyright">Rendered using <a href="https://github.com/anna-ssg/anna">anna</a> ❤️</div>
+        <div class="credits">&copy; <span id="site-year"></span> {{ .DeepDataMerge.LayoutConfig.SiteTitle }}</div>
+    </div>
+    <script>/* set current year client-side to avoid template helpers */(function () { var el = document.getElementById('site-year'); if (el) el.textContent = new Date().getFullYear(); })();
+
+        /* mobile nav toggle */
+        (function () {
+            var ham = document.getElementById('hamburger'); if (!ham) return;
+
+            function setNavStateOnLoadOrResize() {
+                // Desktop: ensure the nav is visible (handled by CSS) and ensure mobile nav is closed
+                if (window.innerWidth > 700) {
+                    document.body.classList.remove('nav-open');
+                    ham.setAttribute('aria-expanded', 'false');
+                } else {
+                    // Mobile: default closed
+                    document.body.classList.remove('nav-open');
+                    ham.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            function toggleNav() {
+                var isOpen = document.body.classList.toggle('nav-open');
+                ham.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
+
+            // initialize state on load
+            setNavStateOnLoadOrResize();
+
+            ham.addEventListener('click', toggleNav);
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { document.body.classList.remove('nav-open'); ham.setAttribute('aria-expanded', 'false'); } });
+            window.addEventListener('resize', setNavStateOnLoadOrResize);
+            // close when clicking outside the header/nav
+            document.addEventListener('click', function (e) { if (!document.body.classList.contains('nav-open')) return; if (!e.target.closest || !e.target.closest('.site-header')) { document.body.classList.remove('nav-open'); ham.setAttribute('aria-expanded', 'false'); } });
+        })();</script>
 </footer>
 {{end}}

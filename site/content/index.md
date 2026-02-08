@@ -3,6 +3,7 @@ date: 2024-02-24
 title: Home
 previewimage: "/static/images/anna.png"
 description: "homepage for our ssg"
+layout: page
 ---
 
 # Henlo!

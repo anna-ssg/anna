@@ -2,10 +2,10 @@
 {{$PageData := .TemplateData}}
 {{ template "head" .}}
 
-<body>
-{{template "header" .}}
-    <div class="body">
-        <article>
+<body class="site-body">
+    {{template "header" .}}
+    <main class="container site-main" role="main">
+        <article class="content">
             <section class="posts">
                 <div class="all-tags">
                     {{range .TagNames}}
@@ -14,7 +14,7 @@
                 </div>
             </section>
         </article>
-    </div>
+    </main>
 
     <!-- <div id="chart"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>

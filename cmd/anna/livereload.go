@@ -30,10 +30,11 @@ type liveReload struct {
 
 func newLiveReload(siteDataPath string) *liveReload {
 	lr := liveReload{
-		errorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
-		fileTimes:    make(map[string]time.Time),
-		rootDirs:     []string{siteDataPath},
-		extensions:   []string{".md"},
+		errorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
+		fileTimes:   make(map[string]time.Time),
+		rootDirs:    []string{siteDataPath},
+		// empty/extensions==nil means watch all files
+		extensions:   nil,
 		siteDataPath: siteDataPath,
 	}
 	return &lr
@@ -64,7 +65,17 @@ func (lr *liveReload) traverseDirectory(rootDir string) bool {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && lr.hasValidExtension(path) {
+		// Skip generated and VCS directories to avoid render loops and noisy events
+		if info.IsDir() {
+			name := info.Name()
+			if name == "rendered" || name == ".git" || name == "node_modules" || name == "vendor" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		// Consider all files if extensions list is nil/empty, otherwise filter by extension
+		if lr.hasValidExtension(path) {
 			if lr.checkFile(path, info.ModTime()) {
 				filesChanged = true
 				return nil
@@ -79,6 +90,10 @@ func (lr *liveReload) traverseDirectory(rootDir string) bool {
 }
 
 func (lr *liveReload) hasValidExtension(path string) bool {
+	// if no extensions are configured, accept all files
+	if len(lr.extensions) == 0 {
+		return true
+	}
 	ext := filepath.Ext(path)
 	for _, validExt := range lr.extensions {
 		if ext == validExt {

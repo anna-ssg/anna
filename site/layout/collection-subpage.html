@@ -2,11 +2,10 @@
 {{$PageData := index .DeepDataMerge.Collections .PageURL}}
 {{ template "head" .}}
 
-<body>
+<body class="site-body">
     {{template "header" .}}
-
-    <div class="body">
-        <article>
+    <main class="container site-main" role="main">
+        <article class="content">
             <section class="tagged-posts">
                 {{$CollectionSet := index .DeepDataMerge.CollectionsMap .PageURL}}
                 {{range $CollectionSet }}
@@ -14,7 +13,7 @@
                 {{end}}
             </section>
         </article>
-    </div>
+    </main>
 
     {{template "footer" .}}
 </body>

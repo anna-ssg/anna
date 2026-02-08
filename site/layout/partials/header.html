@@ -3,12 +3,25 @@
 {{ $PageData := index .DeepDataMerge.Templates .PageURL }} {{if eq $PageData nil
 }} {{ $PageData = .TemplateData }} {{end}}
 
-<header>
-    <nav>
-        {{range $index_no, $map := .DeepDataMerge.LayoutConfig.Navbar}} {{range
-        $key, $value := $map }}
-        <a class="navitem" href="/{{ $value }}">[{{ $key }}]</a>
-        {{ end }} {{end}}
-    </nav>
+<header class="site-header">
+    <div class="container header-inner">
+        <div class="brand">
+            <a href="/" aria-label="{{ .DeepDataMerge.LayoutConfig.SiteTitle }}"><img src="/static/images/anna.png"
+                    alt="{{ .DeepDataMerge.LayoutConfig.SiteTitle }}" class="brand-logo" /></a>
+        </div>
+        <nav id="mobile-nav" class="site-nav" aria-label="Main navigation">
+            {{range $index_no, $map := .DeepDataMerge.LayoutConfig.Navbar}}
+            {{range $key, $value := $map}}
+            <a class="navitem" href="/{{ $value }}">{{ $key }}</a>
+            {{end}}
+            {{end}}
+        </nav>
+        <div class="actions">
+            <button class="hamburger" id="hamburger" aria-controls="mobile-nav" aria-expanded="false"
+                aria-label="Open menu">☰</button>
+            <button class="search-btn" id="openSearch" aria-label="Search (Cmd/Ctrl+K)">🔎</button>
+        </div>
+    </div>
 </header>
+
 {{template "search" .}} {{end}}
