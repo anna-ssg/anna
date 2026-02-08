@@ -3,7 +3,7 @@ all:
 
 # Build with embedded commit hash (set COMMIT env var or default to current git HEAD)
 COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo "")
-LDFLAGS ?= -X main.CommitHash=$(COMMIT)
+LDFLAGS ?= -X main.FullCommitHash=$(COMMIT)
 build:
 	@echo "anna: building with commit $(COMMIT)"
 	@go build -ldflags "$(LDFLAGS)"

@@ -14,9 +14,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// CommitHash can be set at build time with -ldflags "-X main.CommitHash=<hash-or-tag>".
-// Example: go build -ldflags "-X main.CommitHash=1a2b3c4"
-var CommitHash string
+// FullCommitHash can be set at build time with -ldflags "-X main.FullCommitHash=<hash-or-tag>".
+// Example: go build -ldflags "-X main.FullCommitHash=1a2b3c4"
+var FullCommitHash string
 
 func main() {
 	var addr string
@@ -27,7 +27,7 @@ func main() {
 	var version bool
 	var siteDirPath string
 
-	Version := "v3.0.0" // to be set at build time $(git describe --tags)
+	Version := "v4.0.0-rc-3" // to be set at build time $(git describe --tags)
 
 	rootCmd := &cobra.Command{
 		Use:   "anna",
@@ -37,8 +37,8 @@ func main() {
 
 			// If the binary was built with an embedded commit hash, expose it to
 			// the rest of the process via ANNA_COMMIT so non-CLI flows can use it.
-			if CommitHash != "" {
-				os.Setenv("ANNA_COMMIT", CommitHash)
+			if FullCommitHash != "" {
+				os.Setenv("ANNA_COMMIT", FullCommitHash)
 			}
 			annaCmd := anna.Cmd{
 				RenderDrafts: renderDrafts,
@@ -66,8 +66,8 @@ func main() {
 
 			if version {
 				ver := Version
-				if CommitHash != "" {
-					ver = fmt.Sprintf("%s (commit: %s)", Version, CommitHash)
+				if FullCommitHash != "" {
+					ver = fmt.Sprintf("%s (commit: %s)", Version, FullCommitHash)
 				}
 				annaCmd.InfoLogger.Println("Current version:", ver)
 			}
@@ -109,16 +109,16 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			info := logger.New(os.Stderr)
 
-			// If a build-time CommitHash was embedded prefer that over --url
-			if CommitHash != "" {
-				trim := strings.TrimSpace(CommitHash)
+			// If a build-time FullCommitHash was embedded prefer that over --url
+			if FullCommitHash != "" {
+				trim := strings.TrimSpace(FullCommitHash)
 				// If the embedded value already looks like a URL, use it directly.
 				if strings.HasPrefix(trim, "http://") || strings.HasPrefix(trim, "https://") {
 					bsURL = trim
 					info.Printf("Bootstrapping from embedded URL -> %s\n", bsURL)
 				} else {
 					bsURL = fmt.Sprintf("https://github.com/anna-ssg/anna/archive/%s.zip", trim)
-					info.Printf("Bootstrapping from embedded commit %s -> %s\n", CommitHash, bsURL)
+					info.Printf("Bootstrapping from embedded commit %s -> %s\n", FullCommitHash, bsURL)
 				}
 			}
 

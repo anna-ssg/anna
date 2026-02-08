@@ -1,8 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&display=swap");
 
 :root {
-    --font-family-sans: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    font-family: var(--font-family-sans);
+    --font-family-sans:
+        "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, "Noto Sans", sans-serif;
+    --font-family-serif: "Lora", Georgia, "Times New Roman", Times, serif;
+    font-family: var(--font-family-serif);
 }
 
 i,
@@ -32,6 +36,23 @@ body {
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Improve vertical rhythm for prose */
+    line-height: 1.7;
+}
+
+/* Ensure paragraphs have comfortable spacing */
+p {
+    margin: 0 0 1.15rem 0;
+}
+
+/* Slightly reduce heading line-height so headings remain compact */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.25;
 }
 
 /* Prevent horizontal overflow on small viewports */
@@ -101,23 +122,25 @@ pre>code {
     display: block;
 }
 
-@media (max-width: 640px) {
-    pre {
-        max-height: 320px;
-    }
-}
-
 /* Page container to make a readable docs layout */
 .container {
     box-sizing: border-box;
     margin: 0 auto;
     /* a little more breathing room inside the page container */
     padding: 1rem;
-    max-width: 36rem;
+    /* Use characters-based measure for optimal line length on articles */
+    max-width: 65ch;
+}
+
+/* Larger container for very wide viewports while keeping measure readable */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 75ch;
+    }
 }
 
 /* Increase container padding on larger viewports for better rhythm */
-@media (min-width: 768px) {
+@media (min-width: 900px) {
     .container {
         padding: 1.25rem;
     }
@@ -144,7 +167,7 @@ pre>code {
 }
 
 /* Wider layout on larger screens */
-@media (min-width: 768px) {
+@media (min-width: 900px) {
     .container {
         max-width: 48rem;
         padding: 1rem;
@@ -201,22 +224,13 @@ img {
 #carousel-frame {
     aspect-ratio: 3/4 !important;
     width: 100%;
-    max-width: 640px;
+    max-width: 900px;
     margin: 1rem auto;
     border-radius: 10px;
     border: 1px solid rgba(2, 6, 23, 0.06);
     box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
     background: transparent;
     height: auto;
-}
-
-@media (max-width: 640px) {
-
-    /* on small screens keep the original wide aspect */
-    #carousel-frame {
-        aspect-ratio: 16/9 !important;
-        max-width: 100%;
-    }
 }
 
 @media (min-width: 1100px) {
@@ -228,23 +242,16 @@ img {
 /* Embed card: visually matches the code card style (rounded, border, shadow) */
 .embed-card {
     width: 100%;
-    background: var(--inline-code-bg);
+    background: transparent;
+    /* inner content fills the card */
     border: 1px solid var(--color-border);
     border-radius: 10px;
-    padding: 0.6rem;
+    padding: 0;
+    /* card has no inner padding so iframe fills it */
     position: relative;
     box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
     overflow: hidden;
     margin: 1rem 0;
-}
-
-/* make the embedded content sit flush inside the card */
-.embed-card {
-    padding: 0;
-    /* remove inner padding so iframe fills the card */
-    background: transparent;
-    border-radius: inherit;
-    overflow: hidden;
 }
 
 .embed-card .responsive-iframe {
@@ -256,25 +263,66 @@ img {
 
 /* Gallery styles: tilted preview cards with subtle float animation */
 .embed-gallery {
+    --embed-gap: 0.9rem;
     display: flex;
-    gap: 0.9rem;
+    gap: var(--embed-gap);
     justify-content: center;
     align-items: flex-end;
     margin: 1.25rem 0;
     padding: 0.1rem 0.1rem 0.9rem 0.1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Desktop: show exactly four items in view and constrain to container width */
+@media (min-width: 900px) {
+
+    .marquee,
+    .embed-gallery,
+    .marquee-track {
+        width: 100%;
+        /* ensure the timeline fits inside page container / footer margins */
+        box-sizing: border-box;
+    }
+
+    .embed-item {
+        /* Calculate four equally sized items, accounting for three gaps */
+        flex: 0 0 calc((100% - (var(--embed-gap) * 3)) / 4);
+        max-width: calc((100% - (var(--embed-gap) * 3)) / 4);
+    }
+}
+
+/* Keep four items visible on smaller screens as well */
+@media (max-width: 899px) {
+    .embed-item {
+        /* same four-up calculation as desktop so the timeline shows 4 items consistently */
+        flex: 0 0 calc((100% - (var(--embed-gap) * 3)) / 4);
+        max-width: calc((100% - (var(--embed-gap) * 3)) / 4);
+    }
+}
+
+/* Very small viewports: show two items to retain readability */
+@media (max-width: 399px) {
+    .embed-item {
+        /* two-up calculation with one gap between items */
+        flex: 0 0 calc((100% - var(--embed-gap)) / 2);
+        max-width: calc((100% - var(--embed-gap)) / 2);
+    }
 }
 
 .embed-item {
-    /* narrower phone-like card for portrait screenshots */
-    width: 220px;
-    min-width: 140px;
-    max-width: 320px;
+    /* flexible card that can shrink to keep four items visible on narrow viewports */
+    width: auto;
+    min-width: 0;
+    max-width: none;
     position: relative;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
     transform-origin: center bottom;
-    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
+    transition:
+        transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
+        box-shadow 260ms cubic-bezier(0.2, 0.9, 0.2, 1);
     background: #fff;
     /* match the rendered-item card */
     border: 1px solid rgba(2, 6, 23, 0.03);
@@ -297,32 +345,11 @@ img {
     aspect-ratio: 9/16;
 }
 
-/* responsive adjustments for small screens */
-@media (max-width: 640px) {
-    .embed-gallery {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .embed-item {
-        width: 80% !important;
-        max-width: 480px;
-    }
-
-    .embed-item.mobile {
-        width: 90%;
-        max-width: 360px;
-    }
-
-    .embed-item.mobile .responsive-iframe {
-        aspect-ratio: 16/9;
-    }
-}
+/* responsive adjustments for small screens are handled by the unified 900px rules elsewhere */
 
 /* subtle base/bezel under the phone (smaller) — removed white cap gradient */
 .embed-item::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 14%;
     right: 14%;
@@ -356,7 +383,6 @@ img {
     transform: rotate(-3deg) translateY(4px);
 }
 
-
 /* The inner frame gets the subtle float animation so outer rotate stays intact */
 .embed-frame {
     /* stronger zoom out and top focus for portrait previews */
@@ -368,7 +394,8 @@ img {
     aspect-ratio: 9/16;
     position: relative;
     transform-origin: center center;
-    animation: float 5s ease-in-out infinite;
+    /* inner frames kept static; outer `.embed-item` provides the wobble */
+    animation: none !important;
     overflow: hidden;
     /* allow taller portrait frames on larger screens */
     max-height: 720px;
@@ -411,43 +438,51 @@ img {
 }
 
 @keyframes float {
+
+    /* cartoony bounce with subtle overshoot and squash/stretch */
     0% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(0deg) scale(1);
     }
 
-    25% {
-        transform: translateY(-6px) rotate(0.6deg);
+    12% {
+        transform: translateY(-14px) rotate(3deg) scale(1.02);
     }
 
-    50% {
-        transform: translateY(0) rotate(0deg);
+    28% {
+        transform: translateY(8px) rotate(-2deg) scale(0.98);
     }
 
-    75% {
-        transform: translateY(-3px) rotate(-0.4deg);
+    52% {
+        transform: translateY(-9px) rotate(1.6deg) scale(1.01);
+    }
+
+    76% {
+        transform: translateY(3px) rotate(-0.8deg) scale(0.995);
     }
 
     100% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(0deg) scale(1);
     }
 }
 
 /* 'Window' idle motion: subtle parallax/3d tilt that makes the content look like a floating window */
 @keyframes windowFloat {
+
+    /* playful window tilt with gentle 3D motion & scale */
     0% {
         transform: translateX(0) translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
     }
 
-    25% {
-        transform: translateX(-4px) translateY(-6px) rotateX(1.2deg) rotateZ(0.45deg) scale(1.002);
+    20% {
+        transform: translateX(-8px) translateY(-10px) rotateX(3deg) rotateZ(2deg) scale(1.01);
     }
 
-    50% {
-        transform: translateX(0) translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+    45% {
+        transform: translateX(6px) translateY(-4px) rotateX(-1.8deg) rotateZ(-1deg) scale(0.995);
     }
 
-    75% {
-        transform: translateX(3px) translateY(-3px) rotateX(-1deg) rotateZ(-0.35deg) scale(1.001);
+    70% {
+        transform: translateX(-4px) translateY(-8px) rotateX(2deg) rotateZ(1deg) scale(1.008);
     }
 
     100% {
@@ -463,17 +498,19 @@ img {
 
 /* apply the window motion to inner content — images and iframe frames */
 .rendered-item img {
-    animation: windowFloat 10s ease-in-out infinite;
+    /* disabled heavy windowFloat motion for calmer UI */
+    animation: none !important;
     transform-origin: center center;
 }
 
 .rendered-item:hover img {
-    animation-play-state: paused;
+    /* no animation to pause */
 }
 
 .embed-frame,
 .embed-item iframe {
-    animation: windowFloat 9s ease-in-out infinite;
+    /* keep inner frames static — wobble is handled by the outer `.embed-item` */
+    animation: none !important;
     transform-origin: center center;
 }
 
@@ -487,7 +524,8 @@ img {
 
     .rendered-item img,
     .embed-frame,
-    .embed-item iframe {
+    .embed-item iframe,
+    .embed-item {
         animation: none !important;
     }
 }
@@ -504,24 +542,31 @@ img {
 }
 
 .marquee {
-    overflow: hidden;
+    /* switch to a horizontally scrollable container so users can drag/scroll the timeline */
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+    /* hide native scrollbars but keep scrollability */
+    scrollbar-width: none;
+    /* firefox */
+}
+
+.marquee::-webkit-scrollbar {
+    display: none;
+    /* webkit */
 }
 
 .marquee-track {
     display: flex;
     gap: 0.9rem;
     align-items: flex-end;
-    will-change: transform;
+    /* no CSS transform-based animation anymore; JS handles auto-scroll */
 }
 
 .marquee:hover .marquee-track,
 .marquee:focus-within .marquee-track {
     animation-play-state: paused !important;
-}
-
-..embed-frame {
-    /* DEBUG outline to confirm selector application; remove after verification */
-    outline: 2px solid rgba(0, 180, 255, 0.18);
 }
 
 .embed-item img,
@@ -543,8 +588,7 @@ img {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
-
-@media (max-width: 900px) {
+@media (max-width: 899px) {
     .embed-gallery {
         gap: 0.6rem;
     }
@@ -556,57 +600,6 @@ img {
     .embed-item img,
     .embed-item iframe {
         max-height: 420px;
-    }
-}
-
-@media (max-width: 620px) {
-    .embed-gallery {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .embed-item {
-        width: 100% !important;
-        max-width: none;
-        transform: none !important;
-        margin-bottom: 1rem;
-        border-radius: 10px;
-    }
-
-    /* Mobile: use a landscape/frame so the page is visible (not squished into portrait square) */
-    .embed-frame {
-        aspect-ratio: 16/9 !important;
-        --embed-zoom: 1 !important;
-        --embed-focus: 0% !important;
-        max-height: none !important;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .embed-item img,
-    .embed-item iframe,
-    .embed-frame img,
-    .embed-frame iframe {
-        position: static !important;
-        width: 100% !important;
-        height: 100% !important;
-        transform: none !important;
-        top: auto !important;
-        left: auto !important;
-        border-radius: inherit !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .embed-item img,
-    .embed-item iframe {
-        max-height: 260px;
-    }
-
-    .embed-item {
-        width: 100%;
     }
 }
 
@@ -628,7 +621,9 @@ img {
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
     transform-origin: center bottom;
-    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
+    transition:
+        transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
+        box-shadow 260ms cubic-bezier(0.2, 0.9, 0.2, 1);
     border: 1px solid rgba(2, 6, 23, 0.03);
 }
 
@@ -667,7 +662,7 @@ img {
     box-shadow: 0 20px 48px rgba(2, 6, 23, 0.12);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
     .rendered-item {
         width: 29%;
     }
@@ -694,15 +689,9 @@ img {
     }
 }
 
-@media (max-width: 480px) {
-    .rendered-item img {
-        height: 240px;
-    }
-}
-
 blockquote {
-    margin: 0.25rem 0;
-    padding: 0.05rem 1.2rem;
+    margin: 1rem 0;
+    padding: 0.75rem 1.2rem;
     background-color: var(--inline-code-bg);
 
     /* Constrain and wrap to avoid overflowing the page container */
@@ -713,6 +702,12 @@ blockquote {
     overflow-x: auto;
     /* allow narrow horizontal scroll inside the quote */
 }
+
+blockquote>* {
+    margin: 0;
+}
+
+/* Ensure any code or pre elements inside a blockquote do not push layout */
 
 blockquote>* {
     color: var(--color-text);
@@ -728,26 +723,13 @@ blockquote code {
     overflow-x: auto;
 }
 
-@media (max-width: 480px) {
-    blockquote {
-        padding-inline: 0.9rem;
-    }
-
-    blockquote pre,
-    blockquote code {
-        /* on tiny viewports prefer wrapping for readability */
-        white-space: pre-wrap !important;
-        overflow-x: hidden !important;
-    }
-}
-
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-    font-family: Inter, sans-serif;
+    font-family: var(--font-family-serif);
     font-weight: 600;
     color: var(--color-primary);
     line-height: 1.2;
@@ -756,7 +738,23 @@ h6 {
 /* Improved heading scale for docs (reduced for tighter layout) */
 h1 {
     font-size: 1.75rem;
-    margin: 1rem 0 0.4rem;
+    margin: 1.25rem 0 0.6rem;
+}
+
+.page-date {
+    color: var(--color-text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+}
+
+.post-description {
+    margin-bottom: 1rem;
+}
+
+.authors-placeholder p {
+    margin: 0 0 0.6rem 0;
+    color: var(--color-text);
+    font-weight: 600;
 }
 
 h2 {
@@ -839,8 +837,8 @@ pre {
     background: var(--inline-code-bg);
     border: 1px solid var(--color-border);
     border-radius: 10px;
-    padding: 0.6rem 3.8rem 0.6rem 0.9rem;
-    /* room for copy button on the right */
+    padding: 0.6rem 1.2rem 0.6rem 0.9rem;
+    /* reduced right padding so the card is tighter while the copy button is absolutely positioned */
     box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
     overflow: hidden;
     /* keep layout tidy; inner code scrolls */
@@ -851,7 +849,7 @@ pre code {
     display: block;
     margin: 0;
     padding: 1rem 0;
-    font-family: Menlo, Monaco, "Courier New", monospace;
+    font-family: monospace;
     font-size: 0.95rem;
     line-height: 1.35;
     white-space: pre;
@@ -878,43 +876,16 @@ pre .copy-button {
     font-size: 0.85rem;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
-    transition: background 0.12s, transform 0.08s, box-shadow 0.08s;
+    transition:
+        background 0.12s,
+        transform 0.08s,
+        box-shadow 0.08s;
 }
 
 pre button[class*="copy"]:hover,
 pre .hljs-copy:hover,
 pre .copy-button:hover {
     transform: translateY(-1px);
-}
-
-/* Right-side visual fade removed; copy button sits directly on the card */
-@media (min-width: 481px) {
-    /* no-op: fade mask removed */
-}
-
-/* Mobile safety: wrap on tiny viewports to avoid page zoom/overflow */
-@media (max-width: 480px) {
-    pre {
-        padding-right: 2.8rem;
-    }
-
-    pre>code,
-    pre code {
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-        overflow-x: hidden !important;
-    }
-
-    /* no pre::after mask */
-
-    pre button[class*="copy"],
-    pre .hljs-copy,
-    pre .copy-button {
-        right: 8px;
-        top: 6px;
-        font-size: 0.72rem;
-        padding: 0.08rem 0.22rem;
-    }
 }
 
 p>code,
@@ -974,7 +945,10 @@ nav {
     font-size: 0.9rem;
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
+    /* keep nav items on a single line; allow horizontal scroll on narrow viewports */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-bottom: none;
 }
 
@@ -994,7 +968,12 @@ nav a,
     border: none;
     padding: 0;
     border-radius: 0;
-    transition: color 0.15s, text-decoration-color 0.15s, transform 0.12s;
+    /* prevent individual nav links from wrapping to the next line */
+    white-space: nowrap;
+    transition:
+        color 0.15s,
+        text-decoration-color 0.15s,
+        transform 0.12s;
 }
 
 nav a:hover,
@@ -1013,7 +992,7 @@ nav a:visited,
     color: inherit;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 
     /* Mobile: keep nav collapsed by default; reveal in-flow on `nav-open` */
     .site-nav {
@@ -1021,7 +1000,9 @@ nav a:visited,
         max-height: 0;
         overflow: hidden;
         padding: 0 0;
-        transition: max-height 0.28s ease, padding 0.18s ease;
+        transition:
+            max-height 0.28s ease,
+            padding 0.18s ease;
         border-top: none;
         /* remove top bar */
     }
@@ -1141,7 +1122,10 @@ ul:has(.post-list-element) {
     text-decoration: none;
     font-weight: 700;
     font-size: 1rem;
-    transition: background 0.12s, color 0.12s, transform 0.08s;
+    transition:
+        background 0.12s,
+        color 0.12s,
+        transform 0.08s;
 }
 
 .all-tags a:hover {
@@ -1150,7 +1134,7 @@ ul:has(.post-list-element) {
     transform: translateY(-2px);
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
     .all-tags {
         gap: 0.4rem;
         padding: 0.6rem 0;
@@ -1226,8 +1210,8 @@ pre code {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     padding-inline: 0.5rem;
-    padding-inline-end: 3rem;
-    /* leave space for copy button */
+    padding-inline-end: 1.2rem;
+    /* reduced inline-end space; copy button is absolutely positioned */
     box-sizing: border-box;
 }
 
@@ -1251,9 +1235,11 @@ pre .copy-button {
     font-size: 0.85rem;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
-    transition: background 0.12s, transform 0.08s, box-shadow 0.08s;
+    transition:
+        background 0.12s,
+        transform 0.08s,
+        box-shadow 0.08s;
 }
-
 
 /* Removed right-edge mask; keep copy button flush with the card */
 @media (min-width: 481px) {
@@ -1264,7 +1250,6 @@ pre .copy-button {
         right: 8px;
     }
 }
-
 
 /* Ensure code blocks are constrained to the page container and are touch-friendly.
    - width/max-width prevents the pre element from escaping the container
@@ -1304,39 +1289,12 @@ pre a {
     color: inherit;
 }
 
-@media (max-width: 640px) {
-
-    /* Shrink right padding a touch to fit small screens but keep button visible */
-    pre {
-        padding-inline-end: 3rem;
-        max-width: calc(100% - 1.5rem);
-    }
-}
-
-@media (max-width: 640px) {
-
-    /* Give a touch-friendly right padding so copy button is never off-canvas */
-    pre {
-        padding-inline-end: 3.5rem;
-    }
-
-    pre button[class*="copy"],
-    pre .hljs-copy,
-    pre .copy-button {
-        right: 8px;
-        top: 6px;
-        font-size: 0.75rem;
-        padding: 0.12rem 0.28rem;
-    }
-}
-
 pre button[class*="copy"]:hover,
 pre .hljs-copy:hover,
 pre .copy-button:hover {
     transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.06);
 }
-
 
 @media (max-width: 700px) {
 
@@ -1358,33 +1316,6 @@ pre .copy-button:hover {
 
 /* Extra safety for very small screens: allow long code lines to wrap instead of causing
    the page to zoom or overflow. On larger screens we still prefer horizontal scrolling. */
-@media (max-width: 480px) {
-    pre {
-        /* Let code wrap on tiny viewports to avoid triggering page-wide horizontal scroll/zoom */
-        white-space: pre-wrap;
-        word-break: break-word;
-        overflow-x: hidden;
-        max-width: 100% !important;
-        padding-inline-end: 2.8rem;
-    }
-
-    pre>code,
-    pre .hljs,
-    pre * {
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-        overflow-wrap: anywhere !important;
-    }
-
-    pre button[class*="copy"],
-    pre .hljs-copy,
-    pre .copy-button {
-        right: 8px;
-        top: 6px;
-        font-size: 0.72rem;
-        padding: 0.08rem 0.22rem;
-    }
-}
 
 pre>code {
     display: block;
@@ -1556,57 +1487,6 @@ a>code {
     font-family: Inter, sans-serif;
 }
 
-/* Mobile */
-@media (max-width: 640px) {
-    #lastfm .lastfm-row {
-        grid-template-columns: 48px 1fr;
-        gap: 0.7rem;
-        padding: 0.5rem 0.45rem;
-    }
-
-    #lastfm .lastfm-row.now-playing {
-        padding: 0.75rem;
-        padding-left: calc(0.75rem + 10px);
-        padding-right: calc(0.75rem + 10px);
-        margin: 0 -10px 0.75rem -10px;
-        border-bottom: none;
-    }
-
-    #lastfm .cover {
-        width: 48px;
-        height: 48px;
-    }
-
-    #lastfm .meta {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #lastfm .time {
-        grid-column: auto;
-        text-align: left;
-        margin-top: 0.15rem;
-        font-size: 0.85rem;
-        order: 3;
-    }
-
-    #lastfm .title {
-        font-size: 0.95rem;
-        margin: 0;
-        order: 1;
-    }
-
-    #lastfm .artist {
-        font-size: 0.9rem;
-        margin: 0.05rem 0 0;
-        order: 2;
-    }
-
-    #lastfm .menu {
-        display: none;
-    }
-}
-
 :root {
     --color-text: #24292f;
     --color-text-dim: #656d76;
@@ -1671,7 +1551,7 @@ a>code {
 }
 
 /* Desktop wide layout handled via .container; remove body max-width to avoid left-alignment */
-@media (min-width: 768px) {
+@media (min-width: 900px) {
 
     /* keep container sizing only */
     .container {
@@ -1718,19 +1598,91 @@ a>code {
     object-fit: contain;
     display: block;
     margin-right: 0.75rem;
+
+    /* static by default — keep header calm; hover provides lift */
+    position: relative;
+    transform-origin: center;
+    will-change: transform;
+    animation: none !important;
 }
 
-.site-nav {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    justify-self: center;
-    /* keep nav centered in middle column */
+.brand-logo:hover {
+    transform: translateY(-4px) scale(1.06) rotate(-3deg);
+    filter: drop-shadow(0 8px 18px rgba(2, 6, 23, 0.12));
 }
 
-/* Replaced by unified underline style above */
-.site-nav .navitem {
+@keyframes brand-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px) scale(1.03);
+    }
+}
+
+@keyframes brand-shine {
+
+    /* rest: small visible sheen, then quick strong sweep */
+    0%,
+    70% {
+        transform: translateX(-40%) skewX(-20deg);
+        opacity: 0.18;
+    }
+
+    75% {
+        transform: translateX(-60%) skewX(-20deg);
+        opacity: 0.95;
+    }
+
+    85% {
+        transform: translateX(60%) skewX(-20deg);
+        opacity: 0.95;
+    }
+
+    95%,
+    100% {
+        transform: translateX(150%) skewX(-20deg);
+        opacity: 0.18;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .brand-logo,
+    .brand-logo::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* keep a subtle static sheen for reduced-motion users */
+    .brand-logo::after {
+        opacity: 0.12;
+        filter: blur(1px);
+    }
+
     /* styles handled by nav a, kept for markup compatibility */
+}
+
+/* subtle sheen for the logo (static, no animation) */
+.brand-logo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.95) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    background-size: 30% 100%;
+    background-repeat: no-repeat;
+    transform: translateX(-40%) skewX(-20deg);
+    opacity: 0.18;
+    pointer-events: none;
+    filter: blur(2px);
+    animation: none !important;
 }
 
 .site-nav .navitem:hover {
@@ -1765,7 +1717,7 @@ a>code {
     transform: translateY(-1px);
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
 
     /* hide mobile hamburger on desktop */
     .hamburger {
@@ -1775,7 +1727,7 @@ a>code {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 
     /* make action buttons even smaller on mobile */
     .actions button {
@@ -1784,7 +1736,7 @@ a>code {
     }
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
 
     /* Ensure any residual `nav-open` state does not trigger the mobile overlay on desktop */
     body.nav-open .site-nav {
@@ -1897,21 +1849,6 @@ a>code {
     overflow-y: auto;
 }
 
-@media (max-width: 640px) {
-    .search-box {
-        max-width: calc(100% - 1.2rem);
-        padding: 0.6rem;
-        /* nudge up from the bottom when virtual keyboard appears */
-        top: 45%;
-        transform: translate(-50%, -45%);
-    }
-
-    .search-input-row input {
-        font-size: 0.95rem;
-        padding: 0.45rem 0.5rem;
-    }
-}
-
 /* Ensure footer container respects alignment; header uses .header-inner grid */
 .site-footer .container {
     display: flex;
@@ -1923,16 +1860,6 @@ a>code {
 }
 
 /* Small screens: stack footer items and center them so they don't exceed viewport */
-@media (max-width: 640px) {
-    .site-footer .container>* {
-        flex: 1 1 100%;
-        text-align: center;
-    }
-
-    .site-footer .container {
-        justify-content: center;
-    }
-}
 
 /* Ensure long inline elements in footer (links, copyright etc.) wrap */
 .site-footer .container a,
@@ -1954,5 +1881,13 @@ a>code {
 }
 
 .embed-item {
-    animation: float 3s ease-in-out infinite;
+    /* make the card float with a bouncy, cartoony rhythm (slower) */
+    --float-duration: 7s;
+    animation: float var(--float-duration) cubic-bezier(0.22, 1.5, 0.35, 1) infinite;
+}
+
+/* Slightly exaggerate the hover lift to feel playful */
+.embed-item:hover {
+    transform: translateY(-14px) scale(1.04);
+    box-shadow: 0 28px 60px rgba(2, 6, 23, 0.16);
 }

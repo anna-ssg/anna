@@ -22,6 +22,8 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      - -X main.FullCommitHash={{.FullCommit}}
 
 archives:
   - format: tar.gz

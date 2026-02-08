@@ -1,14 +1,12 @@
 ---
 date: 2024-04-28
 title: Developer Guide
-toc: true
+toc: false
 collections:
   - anna
   - guide
 layout: page_2
 ---
-
-# Developer Guide
 
 This document explains the repository layout, development commands and how to contribute.
 

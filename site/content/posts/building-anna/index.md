@@ -2,7 +2,7 @@
 title: Building anna
 date: 2024-04-04
 type: post
-toc: true
+toc: false
 description: A lightning-fast static site generator written in Go
 tags: ["acm", "hsp", "go", "tech", "talks", "aiep", "anna"]
 authors:
