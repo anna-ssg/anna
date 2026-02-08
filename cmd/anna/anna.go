@@ -21,7 +21,7 @@ type Cmd struct {
 	InfoLogger  *log.Logger
 }
 
-func (cmd *Cmd) VanillaRender(siteDirPath string) {
+func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
 		Templates:                 make(map[template.URL]parser.TemplateData, 10),
@@ -87,4 +87,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) {
 	e.RenderUserDefinedPages(siteDirPath, templ)
 	e.RenderTags(siteDirPath, templ)
 	e.RenderCollections(siteDirPath, templ)
+
+	// Return number of templates/pages rendered for reporting
+	return len(e.DeepDataMerge.Templates)
 }

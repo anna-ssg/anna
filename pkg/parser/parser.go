@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
@@ -256,12 +257,35 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
-	// // Check if the configuration file exists
-	// _, err := os.Stat(inFilePath)
-	// if os.IsNotExist(err) {
-	// 	p.Helper.Bootstrap()
-	// 	return
-	// }
+	// Check if the configuration file exists
+	if _, err := os.Stat(inFilePath); err != nil {
+		if os.IsNotExist(err) {
+			// Ask the user whether they want to download the default site layout
+			url := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
+			p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
+			p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
+			var resp string
+			_, scanErr := fmt.Scanln(&resp)
+			if scanErr != nil {
+				p.ErrorLogger.Println("Input error:", scanErr)
+				p.ErrorLogger.Fatal("configuration missing and input unavailable")
+			}
+			if strings.ToLower(strings.TrimSpace(resp)) == "y" || strings.ToLower(strings.TrimSpace(resp)) == "yes" {
+				if p.Helper == nil {
+					p.Helper = &helpers.Helper{ErrorLogger: p.ErrorLogger}
+				}
+				p.ErrorLogger.Println("Downloading and extracting site layout... this may take a moment")
+				if err := p.Helper.BootstrapFromURL(url); err != nil {
+					p.ErrorLogger.Fatal("bootstrap failed: ", err)
+				}
+				p.ErrorLogger.Println("Bootstrap complete — retrying configuration parse")
+			} else {
+				p.ErrorLogger.Fatal("configuration missing and user declined bootstrap")
+			}
+		} else {
+			p.ErrorLogger.Fatal(err)
+		}
+	}
 
 	// Read and parse the configuration file
 	configFile, err := os.ReadFile(inFilePath)

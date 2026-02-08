@@ -40,11 +40,15 @@ func main() {
 				annaCmd.StartLiveReload(siteDirPath)
 			}
 
+			built := false
+
 			if prof {
 				startTime := time.Now()
-				annaCmd.VanillaRender(siteDirPath)
+				count := annaCmd.VanillaRender(siteDirPath)
 				elapsedTime := time.Since(startTime)
 				annaCmd.PrintStats(elapsedTime)
+				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsedTime)
+				built = true
 			}
 
 			if version {
@@ -61,7 +65,12 @@ func main() {
 				annaCmd.StartLiveReload(siteDirPath)
 			}
 
-			annaCmd.VanillaRender(siteDirPath)
+			if !built {
+				startTime := time.Now()
+				count := annaCmd.VanillaRender(siteDirPath)
+				elapsedTime := time.Since(startTime)
+				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsedTime)
+			}
 		},
 	}
 

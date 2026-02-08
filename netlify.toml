@@ -1,4 +1,4 @@
 [build]
-command = "make"
-environment = { GO_VERSION = "1.22.1" }
+command = "bash -c ./deploy.sh"
+#environment = { GO_VERSION = "1.25.3" }
 publish = "site/rendered"
