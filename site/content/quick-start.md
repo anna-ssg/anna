@@ -1,81 +1,78 @@
 ---
 date: 2024-04-28
 title: Quick Start
-toc: true
+toc: false
 collections: ["anna"]
----
-
-# Quick Start
-
 ---
 
 ## Installation
 
-### Brew taps for macOS
+> Download a prebuilt binary for your platform from the latest release:
 
-To install anna on macOS via brew, run the below commands:
+### MacOS
 
 ```sh
-brew tap anna-ssg/anna
-brew install anna
-
-# to run anna
-anna
+brew install anna-ssg/anna/anna
 ```
 
-### Installing anna from releases
+
+### GNU/Linux (tar.gz):
+
+> 1. Linux (x86_64): [anna_Linux_x86_64.tar.gz](https://github.com/anna-ssg/anna/releases/latest/download/anna_Linux_x86_64.tar.gz)
+> 2. `tar -xzf anna_Linux_x86_64.tar.gz`
+> 3. `./anna`
+
+### Windows 10/11 (x86_64):
+
+> 1. Download [anna_Windows_x86_64.zip](https://github.com/anna-ssg/anna/releases/latest/download/anna_Windows_x86_64.zip)
+> 2. Unzip `anna_Windows_*.zip`
+> 3. Run `anna.exe` from the extracted folder in a terminal
+
+---
+
+## Bootstrap (create a `site/` directory)
+
+If you don't already have a `site/` directory, Anna can initialize one for you with a default layout.
 
 ```sh
-curl -L https://github.com/anna-ssg/anna/releases/download/version-tag/releases-name.tar.gz > anna.tar.gz
-tar -xvf anna.tar.gz # unzip the tar file
-rm anna.tar.gz # removing the tar file
-
-# here you could add anna to your path if you want and use in in any directory
-./anna # runs anna. The instructions are given below
-```
-
-### Installing anna with go
-
-If you have the Go toolchain installed, run the below command to download and build anna:
-
-```sh
-go run github.com/anna-ssg/anna/v3@v3.0.0 -s './'
+# will ask to download the default site layout when config is missing
+./anna 
 ```
 
 ---
 
 ## Usage
 
-### Running anna
+### Basic render
+
+Render the site found at `site/` (default):
 
 ```sh
 anna
 ```
 
-- Render the site located at `site_path`
+Specify a path:
 
 ```sh
-anna -p [site_path]
+anna -p ./site
 ```
 
-### Serving the site with live reload to watch for file updates
+### Serve with live reload
 
 ```sh
 anna -s
 ```
 
-- Serve the site located in `site_path`
+### Version and debug
+
+Show the version (includes embedded commit when present):
 
 ```sh
-anna -s -p [site_path]
+anna -v
 ```
 
-### Other commands and flags
-
-To view all the commands and flags available, run the below command:
+Show usage and all flags:
 
 ```sh
-  anna -h
+anna -h
 ```
-
----

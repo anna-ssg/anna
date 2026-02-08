@@ -1,18 +1,18 @@
 all:
 	@make build
 
+# Build with embedded commit hash (set COMMIT env var or default to current git HEAD)
 COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo "")
-COMMIT_SHORT ?= $(shell echo $(COMMIT) | cut -c1-7)
 LDFLAGS ?= -X main.CommitHash=$(COMMIT)
 build:
-	@echo "anna: building with commit $(COMMIT_SHORT)"
+	@echo "anna: building with commit $(COMMIT)"
 	@go build -ldflags "$(LDFLAGS)"
 	@./anna
 
 serve:
 	@echo "anna: serving site"
 	@go build
-	@./anna -s "site/"
+	@./anna -s -p "site"
 tests:
 	@echo "anna: running all tests"
 	@go test ./...
@@ -26,5 +26,3 @@ clean:
 	@cd test/
 	@rm -rf `find . -type d -name rendered`
 	@cd ../
-
-# Build with embedded commit hash (set COMMIT env var or default to current git HEAD)

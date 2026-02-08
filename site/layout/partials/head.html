@@ -21,11 +21,9 @@
     <link rel="apple-touch-icon" href="/static/images/anna.png" />
     <meta name="theme-color" content="#ffffff" />
 
-    <!-- Highlight.js theme (light and dark variant) -->
+    <!-- Highlight.js theme (light variant only) -->
     <link id="hljs-light" rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css" />
-    <link id="hljs-dark" rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" disabled />
 
     <!-- External Scripts (highlight.js + copy plugin) -->
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
@@ -61,19 +59,6 @@
                 hljs.addPlugin(new CopyButtonPlugin());
             }
         }
-
-        // ensure correct highlight theme is enabled on initial load
-        (function () {
-            try {
-                var light = document.getElementById('hljs-light');
-                var dark = document.getElementById('hljs-dark');
-                var isDark = document.documentElement.classList.contains('dark');
-                if (light && dark) {
-                    light.disabled = !!isDark;
-                    dark.disabled = !isDark;
-                }
-            } catch (e) { }
-        })();
     </script>
 </head>
 {{end}}

@@ -21,16 +21,15 @@ html {
 }
 
 body {
-    margin: 0;
-    min-height: 100vh;
+    /* Make page a column flex container so footer can sit at the bottom on short pages */
     display: flex;
     flex-direction: column;
-    line-height: 1.6;
+    min-height: 100vh;
+
     font-size: 1.05rem;
     font-weight: 400;
     font-family: var(--font-family-sans);
     color: var(--color-text);
-    background-color: var(--color-background);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -78,16 +77,56 @@ code {
     box-sizing: border-box;
 }
 
+/* Make fenced code blocks preserve whitespace, allow both X/Y scrolling and avoid vertical squish */
 pre {
+    white-space: pre;
+    /* do not wrap code lines */
+    display: block;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 420px;
+    /* limit vertical size and enable scroll */
+    padding: 0.85rem 1rem;
+    margin: 0.6rem 0;
+    border-radius: 8px;
+    background-color: var(--inline-code-bg);
+    border: 1px solid rgba(2, 6, 23, 0.06);
+    -webkit-overflow-scrolling: touch;
+    /* smooth scrolling on mobile */
+}
+
+pre>code {
+    white-space: pre;
+    /* ensure code inside pre does not wrap */
+    display: block;
+}
+
+@media (max-width: 640px) {
+    pre {
+        max-height: 320px;
+    }
 }
 
 /* Page container to make a readable docs layout */
 .container {
     box-sizing: border-box;
     margin: 0 auto;
-    padding: 0.75rem;
+    /* a little more breathing room inside the page container */
+    padding: 1rem;
     max-width: 36rem;
+}
+
+/* Increase container padding on larger viewports for better rhythm */
+@media (min-width: 768px) {
+    .container {
+        padding: 1.25rem;
+    }
+}
+
+@media (min-width: 1100px) {
+    .container {
+        padding: 1.5rem;
+    }
 }
 
 .site-main {
@@ -139,13 +178,566 @@ img {
     object-position: center center;
 }
 
+/* Responsive iframe helper for embedding live previews */
+.responsive-iframe {
+    width: 100%;
+    margin: 1rem 0;
+    /* Prefer modern aspect-ratio, fallback to 16:9 spacing for older browsers */
+    aspect-ratio: 16/9;
+    background: var(--inline-code-bg);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.responsive-iframe iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: white;
+}
+
+/* Larger live preview iframe: portrait/vertical card on wider viewports */
+#carousel-frame {
+    aspect-ratio: 3/4 !important;
+    width: 100%;
+    max-width: 640px;
+    margin: 1rem auto;
+    border-radius: 10px;
+    border: 1px solid rgba(2, 6, 23, 0.06);
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
+    background: transparent;
+    height: auto;
+}
+
+@media (max-width: 640px) {
+
+    /* on small screens keep the original wide aspect */
+    #carousel-frame {
+        aspect-ratio: 16/9 !important;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 1100px) {
+    #carousel-frame {
+        max-width: 720px;
+    }
+}
+
+/* Embed card: visually matches the code card style (rounded, border, shadow) */
+.embed-card {
+    width: 100%;
+    background: var(--inline-code-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0.6rem;
+    position: relative;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+/* make the embedded content sit flush inside the card */
+.embed-card {
+    padding: 0;
+    /* remove inner padding so iframe fills the card */
+    background: transparent;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.embed-card .responsive-iframe {
+    margin: 0;
+    border-radius: 6px;
+    background: #fff;
+    /* bezel color */
+}
+
+/* Gallery styles: tilted preview cards with subtle float animation */
+.embed-gallery {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    align-items: flex-end;
+    margin: 1.25rem 0;
+    padding: 0.1rem 0.1rem 0.9rem 0.1rem;
+}
+
+.embed-item {
+    /* narrower phone-like card for portrait screenshots */
+    width: 220px;
+    min-width: 140px;
+    max-width: 320px;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+    transform-origin: center bottom;
+    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
+    background: #fff;
+    /* match the rendered-item card */
+    border: 1px solid rgba(2, 6, 23, 0.03);
+}
+
+.embed-item:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.12);
+}
+
+/* Portrait/mobile embedded item */
+.embed-item.mobile {
+    width: 180px;
+    min-width: 120px;
+    max-width: 240px;
+}
+
+.embed-item.mobile .responsive-iframe {
+    /* portrait mobile frame */
+    aspect-ratio: 9/16;
+}
+
+/* responsive adjustments for small screens */
+@media (max-width: 640px) {
+    .embed-gallery {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .embed-item {
+        width: 80% !important;
+        max-width: 480px;
+    }
+
+    .embed-item.mobile {
+        width: 90%;
+        max-width: 360px;
+    }
+
+    .embed-item.mobile .responsive-iframe {
+        aspect-ratio: 16/9;
+    }
+}
+
+/* subtle base/bezel under the phone (smaller) — removed white cap gradient */
+.embed-item::after {
+    content: '';
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    bottom: -6px;
+    height: 8px;
+    background: transparent;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Slight tilts for visual variety (base rotation applied to the card) */
+.embed-item:nth-child(1) {
+    transform: rotate(-6deg) translateY(4px);
+}
+
+.embed-item:nth-child(2) {
+    transform: rotate(3deg) translateY(0);
+}
+
+.embed-item:nth-child(3) {
+    transform: rotate(-1deg) translateY(6px);
+}
+
+.embed-item:nth-child(4) {
+    transform: rotate(1.5deg) translateY(2px);
+}
+
+.embed-item:nth-child(5) {
+    transform: rotate(-3deg) translateY(4px);
+}
+
+
+/* The inner frame gets the subtle float animation so outer rotate stays intact */
+.embed-frame {
+    /* stronger zoom out and top focus for portrait previews */
+    --embed-zoom: 0.6;
+    --embed-focus: 0%;
+
+    display: block;
+    width: 100%;
+    aspect-ratio: 9/16;
+    position: relative;
+    transform-origin: center center;
+    animation: float 5s ease-in-out infinite;
+    overflow: hidden;
+    /* allow taller portrait frames on larger screens */
+    max-height: 720px;
+    /* ensure the frame rounds to the same radius as the parent */
+    border-radius: inherit;
+    background: transparent;
+}
+
+/* larger viewport refinement */
+@media (min-width: 1100px) {
+    .embed-frame {
+        max-height: 880px;
+    }
+}
+
+/* small variations per card for a natural look */
+.embed-item:nth-child(1) .embed-frame {
+    animation-delay: 0s;
+}
+
+.embed-item:nth-child(2) .embed-frame {
+    animation-delay: 0.15s;
+}
+
+.embed-item:nth-child(3) .embed-frame {
+    animation-delay: 0.3s;
+}
+
+.embed-item:nth-child(4) .embed-frame {
+    animation-delay: 0.45s;
+}
+
+.embed-item:nth-child(5) .embed-frame {
+    animation-delay: 0.6s;
+}
+
+/* Pause animation on hover to let the hover lift feel clean */
+.embed-item:hover .embed-frame {
+    animation-play-state: paused;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-6px) rotate(0.6deg);
+    }
+
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    75% {
+        transform: translateY(-3px) rotate(-0.4deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+/* 'Window' idle motion: subtle parallax/3d tilt that makes the content look like a floating window */
+@keyframes windowFloat {
+    0% {
+        transform: translateX(0) translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+    }
+
+    25% {
+        transform: translateX(-4px) translateY(-6px) rotateX(1.2deg) rotateZ(0.45deg) scale(1.002);
+    }
+
+    50% {
+        transform: translateX(0) translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+    }
+
+    75% {
+        transform: translateX(3px) translateY(-3px) rotateX(-1deg) rotateZ(-0.35deg) scale(1.001);
+    }
+
+    100% {
+        transform: translateX(0) translateY(0) rotateX(0deg) rotateZ(0deg) scale(1);
+    }
+}
+
+/* allow a mild 3D perspective so rotateX looks natural */
+.rendered-gallery,
+.embed-gallery {
+    perspective: 900px;
+}
+
+/* apply the window motion to inner content — images and iframe frames */
+.rendered-item img {
+    animation: windowFloat 10s ease-in-out infinite;
+    transform-origin: center center;
+}
+
+.rendered-item:hover img {
+    animation-play-state: paused;
+}
+
+.embed-frame,
+.embed-item iframe {
+    animation: windowFloat 9s ease-in-out infinite;
+    transform-origin: center center;
+}
+
+.embed-item:hover .embed-frame,
+.embed-item:hover iframe {
+    animation-play-state: paused;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .rendered-item img,
+    .embed-frame,
+    .embed-item iframe {
+        animation: none !important;
+    }
+}
+
+/* Marquee / carousel styles */
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(var(--marquee-distance));
+    }
+}
+
+.marquee {
+    overflow: hidden;
+}
+
+.marquee-track {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-end;
+    will-change: transform;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+    animation-play-state: paused !important;
+}
+
+..embed-frame {
+    /* DEBUG outline to confirm selector application; remove after verification */
+    outline: 2px solid rgba(0, 180, 255, 0.18);
+}
+
+.embed-item img,
+.embed-item iframe,
+.embed-frame img,
+.embed-frame iframe {
+    display: block;
+    /* expand the iframe so scaling reveals more page; centered then nudged up */
+    width: calc(100% / var(--embed-zoom, 0.6)) !important;
+    height: calc(100% / var(--embed-zoom, 0.6)) !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, calc(-50% + var(--embed-focus, 0%))) scale(var(--embed-zoom, 0.6)) !important;
+    border: 0;
+    object-fit: cover;
+    border-radius: inherit;
+    background: transparent;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+
+@media (max-width: 900px) {
+    .embed-gallery {
+        gap: 0.6rem;
+    }
+
+    .embed-item {
+        width: 30%;
+    }
+
+    .embed-item img,
+    .embed-item iframe {
+        max-height: 420px;
+    }
+}
+
+@media (max-width: 620px) {
+    .embed-gallery {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .embed-item {
+        width: 100% !important;
+        max-width: none;
+        transform: none !important;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+    }
+
+    /* Mobile: use a landscape/frame so the page is visible (not squished into portrait square) */
+    .embed-frame {
+        aspect-ratio: 16/9 !important;
+        --embed-zoom: 1 !important;
+        --embed-focus: 0% !important;
+        max-height: none !important;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .embed-item img,
+    .embed-item iframe,
+    .embed-frame img,
+    .embed-frame iframe {
+        position: static !important;
+        width: 100% !important;
+        height: 100% !important;
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
+        border-radius: inherit !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .embed-item img,
+    .embed-item iframe {
+        max-height: 260px;
+    }
+
+    .embed-item {
+        width: 100%;
+    }
+}
+
+/* Rendered gallery (matches 'Rendered with Anna' look) */
+.rendered-gallery {
+    display: flex;
+    gap: 1.1rem;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 1.2rem 0 1.8rem;
+}
+
+.rendered-item {
+    width: 22%;
+    min-width: 180px;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+    transform-origin: center bottom;
+    transition: transform 260ms cubic-bezier(.2, .9, .2, 1), box-shadow 260ms cubic-bezier(.2, .9, .2, 1);
+    border: 1px solid rgba(2, 6, 23, 0.03);
+}
+
+.rendered-item img {
+    display: block;
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border: 0;
+    background: white;
+}
+
+/* Slightly varied rotation/offsets to match the collage feeling */
+.rendered-item:nth-child(1) {
+    transform: rotate(-6deg) translateY(6px);
+}
+
+.rendered-item:nth-child(2) {
+    transform: rotate(2deg) translateY(-10px);
+}
+
+.rendered-item:nth-child(3) {
+    transform: rotate(-2deg) translateY(0px);
+}
+
+.rendered-item:nth-child(4) {
+    transform: rotate(4deg) translateY(-6px);
+}
+
+.rendered-item:nth-child(5) {
+    transform: rotate(-3deg) translateY(4px);
+}
+
+.rendered-item:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.12);
+}
+
+@media (max-width: 900px) {
+    .rendered-item {
+        width: 29%;
+    }
+
+    .rendered-item img {
+        height: 280px;
+    }
+}
+
+@media (max-width: 620px) {
+    .rendered-gallery {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rendered-item {
+        width: 92%;
+        transform: none !important;
+        margin-bottom: 1rem;
+    }
+
+    .rendered-item img {
+        height: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rendered-item img {
+        height: 240px;
+    }
+}
+
 blockquote {
-    margin: 0.25rem 0 0.25rem;
-    padding: 0.05rem 1.2rem 0.05rem;
+    margin: 0.25rem 0;
+    padding: 0.05rem 1.2rem;
     background-color: var(--inline-code-bg);
 
-    &>* {
-        color: var(--color-text);
+    /* Constrain and wrap to avoid overflowing the page container */
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow-x: auto;
+    /* allow narrow horizontal scroll inside the quote */
+}
+
+blockquote>* {
+    color: var(--color-text);
+}
+
+/* Ensure any code or pre elements inside a blockquote do not push layout */
+blockquote pre,
+blockquote code {
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+}
+
+@media (max-width: 480px) {
+    blockquote {
+        padding-inline: 0.9rem;
+    }
+
+    blockquote pre,
+    blockquote code {
+        /* on tiny viewports prefer wrapping for readability */
+        white-space: pre-wrap !important;
+        overflow-x: hidden !important;
     }
 }
 
@@ -237,35 +829,92 @@ hr {
     background: transparent;
 }
 
-/* Code block improvements: render the entire <pre> as a rounded card */
+/* Code block: simplified, compact, and robust */
 pre {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
+    width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     position: relative;
-    /* keep copy button positioned inside the pre */
 
-    /* visual card */
-    background-color: var(--inline-code-bg);
+    background: var(--inline-code-bg);
     border: 1px solid var(--color-border);
     border-radius: 10px;
-    padding: 0.6rem;
-    /* outer padding so copy button doesn't overlap content */
+    padding: 0.6rem 3.8rem 0.6rem 0.9rem;
+    /* room for copy button on the right */
     box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    overflow: hidden;
+    /* keep layout tidy; inner code scrolls */
 }
 
-pre>code {
+pre>code,
+pre code {
     display: block;
-    min-width: 100%;
-    white-space: pre;
-    box-sizing: border-box;
-    background: transparent;
-    /* let the parent <pre> provide the card background */
-    padding: 0;
-    /* inner code lines use parent padding */
     margin: 0;
+    padding: 1rem 0;
+    font-family: Menlo, Monaco, "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    white-space: pre;
+    /* preserve formatting by default */
+    overflow-x: auto;
+    /* scroll inside the code area */
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+/* Copy button */
+pre button[class*="copy"],
+pre .hljs-copy,
+pre .copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    background: var(--inline-code-bg);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    color: var(--color-text);
+    padding: 0.18rem 0.45rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
+    transition: background 0.12s, transform 0.08s, box-shadow 0.08s;
+}
+
+pre button[class*="copy"]:hover,
+pre .hljs-copy:hover,
+pre .copy-button:hover {
+    transform: translateY(-1px);
+}
+
+/* Right-side visual fade removed; copy button sits directly on the card */
+@media (min-width: 481px) {
+    /* no-op: fade mask removed */
+}
+
+/* Mobile safety: wrap on tiny viewports to avoid page zoom/overflow */
+@media (max-width: 480px) {
+    pre {
+        padding-right: 2.8rem;
+    }
+
+    pre>code,
+    pre code {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        overflow-x: hidden !important;
+    }
+
+    /* no pre::after mask */
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        right: 8px;
+        top: 6px;
+        font-size: 0.72rem;
+        padding: 0.08rem 0.22rem;
+    }
 }
 
 p>code,
@@ -588,16 +1237,97 @@ pre .hljs-copy,
 pre .copy-button {
     position: absolute;
     top: 8px;
-    right: 8px;
+    right: 10px;
+    /* nudge slightly inward for better overlap */
     z-index: 10;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--color-border);
+    /* blend into the pre card: use the same background and mask the underlying border */
+    background: var(--inline-code-bg);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    /* add a left border that matches the card background to mask the pre border */
+    border-left: 1px solid var(--inline-code-bg);
     color: var(--color-text);
     padding: 0.18rem 0.45rem;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: background 0.12s, transform 0.08s;
+    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
+    transition: background 0.12s, transform 0.08s, box-shadow 0.08s;
+}
+
+
+/* Removed right-edge mask; keep copy button flush with the card */
+@media (min-width: 481px) {
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        right: 8px;
+    }
+}
+
+
+/* Ensure code blocks are constrained to the page container and are touch-friendly.
+   - width/max-width prevents the pre element from escaping the container
+   - overscroll-behavior/touch-action keep panning inside the code block on mobile
+   - pre>code min-width:0 lets inner blocks shrink instead of forcing overflow in flex contexts */
+pre {
+    width: 100%;
+    /* ensure pre never exceeds the page container; subtract a small margin for padding/copy button */
+    max-width: calc(100% - 2rem);
+    margin: 0;
+    /* don't let pre add extra margins outside the container */
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Make inner code cooperate with narrow containers and allow scrolling within */
+pre>code,
+pre .hljs,
+pre * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+pre>code {
+    overflow-wrap: normal;
+    white-space: pre;
+    /* preserve line breaks and allow horizontal scrolling */
+}
+
+/* Ensure links or very long tokens inside code do not blow out the layout; they scroll inside pre */
+pre a {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    color: inherit;
+}
+
+@media (max-width: 640px) {
+
+    /* Shrink right padding a touch to fit small screens but keep button visible */
+    pre {
+        padding-inline-end: 3rem;
+        max-width: calc(100% - 1.5rem);
+    }
+}
+
+@media (max-width: 640px) {
+
+    /* Give a touch-friendly right padding so copy button is never off-canvas */
+    pre {
+        padding-inline-end: 3.5rem;
+    }
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        right: 8px;
+        top: 6px;
+        font-size: 0.75rem;
+        padding: 0.12rem 0.28rem;
+    }
 }
 
 pre button[class*="copy"]:hover,
@@ -607,16 +1337,6 @@ pre .copy-button:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-
-    pre button[class*="copy"],
-    pre .hljs-copy,
-    pre .copy-button {
-        background: rgba(0, 0, 0, 0.35);
-        color: var(--color-text);
-        border-color: rgba(255, 255, 255, 0.06);
-    }
-}
 
 @media (max-width: 700px) {
 
@@ -633,6 +1353,36 @@ pre .copy-button:hover {
     /* Ensure code has right padding on mobile so the scroller doesn't hide button */
     pre code {
         padding-inline-end: 2.5rem;
+    }
+}
+
+/* Extra safety for very small screens: allow long code lines to wrap instead of causing
+   the page to zoom or overflow. On larger screens we still prefer horizontal scrolling. */
+@media (max-width: 480px) {
+    pre {
+        /* Let code wrap on tiny viewports to avoid triggering page-wide horizontal scroll/zoom */
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-x: hidden;
+        max-width: 100% !important;
+        padding-inline-end: 2.8rem;
+    }
+
+    pre>code,
+    pre .hljs,
+    pre * {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    pre button[class*="copy"],
+    pre .hljs-copy,
+    pre .copy-button {
+        right: 8px;
+        top: 6px;
+        font-size: 0.72rem;
+        padding: 0.08rem 0.22rem;
     }
 }
 
@@ -1167,83 +1917,42 @@ a>code {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* allow the footer to wrap on narrow viewports to avoid horizontal overflow */
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-text: #f0f6fc;
-        --color-text-dim: #c9d1d9;
-        --color-text-low: #c9d1d990;
-
-        --color-background: #0d1117;
-        --color-background-dim: #0d11177a;
-        --color-background-low: #0d111750;
-        --color-background-contrast: #79c0ff;
-
-        --inline-code-bg: #161b22;
-        --selection-bg: #79c0ff1a;
-
-        --color-primary: #79c0ff;
-        --color-primary-dim: #79c0ffef;
-        --color-primary-low: #79c0ff1a;
-
-        --color-border: #30363d;
-        /* stronger HR contrast in dark mode */
-        --color-hr: rgba(255, 255, 255, 0.10);
-        --color-surface: #161b22;
+/* Small screens: stack footer items and center them so they don't exceed viewport */
+@media (max-width: 640px) {
+    .site-footer .container>* {
+        flex: 1 1 100%;
+        text-align: center;
     }
 
-    nav {
-        background-color: var(--color-surface);
-        color: var(--color-text);
-        border-bottom: none;
-    }
-
-    /* Dark-mode: keep underline-only style consistent */
-    nav a,
-    .site-nav .navitem {
-        color: var(--color-primary);
-        text-decoration: underline;
-        text-underline-offset: 6px;
-        text-decoration-thickness: 2px;
-        text-decoration-color: transparent;
-        margin: 0 0.75rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-        background: transparent;
-        border: none;
-        padding: 0;
-        border-radius: 0;
-        transition: color 0.15s, text-decoration-color 0.15s, transform 0.12s;
-    }
-
-    nav a:hover,
-    .site-nav .navitem:hover {
-        color: var(--color-primary-dim);
-        text-decoration-color: var(--color-primary);
-        transform: translateY(-1px);
+    .site-footer .container {
+        justify-content: center;
     }
 }
 
-/* Dark mode via HTML root .dark class (toggled by JS) */
-:root.dark {
-    --color-text: #f0f6fc;
-    --color-text-dim: #c9d1d9;
-    --color-text-low: #c9d1d990;
+/* Ensure long inline elements in footer (links, copyright etc.) wrap */
+.site-footer .container a,
+.site-footer .container * {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
 
-    --color-background: #0d1117;
-    --color-background-dim: #0d11177a;
-    --color-background-low: #0d111750;
-    --color-background-contrast: #79c0ff;
+@keyframes float {
 
-    --inline-code-bg: #161b22;
-    --selection-bg: #79c0ff1a;
+    0%,
+    100% {
+        transform: translateY(0);
+    }
 
-    --color-primary: #79c0ff;
-    --color-primary-dim: #79c0ffef;
-    --color-primary-low: #79c0ff1a;
+    50% {
+        transform: translateY(-5px);
+    }
+}
 
-    --color-border: #30363d;
-    --color-surface: #161b22;
+.embed-item {
+    animation: float 3s ease-in-out infinite;
 }
