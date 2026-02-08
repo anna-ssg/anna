@@ -3,10 +3,10 @@ package engine
 import (
 	"bytes"
 	"html/template"
-	"log"
 	"os"
 	"strings"
 
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
@@ -43,7 +43,7 @@ type Engine struct {
 	DeepDataMerge DeepDataMerge
 
 	// Common logger for all engine functions
-	ErrorLogger *log.Logger
+	ErrorLogger *logger.Logger
 
 	// The path to the directory being rendered
 	SiteDataPath string

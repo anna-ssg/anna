@@ -5,17 +5,16 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 )
 
-var version = "2.1.0" // use variable
-
 type Helper struct {
-	ErrorLogger *log.Logger
+	ErrorLogger *logger.Logger
 }
 
 /*
@@ -100,69 +99,70 @@ func (h *Helper) CreateRenderedDir(fileOutPath string) {
 // BootstrapFromURL downloads a zip archive from `url` and extracts the contained
 // `.../site/` directory into the current working directory's `site/` folder.
 func (h *Helper) BootstrapFromURL(url string) error {
-    h.ErrorLogger.Printf("Downloading %s\n", url)
+	h.ErrorLogger.Printf("Downloading %s\n", url)
 
-    resp, err := http.Get(url)
-    if err != nil {
-        return fmt.Errorf("failed to download %s: %w", url, err)
-    }
-    defer resp.Body.Close()
+	resp, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to download %s: %w", url, err)
+	}
+	defer resp.Body.Close()
 
-    if resp.StatusCode != http.StatusOK {
-        return fmt.Errorf("download failed: %s", resp.Status)
-    }
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("download failed: %s", resp.Status)
+	}
 
-    data, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return fmt.Errorf("failed to read response body: %w", err)
-    }
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %w", err)
+	}
 
-    zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
-    if err != nil {
-        return fmt.Errorf("failed to open zip: %w", err)
-    }
+	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		return fmt.Errorf("failed to open zip: %w", err)
+	}
 
-    for _, f := range zr.File {
-        // We only extract files under the repo's `site/` folder
-        if idx := strings.Index(f.Name, "/site/"); idx != -1 {
-            rel := f.Name[idx+len("/site/"):] // path inside site/
-            destPath := filepath.Join("site", rel)
+	for _, f := range zr.File {
+		// We only extract files under the repo's `site/` folder
+		if idx := strings.Index(f.Name, "/site/"); idx != -1 {
+			rel := f.Name[idx+len("/site/"):] // path inside site/
+			destPath := filepath.Join("site", rel)
 
-            if f.FileInfo().IsDir() {
-                if err := os.MkdirAll(destPath, 0755); err != nil {
-                    return fmt.Errorf("failed to create dir %s: %w", destPath, err)
-                }
-                continue
-            }
+			if f.FileInfo().IsDir() {
+				if err := os.MkdirAll(destPath, 0755); err != nil {
+					return fmt.Errorf("failed to create dir %s: %w", destPath, err)
+				}
+				continue
+			}
 
-            if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
-                return fmt.Errorf("failed to create parent dir for %s: %w", destPath, err)
-            }
+			if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
+				return fmt.Errorf("failed to create parent dir for %s: %w", destPath, err)
+			}
 
-            rc, err := f.Open()
-            if err != nil {
-                return fmt.Errorf("failed to open zipped file %s: %w", f.Name, err)
-            }
+			rc, err := f.Open()
+			if err != nil {
+				return fmt.Errorf("failed to open zipped file %s: %w", f.Name, err)
+			}
 
-            out, err := os.OpenFile(destPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, f.Mode())
-            if err != nil {
-                rc.Close()
-                return fmt.Errorf("failed to create file %s: %w", destPath, err)
-            }
+			out, err := os.OpenFile(destPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, f.Mode())
+			if err != nil {
+				rc.Close()
+				return fmt.Errorf("failed to create file %s: %w", destPath, err)
+			}
 
-            if _, err := io.Copy(out, rc); err != nil {
-                out.Close()
-                rc.Close()
-                return fmt.Errorf("failed to copy file %s: %w", destPath, err)
-            }
-            out.Close()
-            rc.Close()
-        }
-    }
+			if _, err := io.Copy(out, rc); err != nil {
+				out.Close()
+				rc.Close()
+				return fmt.Errorf("failed to copy file %s: %w", destPath, err)
+			}
+			out.Close()
+			rc.Close()
+		}
+	}
 
-    h.ErrorLogger.Println("Bootstrapped site/ from archive")
-    return nil
+	h.ErrorLogger.Println("Bootstrapped site/ from archive")
+	return nil
 }
+
 // 	output, err := os.Create("anna-dl.zip")
 // 	if err != nil {
 // 		fmt.Println("Error creating output file:", err)

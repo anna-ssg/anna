@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
@@ -17,9 +17,9 @@ type WizardServer struct {
 	serveMux *http.ServeMux
 
 	// Common logger for all parser functions
-	InfoLogger *log.Logger
+	InfoLogger *logger.Logger
 	// Common logger for all parser functions
-	ErrorLogger *log.Logger
+	ErrorLogger *logger.Logger
 }
 
 var FormSubmittedCh = make(chan struct{})
@@ -30,8 +30,8 @@ func NewWizardServer(addr string) *WizardServer {
 	wizardServer := WizardServer{
 		serveMux:    serveMuxLocal,
 		server:      &http.Server{Addr: addr, Handler: serveMuxLocal},
-		InfoLogger:  log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime),
-		ErrorLogger: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
+		InfoLogger:  logger.New(os.Stderr),
+		ErrorLogger: logger.New(os.Stderr),
 	}
 
 	return &wizardServer

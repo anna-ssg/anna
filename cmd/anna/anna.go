@@ -2,11 +2,11 @@ package anna
 
 import (
 	"html/template"
-	"log"
 	"os"
 
 	"github.com/anna-ssg/anna/v3/pkg/engine"
 	"github.com/anna-ssg/anna/v3/pkg/helpers"
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
@@ -17,8 +17,8 @@ type Cmd struct {
 	SiteDirPath  string
 
 	// Common logger for all cmd functions
-	ErrorLogger *log.Logger
-	InfoLogger  *log.Logger
+	ErrorLogger *logger.Logger
+	InfoLogger  *logger.Logger
 }
 
 func (cmd *Cmd) VanillaRender(siteDirPath string) int {
@@ -29,14 +29,14 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 		CollectionsMap:            make(map[template.URL][]parser.TemplateData, 10),
 		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
 		SiteDataPath:              siteDirPath,
-		ErrorLogger:               log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
+		ErrorLogger:               logger.New(os.Stderr),
 		RenderDrafts:              cmd.RenderDrafts,
 		LiveReload:                cmd.LiveReload,
 	}
 
 	e := engine.Engine{
 		SiteDataPath: siteDirPath,
-		ErrorLogger:  log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime),
+		ErrorLogger:  logger.New(os.Stderr),
 	}
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)

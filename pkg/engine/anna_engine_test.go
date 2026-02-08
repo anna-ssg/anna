@@ -3,19 +3,19 @@ package engine_test
 import (
 	"bytes"
 	"html/template"
-	"log"
 	"os"
 	"slices"
 	"strings"
 	"testing"
 
 	"github.com/anna-ssg/anna/v3/pkg/engine"
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
 func TestRenderTags(t *testing.T) {
 	e := engine.Engine{
-		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: logger.New(os.Stderr),
 	}
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
@@ -120,7 +120,7 @@ func TestGenerateMergedJson(t *testing.T) {
 
 	t.Run("test json creation for the search index", func(t *testing.T) {
 		e := engine.Engine{
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 		e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
 		e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
@@ -156,7 +156,7 @@ func TestGenerateMergedJson(t *testing.T) {
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		testEngine := engine.Engine{
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 		testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
 		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)

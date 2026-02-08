@@ -2,18 +2,18 @@ package engine_test
 
 import (
 	"html/template"
-	"log"
 	"os"
 	"slices"
 	"testing"
 
 	"github.com/anna-ssg/anna/v3/pkg/engine"
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
 func TestRenderUserDefinedPages(t *testing.T) {
 	testEngine := engine.Engine{
-		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: logger.New(os.Stderr),
 	}
 	testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
 	testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,6 +13,7 @@ import (
 	"time"
 
 	"github.com/anna-ssg/anna/v3/pkg/helpers"
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -86,7 +86,7 @@ type Parser struct {
 	RenderDrafts bool
 
 	// Common logger for all parser functions
-	ErrorLogger *log.Logger
+	ErrorLogger *logger.Logger
 
 	Helper *helpers.Helper
 
@@ -261,9 +261,23 @@ func (p *Parser) ParseConfig(inFilePath string) {
 	if _, err := os.Stat(inFilePath); err != nil {
 		if os.IsNotExist(err) {
 			// Ask the user whether they want to download the default site layout
+			commit := os.Getenv("ANNA_COMMIT")
 			url := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
-			p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
-			p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
+			if commit != "" {
+				trim := strings.TrimSpace(commit)
+				if strings.HasPrefix(trim, "http://") || strings.HasPrefix(trim, "https://") {
+					url = trim
+					p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
+					p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
+				} else {
+					url = fmt.Sprintf("https://github.com/anna-ssg/anna/archive/%s.zip", trim)
+					p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
+					p.ErrorLogger.Printf("Would you like to download the default site layout from %s (commit %s) and extract the site/ directory into the current folder? (y/N): ", url, trim)
+				}
+			} else {
+				p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
+				p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
+			}
 			var resp string
 			_, scanErr := fmt.Scanln(&resp)
 			if scanErr != nil {
@@ -276,7 +290,17 @@ func (p *Parser) ParseConfig(inFilePath string) {
 				}
 				p.ErrorLogger.Println("Downloading and extracting site layout... this may take a moment")
 				if err := p.Helper.BootstrapFromURL(url); err != nil {
-					p.ErrorLogger.Fatal("bootstrap failed: ", err)
+					// If the download was a commit-based archive and returned a 404,
+					// attempt to fallback to the main branch zip and retry once.
+					if strings.Contains(err.Error(), "404 Not Found") && !strings.Contains(url, "refs/heads/main.zip") {
+						p.ErrorLogger.Printf("Download %s returned 404; falling back to main branch archive and retrying...\n", url)
+						fallback := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
+						if err2 := p.Helper.BootstrapFromURL(fallback); err2 != nil {
+							p.ErrorLogger.Fatal("bootstrap failed: ", err2)
+						}
+					} else {
+						p.ErrorLogger.Fatal("bootstrap failed: ", err)
+					}
 				}
 				p.ErrorLogger.Println("Bootstrap complete — retrying configuration parse")
 			} else {

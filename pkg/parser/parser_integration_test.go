@@ -2,10 +2,10 @@ package parser_test
 
 import (
 	"html/template"
-	"log"
 	"os"
 	"testing"
 
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
@@ -14,7 +14,7 @@ func TestParseMDDir(t *testing.T) {
 		p := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 		p.RenderDrafts = false
 
@@ -34,7 +34,7 @@ func TestParseMDDir(t *testing.T) {
 		p := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 		p.RenderDrafts = true
 

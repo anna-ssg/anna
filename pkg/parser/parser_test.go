@@ -2,12 +2,12 @@ package parser_test
 
 import (
 	"html/template"
-	"log"
 	"os"
 	"reflect"
 	"slices"
 	"testing"
 
+	"github.com/anna-ssg/anna/v3/pkg/logger"
 	"github.com/anna-ssg/anna/v3/pkg/parser"
 )
 
@@ -17,7 +17,7 @@ func TestAddFileAndRender(t *testing.T) {
 	gotParser := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
 		TagsMap:     make(map[template.URL][]parser.TemplateData),
-		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: logger.New(os.Stderr),
 	}
 
 	wantLayout := parser.LayoutConfig{
@@ -79,7 +79,7 @@ func TestParseMarkdownContent(t *testing.T) {
 	p := parser.Parser{
 		Templates:   make(map[template.URL]parser.TemplateData),
 		TagsMap:     make(map[template.URL][]parser.TemplateData),
-		ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger: logger.New(os.Stderr),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
@@ -128,7 +128,7 @@ func TestParseConfig(t *testing.T) {
 		gotParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 
 		wantLayout := parser.LayoutConfig{
@@ -157,7 +157,7 @@ func TestParseRobots(t *testing.T) {
 		testParser := parser.Parser{
 			Templates:   make(map[template.URL]parser.TemplateData),
 			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: log.New(os.Stderr, "TEST ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+			ErrorLogger: logger.New(os.Stderr),
 		}
 		testParser.LayoutConfig.BaseURL = "example.org"
 
