@@ -100,20 +100,23 @@ code {
 
 /* Make fenced code blocks preserve whitespace, allow both X/Y scrolling and avoid vertical squish */
 pre {
+    position: relative;
+    /* for the copy button */
     white-space: pre;
     /* do not wrap code lines */
     display: block;
     overflow-x: auto;
     overflow-y: auto;
-    max-height: 420px;
+    max-height: 520px;
     /* limit vertical size and enable scroll */
-    padding: 0.85rem 1rem;
-    margin: 0.6rem 0;
-    border-radius: 8px;
+    padding: 1.25rem 1.2rem;
+    margin: 0.9rem 0;
+    border-radius: 12px;
     background-color: var(--inline-code-bg);
     border: 1px solid rgba(2, 6, 23, 0.06);
     -webkit-overflow-scrolling: touch;
     /* smooth scrolling on mobile */
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
 }
 
 pre>code {
@@ -808,6 +811,116 @@ h1#table-of-contents+ul a:hover {
     text-decoration: underline;
 }
 
+/* Graph visualization (Obsidian-like tag graph) */
+.graph-container {
+    width: 100%;
+    max-width: 520px;
+    height: 320px;
+    margin: 0.6rem 0 1.2rem 0;
+    padding: 0.6rem;
+    border-radius: 10px;
+    background: var(--inline-code-bg);
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+    overflow: hidden;
+}
+
+.chart {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.link {
+    stroke: var(--color-text-low);
+    stroke-opacity: 0.65;
+}
+
+.link--active {
+    stroke: var(--color-text);
+    stroke-opacity: 0.95;
+}
+
+.node {
+    cursor: pointer;
+    transition: stroke-width 0.12s ease, transform 0.12s ease;
+}
+
+.node--faded {
+    opacity: 0.25;
+}
+
+.node-label {
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+    fill: var(--color-text);
+    cursor: pointer;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Bottom page graph */
+.graph-bottom {
+    margin-top: 2rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--color-hr);
+}
+
+.graph-bottom-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--color-text-dim);
+    font-weight: 600;
+}
+
+.graph-container.mini {
+    height: 220px;
+    max-width: 100%;
+    padding: 0.75rem;
+}
+
+/* mini graph label tweaks */
+.graph-container.mini .node-label {
+    font-size: 10px;
+    fill: var(--color-text);
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+/* Empty / error placeholder */
+.graph-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-dim);
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.6rem;
+}
+
+.graph-loading {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-dim);
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.6rem;
+}
+
+@media (max-width: 900px) {
+    .graph-mini {
+        display: none;
+    }
+
+    .graph-container {
+        max-width: 100%;
+    }
+}
+
 /* Content paragraphs and lists spacing */
 p {
     margin: 0.6rem 0;
@@ -848,10 +961,11 @@ pre>code,
 pre code {
     display: block;
     margin: 0;
-    padding: 1rem 0;
-    font-family: monospace;
-    font-size: 0.95rem;
-    line-height: 1.35;
+    padding: 0;
+    /* rely on pre padding */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+    font-size: 1.02rem;
+    line-height: 1.6;
     white-space: pre;
     /* preserve formatting by default */
     overflow-x: auto;
@@ -860,32 +974,47 @@ pre code {
     box-sizing: border-box;
 }
 
-/* Copy button */
+/* Copy button (square, vertically centered) */
 pre button[class*="copy"],
 pre .hljs-copy,
 pre .copy-button {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
     z-index: 10;
-    background: var(--inline-code-bg);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    color: var(--color-text);
-    padding: 0.18rem 0.45rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    background: #fff;
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    /* subtle blue border */
+    color: var(--color-primary);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
-    transition:
-        background 0.12s,
-        transform 0.08s,
-        box-shadow 0.08s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
 }
 
 pre button[class*="copy"]:hover,
 pre .hljs-copy:hover,
 pre .copy-button:hover {
-    transform: translateY(-1px);
+    transform: translateY(-50%) scale(1.04);
+    background: var(--color-primary);
+    color: #fff;
+}
+
+/* ensure icons inside copy buttons are appropriately sized */
+pre button[class*="copy"] svg,
+pre .copy-button svg,
+pre .hljs-copy svg {
+    width: 18px;
+    height: 18px;
+    display: block;
 }
 
 p>code,
@@ -1526,14 +1655,8 @@ a>code {
     font-display: swap;
 }
 
-@font-face {
-    font-family: Inter;
-    src: url(/static/fonts/others/Inter.ttf);
-    font-display: swap;
-    font-feature-settings:
-        "liga" 1,
-        "calt" 1;
-}
+/* Inter font: removed local @font-face so browser will use Google-hosted Inter imported at the top of this file. */
+/* If you want a local fallback, add a valid URL to the font files here. */
 
 @supports (font-variation-settings: normal) {
     :root {
@@ -1541,14 +1664,8 @@ a>code {
     }
 }
 
-@font-face {
-    font-family: InterItalic;
-    src: url(/static/fonts/others/InterItalic.ttf);
-    font-display: swap;
-    font-feature-settings:
-        "liga" 1,
-        "calt" 1;
-}
+/* InterItalic font: removed local @font-face so browser will use Google-hosted italic variant from the Inter family. */
+/* If you want a local fallback, add a valid URL to the font files here. */
 
 /* Desktop wide layout handled via .container; remove body max-width to avoid left-alignment */
 @media (min-width: 900px) {

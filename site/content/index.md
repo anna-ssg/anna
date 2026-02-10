@@ -139,7 +139,7 @@ window.addEventListener('resize', () => {
 
 ---
 
-# [Quick Start Guide](./quick-start)
+# [Quick Start Guide](./quick-start.html)
 
 Download Anna and deploy your site in seconds with our quick start guide.
 

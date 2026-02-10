@@ -36,6 +36,13 @@
                 {{$PageData.Body}}
             </section>
         </article>
+
+        {{ if ne (len $PageData.Frontmatter.Tags) 0 }}
+        <section class="graph-bottom" aria-label="Graph view">
+            <h3 class="graph-bottom-title">Graph View</h3>
+            <div id="mini-graph" class="graph-container mini"></div>
+        </section>
+        {{ end }}
     </main>
 
     {{template "footer" .}}

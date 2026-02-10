@@ -68,7 +68,7 @@ A static site generator in Go
 
 ```
 
-## The small but big decision!
+## The small but big decision
 
 Anna is written in [Go](https://go.dev).
 We considered writing it in Rust, but it came with a steep learning curve.
@@ -170,7 +170,7 @@ The initial version consisted of a multi-goroutine system.
 - If there was no change in the mod time, no changes would be made.
 - If there was a change between the current and previous mod times, a re-render of the site would be performed.
 
-3. The site re-render function checks if a child process is running:
+1. The site re-render function checks if a child process is running:
 
 - For the first render, when a process has not been created, a new process is created that runs anna ("go run main.go --serve")
 - For successive renders, the existing process is killed and a new process is spawned once again that runs the application.
@@ -235,9 +235,9 @@ pkg
 │   ├─── user_engine_test.go
 │   └─── engine_integration_test.go
 └─── parsers
-	├── parser.go
-	├── parser_test.go
-	└── parser_integration_test.go
+ ├── parser.go
+ ├── parser_test.go
+ └── parser_integration_test.go
 ```
 
 > - Wrote unit and integration tests for the parser and engine package

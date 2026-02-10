@@ -40,6 +40,9 @@
         };
     </script>
     {{ end }} {{range $PageData.Frontmatter.JSFiles}}
+    {{ if eq . "graph.js" }}
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    {{ end }}
     <script src="/static/scripts/{{.}}" defer></script>
     {{end}} {{range .DeepDataMerge.LayoutConfig.SiteScripts}}
     <script src="/static/scripts/{{.}}" defer></script>
