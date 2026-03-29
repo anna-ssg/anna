@@ -19,7 +19,8 @@ const urls = [
   "https://adihegde.com",
   "https://hsp-ec.xyz",
   "https://anirudhsudhir.com",
-  "https://polarhive.net"
+  "https://polarhive.net",
+  "https://prawns.dev"
 ];
 
 const gallery = document.getElementById('embed-gallery');
