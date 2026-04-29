@@ -44,6 +44,16 @@ Run all tests and race detector:
 go test ./... -v -race
 ```
 
+## Deploy your Anna site
+
+Use the helper script at [deploy.sh](deploy.sh) to fetch the latest release and run Anna against your site directory:
+
+```bash
+./deploy.sh
+```
+
+The script downloads the latest published release for Linux, extracts the binary, builds your site. Use this in CI workflows like GitHub Actions, Cloudflare Pages, Netlify, etc. to deploy your Anna site.
+
 ## Benchmarks & profiling
 
 Run benchmarks and generate pprof data using the Makefile:

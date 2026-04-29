@@ -317,11 +317,13 @@ img {
 
 .embed-item {
     /* flexible card that can shrink to keep four items visible on narrow viewports */
+    --embed-radius: 10px;
     width: auto;
     min-width: 0;
     max-width: none;
     position: relative;
-    border-radius: 10px;
+    border-radius: var(--embed-radius);
+    clip-path: inset(0 round var(--embed-radius));
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
     transform-origin: center bottom;
@@ -405,7 +407,8 @@ img {
     /* allow taller portrait frames on larger screens */
     max-height: 720px;
     /* ensure the frame rounds to the same radius as the parent */
-    border-radius: inherit;
+    border-radius: var(--embed-radius);
+    clip-path: inset(0 round var(--embed-radius));
     background: transparent;
 }
 

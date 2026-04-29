@@ -29,9 +29,8 @@
     <link id="hljs-dark" rel="stylesheet" media="(prefers-color-scheme: dark)"
         href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" />
 
-    <!-- External Scripts (highlight.js + copy plugin) -->
+    <!-- External Scripts (highlight.js) -->
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
 
     <link rel="alternate" type="application/atom+xml" title="feed" href="/feed.xml" />
 
@@ -62,9 +61,6 @@
     <script defer>
         if (typeof hljs !== 'undefined') {
             hljs.highlightAll();
-            if (typeof CopyButtonPlugin !== 'undefined') {
-                hljs.addPlugin(new CopyButtonPlugin());
-            }
         }
     </script>
 </head>
