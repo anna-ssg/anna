@@ -23,10 +23,6 @@ Inspired by [Hugo](https://gohugo.io) and [Saaru](https://github.com/anirudhRowj
 
 ## Get Started
 
-```sh
-go run github.com/anna-ssg/anna/v3@v3.0.0 -s './'
-```
-
 > To setup your site, follow the quick-start [guide](https://anna-docs.netlify.app/quick-start)
 
 ## Contributing to Anna

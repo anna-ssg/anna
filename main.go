@@ -14,8 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// These values are populated at build time via -ldflags.
-// Defaults are used for local development.
+// Populated at build time by GoReleaser.
 var (
 	Version        = "dev"
 	FullCommitHash = ""
@@ -26,7 +25,6 @@ func main() {
 	var prof bool
 	var renderDrafts bool
 	var serve bool
-	var webconsole bool
 	var version bool
 	var siteDirPath string
 
@@ -45,10 +43,15 @@ func main() {
 
 			siteDirPath = path.Clean(siteDirPath) + "/"
 
-			// If the binary was built with an embedded commit hash, expose it to
-			// the rest of the process via ANNA_COMMIT so non-CLI flows can use it.
-			if FullCommitHash != "" {
-				os.Setenv("ANNA_COMMIT", FullCommitHash)
+			// Automatically bootstrap a new site if one doesn't exist.
+			if _, err := os.Stat(siteDirPath); os.IsNotExist(err) {
+				helper := helpers.Helper{
+					ErrorLogger: logger.New(os.Stderr),
+				}
+				if err := helper.BootstrapEmbedded(false); err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
+				}
 			}
 
 			annaCmd := anna.Cmd{
@@ -67,87 +70,91 @@ func main() {
 			built := false
 
 			if prof {
-				startTime := time.Now()
+				start := time.Now()
 				count := annaCmd.VanillaRender(siteDirPath)
-				elapsedTime := time.Since(startTime)
-				annaCmd.PrintStats(elapsedTime)
-				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsedTime)
+				elapsed := time.Since(start)
+				annaCmd.PrintStats(elapsed)
+				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsed)
 				built = true
 			}
 
-			if webconsole {
-				server := anna.NewWizardServer(":8080")
-				go server.Start()
-				<-anna.FormSubmittedCh // wait for response
-				if err := server.Stop(); err != nil {
-					annaCmd.InfoLogger.Println(err)
-				}
-				annaCmd.StartLiveReload(siteDirPath)
-			}
-
 			if !built {
-				startTime := time.Now()
+				start := time.Now()
 				count := annaCmd.VanillaRender(siteDirPath)
-				elapsedTime := time.Since(startTime)
-				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsedTime)
+				elapsed := time.Since(start)
+				annaCmd.InfoLogger.Printf("Built %d pages in %s\n", count, elapsed)
 			}
 		},
 	}
 
-	rootCmd.Flags().StringVarP(&addr, "addr", "a", "localhost:8000", "specify address over which rendered content is served")
-	rootCmd.Flags().BoolVarP(&renderDrafts, "draft", "d", false, "renders draft posts")
-	rootCmd.Flags().StringVarP(&siteDirPath, "path", "p", "site", "specify the specific site directory to render")
-	rootCmd.Flags().BoolVar(&prof, "prof", false, "enable profiling")
-	rootCmd.Flags().BoolVarP(&serve, "serve", "s", false, "serve the rendered site and watch for file updates")
-	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "prints current version number")
-	// rootCmd.Flags().BoolVarP(&webconsole, "webconsole", "w", false, "wizard to setup anna")
+	rootCmd.Flags().StringVarP(
+		&addr,
+		"addr",
+		"a",
+		"localhost:8000",
+		"specify address over which rendered content is served",
+	)
 
-	// bootstrap subcommand: download and extract `site/` from the upstream archive
+	rootCmd.Flags().BoolVarP(
+		&renderDrafts,
+		"draft",
+		"d",
+		false,
+		"renders draft posts",
+	)
+
+	rootCmd.Flags().StringVarP(
+		&siteDirPath,
+		"path",
+		"p",
+		"site",
+		"specify the specific site directory to render",
+	)
+
+	rootCmd.Flags().BoolVar(
+		&prof,
+		"prof",
+		false,
+		"enable profiling",
+	)
+
+	rootCmd.Flags().BoolVarP(
+		&serve,
+		"serve",
+		"s",
+		false,
+		"serve the rendered site and watch for file updates",
+	)
+
+	rootCmd.Flags().BoolVarP(
+		&version,
+		"version",
+		"v",
+		false,
+		"prints current version number",
+	)
+
 	var bsYes bool
-	var bsURL string
 
 	bootstrapCmd := &cobra.Command{
 		Use:   "bootstrap",
-		Short: "Download and extract the default site/ layout from upstream",
+		Short: "Extract the embedded starter site",
 		Run: func(cmd *cobra.Command, args []string) {
 			info := logger.New(os.Stderr)
 
-			// If a build-time FullCommitHash was embedded prefer that over --url.
-			if FullCommitHash != "" {
-				trim := strings.TrimSpace(FullCommitHash)
-
-				// If the embedded value already looks like a URL, use it directly.
-				if strings.HasPrefix(trim, "http://") || strings.HasPrefix(trim, "https://") {
-					bsURL = trim
-					info.Printf("Bootstrapping from embedded URL -> %s\n", bsURL)
-				} else {
-					bsURL = fmt.Sprintf("https://github.com/anna-ssg/anna/archive/%s.zip", trim)
-					info.Printf("Bootstrapping from embedded commit %s -> %s\n", FullCommitHash, bsURL)
-				}
-			}
-
-			if bsURL == "" {
-				bsURL = "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
-			}
-
-			// Safety check: refuse to overwrite an existing site/ dir unless
-			// --yes was supplied by the user.
-			dest := "site"
-			if _, err := os.Stat(dest); err == nil {
-				if !bsYes {
-					info.Printf("Refusing to bootstrap: %q already exists. Use --yes to overwrite.\n", dest)
-					return
-				}
-				info.Printf("%q already exists; proceeding to overwrite because --yes was passed.\n", dest)
+			if _, err := os.Stat("site"); err == nil && !bsYes {
+				info.Println("site/ already exists. Use --yes to overwrite.")
+				return
 			}
 
 			if !bsYes {
-				fmt.Printf("This will download %s and extract the `site/` directory into ./site/. Continue? (y/N): ", bsURL)
+				fmt.Print("Extract the embedded starter site into ./site? (y/N): ")
+
 				reader := bufio.NewReader(os.Stdin)
 				line, _ := reader.ReadString('\n')
-				line = strings.TrimSpace(line)
+				line = strings.TrimSpace(strings.ToLower(line))
 
-				if strings.ToLower(line) != "y" && strings.ToLower(line) != "yes" {
+				if line != "y" && line != "yes" {
 					info.Println("Aborted.")
 					return
 				}
@@ -157,36 +164,21 @@ func main() {
 				ErrorLogger: logger.New(os.Stderr),
 			}
 
-			if err := helper.BootstrapFromURL(bsURL); err != nil {
-				// If the initial download fails with a 404 and we attempted a
-				// commit-specific archive, try falling back to main.zip.
-				if strings.Contains(err.Error(), "404 Not Found") &&
-					!strings.Contains(bsURL, "refs/heads/main.zip") {
-
-					info.Printf("Download %s returned 404; falling back to main branch archive and retrying...\n", bsURL)
-
-					fallback := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
-
-					if err2 := helper.BootstrapFromURL(fallback); err2 != nil {
-						fmt.Fprintln(os.Stderr, "fallback failed:", err2)
-						os.Exit(1)
-					}
-				} else {
-					fmt.Fprintln(os.Stderr, err)
-					os.Exit(1)
-				}
+			if err := helper.BootstrapEmbedded(bsYes); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
 			}
 
-			info.Println("Bootstrapped site/ successfully")
+			info.Println("Bootstrapped embedded site successfully.")
 		},
 	}
 
-	bootstrapCmd.Flags().BoolVarP(&bsYes, "yes", "y", false, "do not prompt; proceed non-interactively")
-	bootstrapCmd.Flags().StringVar(
-		&bsURL,
-		"url",
-		"https://github.com/anna-ssg/anna/archive/refs/heads/main.zip",
-		"zip archive url to bootstrap from",
+	bootstrapCmd.Flags().BoolVarP(
+		&bsYes,
+		"yes",
+		"y",
+		false,
+		"overwrite existing site",
 	)
 
 	rootCmd.AddCommand(bootstrapCmd)

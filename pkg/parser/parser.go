@@ -3,7 +3,6 @@ package parser
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io/fs"
 	"os"
@@ -257,61 +256,18 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
-	// Check if the configuration file exists
-	if _, err := os.Stat(inFilePath); err != nil {
-		if os.IsNotExist(err) {
-			// Ask the user whether they want to download the default site layout
-			commit := os.Getenv("ANNA_COMMIT")
-			url := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
-			if commit != "" {
-				trim := strings.TrimSpace(commit)
-				if strings.HasPrefix(trim, "http://") || strings.HasPrefix(trim, "https://") {
-					url = trim
-					p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
-					p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
-				} else {
-					url = fmt.Sprintf("https://github.com/anna-ssg/anna/archive/%s.zip", trim)
-					p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
-					p.ErrorLogger.Printf("Would you like to download the default site layout from %s (commit %s) and extract the site/ directory into the current folder? (y/N): ", url, trim)
-				}
-			} else {
-				p.ErrorLogger.Printf("Configuration file %s not found.\n", inFilePath)
-				p.ErrorLogger.Printf("Would you like to download the default site layout from %s and extract the site/ directory into the current folder? (y/N): ", url)
-			}
-			var resp string
-			_, scanErr := fmt.Scanln(&resp)
-			if scanErr != nil {
-				p.ErrorLogger.Println("Input error:", scanErr)
-				p.ErrorLogger.Fatal("configuration missing and input unavailable")
-			}
-			if strings.ToLower(strings.TrimSpace(resp)) == "y" || strings.ToLower(strings.TrimSpace(resp)) == "yes" {
-				if p.Helper == nil {
-					p.Helper = &helpers.Helper{ErrorLogger: p.ErrorLogger}
-				}
-				p.ErrorLogger.Println("Downloading and extracting site layout... this may take a moment")
-				if err := p.Helper.BootstrapFromURL(url); err != nil {
-					// If the download was a commit-based archive and returned a 404,
-					// attempt to fallback to the main branch zip and retry once.
-					if strings.Contains(err.Error(), "404 Not Found") && !strings.Contains(url, "refs/heads/main.zip") {
-						p.ErrorLogger.Printf("Download %s returned 404; falling back to main branch archive and retrying...\n", url)
-						fallback := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
-						if err2 := p.Helper.BootstrapFromURL(fallback); err2 != nil {
-							p.ErrorLogger.Fatal("bootstrap failed: ", err2)
-						}
-					} else {
-						p.ErrorLogger.Fatal("bootstrap failed: ", err)
-					}
-				}
-				p.ErrorLogger.Println("Bootstrap complete — retrying configuration parse")
-			} else {
-				p.ErrorLogger.Fatal("configuration missing and user declined bootstrap")
-			}
-		} else {
-			p.ErrorLogger.Fatal(err)
+	// Ensure the starter site exists.
+	if p.Helper == nil {
+		p.Helper = &helpers.Helper{
+			ErrorLogger: p.ErrorLogger,
 		}
 	}
 
-	// Read and parse the configuration file
+	if err := p.Helper.EnsureSiteExists(); err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+
+	// Read and parse the configuration file.
 	configFile, err := os.ReadFile(inFilePath)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
@@ -319,7 +275,7 @@ func (p *Parser) ParseConfig(inFilePath string) {
 
 	err = json.Unmarshal(configFile, &p.LayoutConfig)
 	if err != nil {
-		p.ErrorLogger.Println("Error at: ", inFilePath)
+		p.ErrorLogger.Println("Error at:", inFilePath)
 		p.ErrorLogger.Fatal(err)
 	}
 
