@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/anna-ssg/anna/v3/pkg/engine"
-	"github.com/anna-ssg/anna/v3/pkg/logger"
-	"github.com/anna-ssg/anna/v3/pkg/parser"
+	"github.com/anna-ssg/anna/v4/pkg/engine"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
+	"github.com/anna-ssg/anna/v4/pkg/parser"
 )
 
 func TestRenderTags(t *testing.T) {

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anna-ssg/anna/v3/pkg/helpers"
-	"github.com/anna-ssg/anna/v3/pkg/logger"
+	"github.com/anna-ssg/anna/v4/pkg/helpers"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"

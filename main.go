@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anna-ssg/anna/v3/cmd/anna"
-	"github.com/anna-ssg/anna/v3/pkg/helpers"
-	"github.com/anna-ssg/anna/v3/pkg/logger"
+	"github.com/anna-ssg/anna/v4/cmd/anna"
+	"github.com/anna-ssg/anna/v4/pkg/helpers"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

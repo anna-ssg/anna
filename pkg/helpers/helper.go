@@ -1,20 +1,17 @@
 package helpers
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
-	"bufio"
-	"errors"
-	"fmt"
-	"os"
-	"strings"	
 
-	embeddedsite "github.com/anna-ssg/anna/v3/site"
-	"github.com/anna-ssg/anna/v3/pkg/logger"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
+	embeddedsite "github.com/anna-ssg/anna/v4/site"
 )
 
 type Helper struct {
@@ -161,7 +158,7 @@ func (h *Helper) EnsureSiteExists() error {
 	if err != nil {
 		return err
 	}
-	
+
 	resp = strings.TrimSpace(strings.ToLower(resp))
 	if resp != "" && resp != "y" && resp != "yes" {
 		return errors.New("aborted")

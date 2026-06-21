@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/anna-ssg/anna/v3/pkg/logger"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
 )
 
 var reloadPageBool atomic.Bool

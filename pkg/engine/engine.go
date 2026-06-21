@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/anna-ssg/anna/v3/pkg/logger"
-	"github.com/anna-ssg/anna/v3/pkg/parser"
+	"github.com/anna-ssg/anna/v4/pkg/logger"
+	"github.com/anna-ssg/anna/v4/pkg/parser"
 )
 
 // DeepDataMerge This struct holds all the ssg data

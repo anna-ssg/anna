@@ -1,4 +1,4 @@
-module github.com/anna-ssg/anna/v3
+module github.com/anna-ssg/anna/v4
 
 go 1.26.4
 

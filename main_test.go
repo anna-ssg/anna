@@ -3,7 +3,7 @@ package main_test
 import (
 	"testing"
 
-	"github.com/anna-ssg/anna/v3/cmd/anna"
+	"github.com/anna-ssg/anna/v4/cmd/anna"
 )
 
 const siteDirPath = "site/"

@@ -29,7 +29,7 @@ go build ./...
 Run the CLI directly during development:
 
 ```bash
-go run github.com/anna-ssg/anna/v3 -p ./site -s
+go run github.com/anna-ssg/anna/v4 -p ./site -s
 ```
 
 Run only unit tests:
