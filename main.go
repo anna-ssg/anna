@@ -43,15 +43,14 @@ func main() {
 
 			siteDirPath = path.Clean(siteDirPath) + "/"
 
-			// Automatically bootstrap a new site if one doesn't exist.
-			if _, err := os.Stat(siteDirPath); os.IsNotExist(err) {
-				helper := helpers.Helper{
-					ErrorLogger: logger.New(os.Stderr),
-				}
-				if err := helper.BootstrapEmbedded(false); err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					os.Exit(1)
-				}
+			helper := helpers.Helper{
+				ErrorLogger: logger.New(os.Stderr),
+			}
+			
+			// Bootstrap a new site if one doesn't exist.
+			if err := helper.EnsureSiteExists(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
 			}
 
 			annaCmd := anna.Cmd{

@@ -256,17 +256,6 @@ func (p *Parser) DateParse(date string) time.Time {
 }
 
 func (p *Parser) ParseConfig(inFilePath string) {
-	// Ensure the starter site exists.
-	if p.Helper == nil {
-		p.Helper = &helpers.Helper{
-			ErrorLogger: p.ErrorLogger,
-		}
-	}
-
-	if err := p.Helper.EnsureSiteExists(); err != nil {
-		p.ErrorLogger.Fatal(err)
-	}
-
 	// Read and parse the configuration file.
 	configFile, err := os.ReadFile(inFilePath)
 	if err != nil {
