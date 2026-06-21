@@ -46,7 +46,7 @@ func main() {
 			helper := helpers.Helper{
 				ErrorLogger: logger.New(os.Stderr),
 			}
-			
+
 			// Bootstrap a new site if one doesn't exist.
 			if err := helper.EnsureSiteExists(); err != nil {
 				fmt.Fprintln(os.Stderr, err)

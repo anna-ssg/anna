@@ -92,6 +92,9 @@ func TestParseMarkdownContent(t *testing.T) {
 		if parseSuccess {
 
 			bodyWant, err := os.ReadFile(TestDirPath + "parse_md/html_want_output.html")
+			if err != nil {
+				t.Errorf("%v", err)
+			}
 			if err = os.WriteFile(TestDirPath+"parse_md/html_got_output.html", []byte(bodyGot), 0666); err != nil {
 				t.Errorf("%v", err)
 			}

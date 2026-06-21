@@ -47,7 +47,11 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if cerr := source.Close(); cerr != nil {
+			h.ErrorLogger.Fatal(cerr)
+		}
+	}()
 
 	if strings.Contains(destPath, "/") {
 		splitPaths := strings.Split(destPath, "/")
@@ -64,7 +68,11 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
-	defer destination.Close()
+	defer func() {
+		if cerr := destination.Close(); cerr != nil {
+			h.ErrorLogger.Fatal(cerr)
+		}
+	}()
 
 	_, err = io.Copy(destination, source)
 	if err != nil {
@@ -112,7 +120,11 @@ func (h *Helper) BootstrapEmbedded(overwrite bool) error {
 		if err != nil {
 			return err
 		}
-		defer src.Close()
+		// Read-only handle on the embedded FS; a close failure here can't
+		// affect data already copied, so it's intentionally discarded.
+		defer func() {
+			_ = src.Close()
+		}()
 
 		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 			return err
@@ -129,7 +141,9 @@ func (h *Helper) BootstrapEmbedded(overwrite bool) error {
 		}
 
 		if _, err := io.Copy(out, src); err != nil {
-			out.Close()
+			// We already have an error to return; the close error is
+			// secondary, so it's intentionally discarded.
+			_ = out.Close()
 			return err
 		}
 

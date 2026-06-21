@@ -35,6 +35,16 @@ cd anna
 make build
 ```
 
+`make build` automatically wires up a **pre-commit hook** (tracked in [`.github/githooks/`](.github/githooks/)) that runs, in order: `gofmt` check, lint (`go vet` + [`golangci-lint`](https://golangci-lint.run/welcome/install/) if installed), audit ([`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) if installed), the test suite, `golangci-lint` and `govulncheck` are optional; the hook skips those steps with a hint if they aren't installed.
+
+You can also install the hook explicitly, without doing a full build, by running:
+
+```sh
+make install-hooks
+```
+
+If you ever need to skip it (e.g. a WIP commit), use `git commit --no-verify`.
+
 ### Developer Guide
 
 Detailed documentation for developers can be found [here](https://anna-docs.netlify.app/developer-guide)

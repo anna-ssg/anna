@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Pre-commit hook for anna.
+#
+# Runs, in order: gofmt check, lint (go vet, plus golangci-lint if
+# installed), audit (govulncheck if installed), the test suite, and
+# finally a build-only compile check. Aborts the commit at the first
+# failing step.
+#
+# Installed automatically by `make build`/`make install-hooks` via
+# `git config core.hooksPath .github/githooks`, so it lives here in the
+# repo instead of the untracked .git/hooks directory.
+#
+# Skip in an emergency with: git commit --no-verify
+
+abort() {
+	echo ""
+	echo "pre-commit: $1 failed, commit aborted."
+	echo "pre-commit: fix the issue above, or bypass with 'git commit --no-verify'."
+	exit 1
+}
+
+make fmt || abort "gofmt"
+make lint || abort "lint"
+make audit || abort "audit"
+make tests || abort "tests"
+make build || abort "build"
+
+exit 0

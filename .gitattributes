@@ -3,3 +3,4 @@
 *.css linguist-vendored=true
 *.js linguist-vendored=true
 *.sh linguist-vendored=true
+.github/githooks/* text eol=lf
