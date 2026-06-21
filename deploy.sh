@@ -26,6 +26,5 @@ if [[ ! -f anna ]]; then
   exit 1
 fi
 
-chmod +x anna
-echo "Running anna..."
+chmod +x anna && echo "Running anna..."
 ./anna

@@ -76,3 +76,25 @@ Show usage and all flags:
 ```sh
 anna -h
 ```
+
+## Deploy Your Site
+
+Anna ships as a single static binary, so most hosts deploy it the same way: fetch the `anna` release binary, run it to generate `site/rendered`, then publish that folder. No Go toolchain needed on the host's end.
+
+### Netlify
+
+1. Push a repo containing your `site/` directory
+2. Copy [`deploy.sh`](deploy.sh) and [`netlify.toml`](netlify.toml) into it
+3. Connect the repo on [Netlify](https://app.netlify.com) — build command and publish dir are picked up automatically from your `netlify.toml` file
+
+### Cloudflare Pages
+
+1. Connect your repo on [Cloudflare Pages](https://pages.cloudflare.com)
+2. Build command: `bash deploy.sh`
+3. Build output directory: `site/rendered`
+
+### GitHub Pages
+
+1. Settings → Pages → Source: **GitHub Actions**
+2. Look at the **Build and Deploy** workflow from our Actions tab
+3. `deploy.sh` fetches a `Linux_x86_64` release binary, which matches the default Linux runners on all three platforms above.
