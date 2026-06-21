@@ -14,9 +14,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// FullCommitHash can be set at build time with -ldflags "-X main.FullCommitHash=<hash-or-tag>".
-// Example: go build -ldflags "-X main.FullCommitHash=1a2b3c4"
-var FullCommitHash string
+// These values are populated at build time via -ldflags.
+// Defaults are used for local development.
+var (
+	Version        = "dev"
+	FullCommitHash = ""
+)
 
 func main() {
 	var addr string
@@ -27,12 +30,19 @@ func main() {
 	var version bool
 	var siteDirPath string
 
-	Version := "v4.0.0-rc-3" // to be set at build time $(git describe --tags)
-
 	rootCmd := &cobra.Command{
 		Use:   "anna",
 		Short: "Static Site Generator",
 		Run: func(cmd *cobra.Command, args []string) {
+			if version {
+				ver := Version
+				if FullCommitHash != "" {
+					ver = fmt.Sprintf("%s (commit: %s)", Version, FullCommitHash)
+				}
+				fmt.Println(ver)
+				return
+			}
+
 			siteDirPath = path.Clean(siteDirPath) + "/"
 
 			// If the binary was built with an embedded commit hash, expose it to
@@ -40,6 +50,7 @@ func main() {
 			if FullCommitHash != "" {
 				os.Setenv("ANNA_COMMIT", FullCommitHash)
 			}
+
 			annaCmd := anna.Cmd{
 				RenderDrafts: renderDrafts,
 				Addr:         addr,
@@ -64,14 +75,6 @@ func main() {
 				built = true
 			}
 
-			if version {
-				ver := Version
-				if FullCommitHash != "" {
-					ver = fmt.Sprintf("%s (commit: %s)", Version, FullCommitHash)
-				}
-				annaCmd.InfoLogger.Println("Current version:", ver)
-			}
-
 			if webconsole {
 				server := anna.NewWizardServer(":8080")
 				go server.Start()
@@ -93,7 +96,6 @@ func main() {
 
 	rootCmd.Flags().StringVarP(&addr, "addr", "a", "localhost:8000", "specify address over which rendered content is served")
 	rootCmd.Flags().BoolVarP(&renderDrafts, "draft", "d", false, "renders draft posts")
-	// Do not set default values for string flags
 	rootCmd.Flags().StringVarP(&siteDirPath, "path", "p", "site", "specify the specific site directory to render")
 	rootCmd.Flags().BoolVar(&prof, "prof", false, "enable profiling")
 	rootCmd.Flags().BoolVarP(&serve, "serve", "s", false, "serve the rendered site and watch for file updates")
@@ -103,15 +105,17 @@ func main() {
 	// bootstrap subcommand: download and extract `site/` from the upstream archive
 	var bsYes bool
 	var bsURL string
+
 	bootstrapCmd := &cobra.Command{
 		Use:   "bootstrap",
 		Short: "Download and extract the default site/ layout from upstream",
 		Run: func(cmd *cobra.Command, args []string) {
 			info := logger.New(os.Stderr)
 
-			// If a build-time FullCommitHash was embedded prefer that over --url
+			// If a build-time FullCommitHash was embedded prefer that over --url.
 			if FullCommitHash != "" {
 				trim := strings.TrimSpace(FullCommitHash)
+
 				// If the embedded value already looks like a URL, use it directly.
 				if strings.HasPrefix(trim, "http://") || strings.HasPrefix(trim, "https://") {
 					bsURL = trim
@@ -126,8 +130,8 @@ func main() {
 				bsURL = "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
 			}
 
-			// Safety check: refuse to overwrite an existing `site/` dir unless
-			// --yes (`bsYes`) was supplied by the user.
+			// Safety check: refuse to overwrite an existing site/ dir unless
+			// --yes was supplied by the user.
 			dest := "site"
 			if _, err := os.Stat(dest); err == nil {
 				if !bsYes {
@@ -142,19 +146,27 @@ func main() {
 				reader := bufio.NewReader(os.Stdin)
 				line, _ := reader.ReadString('\n')
 				line = strings.TrimSpace(line)
+
 				if strings.ToLower(line) != "y" && strings.ToLower(line) != "yes" {
 					info.Println("Aborted.")
 					return
 				}
 			}
 
-			helper := helpers.Helper{ErrorLogger: logger.New(os.Stderr)}
+			helper := helpers.Helper{
+				ErrorLogger: logger.New(os.Stderr),
+			}
+
 			if err := helper.BootstrapFromURL(bsURL); err != nil {
 				// If the initial download fails with a 404 and we attempted a
 				// commit-specific archive, try falling back to main.zip.
-				if strings.Contains(err.Error(), "404 Not Found") && !strings.Contains(bsURL, "refs/heads/main.zip") {
+				if strings.Contains(err.Error(), "404 Not Found") &&
+					!strings.Contains(bsURL, "refs/heads/main.zip") {
+
 					info.Printf("Download %s returned 404; falling back to main branch archive and retrying...\n", bsURL)
+
 					fallback := "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip"
+
 					if err2 := helper.BootstrapFromURL(fallback); err2 != nil {
 						fmt.Fprintln(os.Stderr, "fallback failed:", err2)
 						os.Exit(1)
@@ -168,8 +180,15 @@ func main() {
 			info.Println("Bootstrapped site/ successfully")
 		},
 	}
+
 	bootstrapCmd.Flags().BoolVarP(&bsYes, "yes", "y", false, "do not prompt; proceed non-interactively")
-	bootstrapCmd.Flags().StringVar(&bsURL, "url", "https://github.com/anna-ssg/anna/archive/refs/heads/main.zip", "zip archive url to bootstrap from")
+	bootstrapCmd.Flags().StringVar(
+		&bsURL,
+		"url",
+		"https://github.com/anna-ssg/anna/archive/refs/heads/main.zip",
+		"zip archive url to bootstrap from",
+	)
+
 	rootCmd.AddCommand(bootstrapCmd)
 
 	if err := rootCmd.Execute(); err != nil {
