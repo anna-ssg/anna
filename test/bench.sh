@@ -173,22 +173,18 @@ hyperfine -p 'sync' -w "$warm" \
     }
 
     /Time \(mean ± σ\):/ {
-        mean=$4
-        std=$7
+        mean=$5
+        std=$8
+        user=$11
+        sys=$14
 
-        match($0, /User: ([0-9.]+ ms)/)
-        user=substr($0, RSTART+6, RLENGTH-6)
-
-        match($0, /System: ([0-9.]+ ms)/)
-        system=substr($0, RSTART+8, RLENGTH-8)
-
-        print bench "|" mean "|" std "|" user "|" system
+        print bench "|" mean "|" std "|" user "|" sys
     }
     ' "$BENCH_DIR/bench_results.txt" |
     sort -t'|' -k2,2n |
     awk -F'|' '
     {
-        printf("| %d | %s | %s ms | %s ms | %s | %s |\n",
+        printf("| %d | %s | %s ms | %s ms | %s ms | %s ms |\n",
             NR, $1, $2, $3, $4, $5)
     }
     '
@@ -209,7 +205,6 @@ hyperfine -p 'sync' -w "$warm" \
     cat "$BENCH_DIR/commit_hashes.txt"
 
 } > "$BENCH_DIR/bench_report.md"
-
 
 echo
 echo "Results written to:"
