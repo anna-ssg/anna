@@ -43,6 +43,15 @@ func (h *Helper) CopyDirectoryContents(dirPath string, outDirPath string) {
 }
 
 func (h *Helper) CopyFiles(srcPath string, destPath string) {
+	sourceInfo, err := os.Stat(srcPath)
+	if err != nil {
+		h.ErrorLogger.Fatal(err)
+	}
+
+	if destinationInfo, err := os.Stat(destPath); err == nil && !sourceInfo.ModTime().After(destinationInfo.ModTime()) {
+		return
+	}
+
 	source, err := os.Open(srcPath)
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
@@ -81,12 +90,7 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 }
 
 func (h *Helper) CreateRenderedDir(fileOutPath string) {
-	err := os.RemoveAll(fileOutPath + "rendered/")
-	if err != nil {
-		h.ErrorLogger.Fatal(err)
-	}
-
-	err = os.MkdirAll(fileOutPath+"rendered/", 0750)
+	err := os.MkdirAll(fileOutPath+"rendered/", 0750)
 	if err != nil {
 		h.ErrorLogger.Fatal(err)
 	}
