@@ -4,57 +4,386 @@ on:
   workflow_dispatch:
 
 jobs:
+  generate-corpus:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Corpus
+        run: |
+          mkdir -p generated
+
+          generate_post() {
+            local file=$1 id=$2 paragraphs=$3
+            {
+              cat <<EOF
+          ---
+          title: Benchmark Post $id
+          template: post.jinja
+          author: John Doe
+          date: 2024-01-01
+          categories:
+            - Technology
+            - Programming
+          tags:
+            - benchmark
+            - test-$id
+          reverseindex: ["tags"]
+          collections: ["test", "posts"]
+          ---
+
+          # Benchmark Post $id
+
+          EOF
+              for ((j=0; j<paragraphs; j++)); do
+                cat <<EOF
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+
+          ## Section $j
+
+          - item one
+          - item two
+          - item three
+
+          \`\`\`go
+          func main() {
+              println("hello")
+          }
+          \`\`\`
+
+          EOF
+              done
+            } > "$file"
+          }
+
+          run_one() {
+            local i=$1 paragraphs
+            if   (( i < 700 )); then paragraphs=10
+            elif (( i < 900 )); then paragraphs=50
+            else                     paragraphs=200
+            fi
+            generate_post "$PWD/generated/test_$i.md" "$i" "$paragraphs" || exit 1
+          }
+
+          export -f generate_post run_one
+
+          seq 0 999 | xargs --exit -P"$(nproc)" -I{} bash -c 'run_one "$@"' _ {}
+
+      - name: Upload Corpus
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-corpus
+          path: generated/
+
+  build-ssg:
+    runs-on: ubuntu-latest
+    name: Build SSG (${{ matrix.name }})
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: anna-branch
+            repo: local
+            build_cmd: go build -o anna-branch
+            binary_src: anna-branch
+            lang: go-branch
+
+          - name: saaru
+            repo: https://github.com/anirudhRowjee/saaru
+            build_cmd: cargo build --release --manifest-path saaru/Cargo.toml
+            binary_src: saaru/target/release/saaru
+            lang: rust
+
+          - name: sapling
+            repo: https://github.com/NavinShrinivas/sapling
+            build_cmd: cargo build --release --manifest-path sapling/Cargo.toml
+            binary_src: sapling/target/release/sapling
+            lang: rust
+
+          - name: anna-main
+            repo: https://github.com/anna-ssg/anna
+            build_cmd: cd anna-main && go build -o anna-main
+            binary_src: anna-main/anna-main
+            lang: go
+
+          - name: anna-release
+            repo: skip
+            build_cmd: |
+              mkdir -p anna-release
+              LATEST_TAG=$(curl -s https://api.github.com/repos/anna-ssg/anna/releases/latest | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p')
+              curl -Ls "https://github.com/anna-ssg/anna/releases/download/$LATEST_TAG/anna_Linux_x86_64.tar.gz" | tar -xz -C anna-release
+              mv anna-release/anna anna-release/anna-release
+              chmod +x anna-release/anna-release
+            binary_src: anna-release/anna-release
+            lang: other
+
+    steps:
+      - name: Checkout Local Repository Branch
+        if: matrix.repo == 'local'
+        uses: actions/checkout@v7
+
+      - name: Tools/Go (Local Branch config)
+        if: matrix.lang == 'go-branch'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Tools/Go (Stable)
+        if: matrix.lang == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Tools/Rust
+        if: matrix.lang == 'rust'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Clone Remote Repositories
+        if: matrix.repo != 'skip' && matrix.repo != 'local'
+        run: git clone --depth=1 ${{ matrix.repo }} ${{ matrix.name }}
+
+      - name: Cache/Rust
+        if: matrix.lang == 'rust'
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.name }} -> target
+
+      - name: Build Binary
+        run: ${{ matrix.build_cmd }}
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: bin-${{ matrix.name }}
+          path: ${{ matrix.binary_src }}
+
   benchmark:
+    needs: [generate-corpus, build-ssg]
     runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
       contents: read
 
+    env:
+      files: 1000
+      warm: 10
+      runs: 20
+      BENCH_DIR: ${{ github.workspace }}/tmp/bench
+
     steps:
-      # Checkout
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      # System Dependencies
-      - name: Dependencies/Hyperfine
-        run: |
-          sudo apt-get update; sudo apt-get install -y hyperfine
-
-      # Tool Setup
       - name: Tools/Hugo
         uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Tools/Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
+      - name: Dependencies
+        run: sudo apt-get update && sudo apt-get install -y hyperfine jq rsync
 
-      - name: Tools/Rust
-        uses: actions-rs/toolchain@v1.0.6
+      - name: Download Corpus
+        uses: actions/download-artifact@v4
         with:
-          profile: minimal
-          toolchain: stable
+          name: bench-corpus
+          path: ${{ env.BENCH_DIR }}/generated
 
-      # Execution
-      - name: Execution Run Benchmark
+      - name: Download Binary/saaru
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-saaru
+          path: ${{ env.BENCH_DIR }}/bins
+
+      - name: Download Binary/sapling
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-sapling
+          path: ${{ env.BENCH_DIR }}/bins
+
+      - name: Download Binary/anna-main
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-anna-main
+          path: ${{ env.BENCH_DIR }}/bins
+
+      - name: Download Binary/anna-release
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-anna-release
+          path: ${{ env.BENCH_DIR }}/bins
+
+      - name: Download Binary/anna-branch
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-anna-branch
+          path: ${{ env.BENCH_DIR }}/bins
+
+      - name: chmod Binaries
+        run: chmod +x ${{ env.BENCH_DIR }}/bins/*
+
+      - name: Clone SSG Repos (structure only)
         run: |
-          ./test/bench.sh
-          cp /home/runner/work/anna/anna/tmp/bench/bench_report.md ~/comment_body.txt
+          BENCH_DIR="${{ env.BENCH_DIR }}"
+          git clone --depth=1 https://github.com/anirudhRowjee/saaru    "$BENCH_DIR/saaru"
+          git clone --depth=1 https://github.com/NavinShrinivas/sapling  "$BENCH_DIR/sapling"
+          git clone --depth=1 https://github.com/anna-ssg/anna           "$BENCH_DIR/anna-main"
 
-      # Results
-      - name: Results Post Benchmark
+          # Fix: Explicitly create target execution paths before copying paths
+          mkdir -p "$BENCH_DIR/saaru/target/release"
+          mkdir -p "$BENCH_DIR/sapling/target/release"
+
+          # copy pre-built binaries into place
+          cp "$BENCH_DIR/bins/saaru"     "$BENCH_DIR/saaru/target/release/saaru"
+          cp "$BENCH_DIR/bins/sapling"   "$BENCH_DIR/sapling/target/release/sapling"
+          cp "$BENCH_DIR/bins/anna-main" "$BENCH_DIR/anna-main/anna-main"
+
+          chmod +x \
+            "$BENCH_DIR/saaru/target/release/saaru" \
+            "$BENCH_DIR/sapling/target/release/sapling" \
+            "$BENCH_DIR/anna-main/anna-main"
+
+      - name: Bootstrap Site Skeleton
+        run: |
+          mkdir -p "$BENCH_DIR/anna-release"
+          cp "$BENCH_DIR/bins/anna-release" "$BENCH_DIR/anna-release/anna"
+          chmod +x "$BENCH_DIR/anna-release/anna"
+          (cd "$BENCH_DIR/anna-release" && ./anna bootstrap -y)
+
+          mkdir -p "$BENCH_DIR/anna-branch"
+          cp "$BENCH_DIR/bins/anna-branch" "$BENCH_DIR/anna-branch/anna"
+          chmod +x "$BENCH_DIR/anna-branch/anna"
+          cp -r "$BENCH_DIR/anna-release/site" "$BENCH_DIR/anna-branch/site"
+          cp -r "$BENCH_DIR/anna-release/site" "$BENCH_DIR/anna-main/site"
+
+      - name: Setup Hugo Site
+        run: |
+          hugo new site "$BENCH_DIR/hugo"
+          cd "$BENCH_DIR/hugo"
+          hugo new theme mytheme
+          echo "theme = 'mytheme'" >> hugo.toml
+
+      - name: Clean Content Dirs
+        run: |
+          rm -rf \
+            "$BENCH_DIR/anna-branch/site/content" \
+            "$BENCH_DIR/anna-main/site/content" \
+            "$BENCH_DIR/anna-release/site/content" \
+            "$BENCH_DIR/saaru/docs/src" \
+            "$BENCH_DIR/sapling/benchmark/content/blogs" \
+            "$BENCH_DIR/hugo/content"
+
+          mkdir -p \
+            "$BENCH_DIR/anna-branch/site/content/posts" \
+            "$BENCH_DIR/anna-main/site/content/posts" \
+            "$BENCH_DIR/anna-release/site/content/posts" \
+            "$BENCH_DIR/saaru/docs/src" \
+            "$BENCH_DIR/sapling/benchmark/content/blogs" \
+            "$BENCH_DIR/hugo/content"
+
+      - name: Link Corpus
+        run: |
+          for f in "$BENCH_DIR/generated"/*.md; do
+            name=$(basename "$f")
+            ln "$f" "$BENCH_DIR/anna-branch/site/content/posts/$name"
+            ln "$f" "$BENCH_DIR/anna-main/site/content/posts/$name"
+            ln "$f" "$BENCH_DIR/anna-release/site/content/posts/$name"
+            ln "$f" "$BENCH_DIR/saaru/docs/src/$name"
+            ln "$f" "$BENCH_DIR/sapling/benchmark/content/blogs/$name"
+            ln "$f" "$BENCH_DIR/hugo/content/$name"
+          done
+
+      - name: Collect Commit Hashes
+        run: |
+          get_commit_info() {
+            local repo_dir=$1 name=$2 url=$3
+            read -r SHORT_HASH MSG < <(cd "$repo_dir" && git log --oneline -1 | awk '{print $1, substr($0, index($0,$2))}')
+            FULL_HASH=$(cd "$repo_dir" && git log --format=%H -1)
+            echo "$name: [\`$SHORT_HASH\`]($url/commit/$FULL_HASH) $MSG"
+          }
+
+          LATEST_TAG=$(curl -s https://api.github.com/repos/anna-ssg/anna/releases/latest | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p')
+          RELEASE_SHA=$(git ls-remote --tags https://github.com/anna-ssg/anna.git "refs/tags/$LATEST_TAG^{}" "refs/tags/$LATEST_TAG" | awk 'NR==1{print $1}')
+
+          {
+            get_commit_info "$GITHUB_WORKSPACE"          "anna-branch" "https://github.com/anna-ssg/anna"
+            get_commit_info "$BENCH_DIR/saaru"           "saaru"       "https://github.com/anirudhRowjee/saaru"
+            get_commit_info "$BENCH_DIR/sapling"         "sapling"     "https://github.com/NavinShrinivas/sapling"
+            get_commit_info "$BENCH_DIR/anna-main"       "anna-main"   "https://github.com/anna-ssg/anna"
+            echo "anna-release: [\`${RELEASE_SHA:0:7}\`](https://github.com/anna-ssg/anna/commit/$RELEASE_SHA)"
+          } | tee "$BENCH_DIR/commit_hashes.txt"
+
+      - name: Run Benchmark
+        run: |
+          hyperfine \
+            --warmup "$warm" \
+            --runs   "$runs" \
+            --ignore-failure \
+            --export-json "$BENCH_DIR/bench_results.json" \
+            -n saaru        "(cd $BENCH_DIR/saaru && ./target/release/saaru --base-path ./docs)" \
+            -n sapling      "(cd $BENCH_DIR/sapling/benchmark && ./../target/release/sapling run)" \
+            -n anna-release "(cd $BENCH_DIR/anna-release && ./anna)" \
+            -n anna-main    "(cd $BENCH_DIR/anna-main && ./anna-main)" \
+            -n anna-branch  "(cd $BENCH_DIR/anna-branch && ./anna)" \
+            -n hugo         "(cd $BENCH_DIR/hugo && hugo)"
+
+      - name: Generate Report
+        run: |
+          jq -r '
+            .results
+            | sort_by(.mean // 99999999)
+            | to_entries
+            | map(select(.value.mean != null))
+            | map(
+                "| \(.key + 1) | \(.value.command) | \(.value.mean * 1000 | round) ms | \((.value.stddev // 0) * 1000 | round) ms | \(.value.min * 1000 | round) ms | \(.value.max * 1000 | round) ms | \(.value.user * 1000 | round) ms | \(.value.system * 1000 | round) ms |"
+              )
+            | ["## Benchmark Results", "",
+               "> \($ENV.files) markdown files · \($ENV.warm) warmup runs · \($ENV.runs) timed runs",
+               "",
+               "| Rank | Command | Mean | Std Dev | Min | Max | User | System |",
+               "|------|---------|------|---------|-----|-----|------|--------|"]
+              + .
+            | .[]
+          ' "$BENCH_DIR/bench_results.json" > "$BENCH_DIR/bench_report.md"
+
+          FASTEST_MEAN=$(jq '[.results[].mean | numbers] | min' "$BENCH_DIR/bench_results.json")
+
+          {
+            echo ""
+            echo "### Relative Performance (vs fastest)"
+            echo ""
+            jq -r --argjson fastest "$FASTEST_MEAN" '
+              .results
+              | sort_by(.mean // 99999999)
+              | .[]
+              | select(.mean != null)
+              | "\(.command): \(.mean / $fastest | . * 100 | round | . / 100)x"
+            ' "$BENCH_DIR/bench_results.json" | while read -r line; do
+              echo "- $line"
+            done
+            echo ""
+            echo "## Commit Hashes"
+            echo ""
+            cat "$BENCH_DIR/commit_hashes.txt"
+          } >> "$BENCH_DIR/bench_report.md"
+
+      - name: Post Result to PR
         if: github.event_name == 'pull_request'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file ~/comment_body.txt --create-if-none --edit-last
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body-file "$BENCH_DIR/bench_report.md" \
+            --create-if-none --edit-last
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          
-      - name: Results Upload Benchmark
-        uses: actions/upload-artifact@v4
+
+      - name: Post Result to Job Summary
+        if: always()
+        run: test -f "$BENCH_DIR/bench_report.md" && cat "$BENCH_DIR/bench_report.md" >> $GITHUB_STEP_SUMMARY || echo "No report generated."
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark-results
-          path: bench_report.md
+          path: ${{ env.BENCH_DIR }}/bench_report.md
