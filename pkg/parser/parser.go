@@ -66,6 +66,9 @@ type Parser struct {
 	// Access the data for a particular page by using the relative path to the file as the key
 	Templates map[template.URL]TemplateData
 
+	// SourcePaths stores the src md paths for each page
+	SourcePaths map[template.URL]string
+
 	// K-V pair storing all templates correspoding to a particular tag in the site
 	TagsMap map[template.URL][]TemplateData
 
@@ -77,6 +80,8 @@ type Parser struct {
 
 	// Stores data parsed from layout/config.yml
 	LayoutConfig LayoutConfig
+
+	BuildInputsModTime time.Time
 
 	MdFilesName []string
 	MdFilesPath []string
@@ -154,6 +159,9 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	}
 
 	p.Templates[template.URL(url)] = page
+	if p.SourcePaths != nil {
+		p.SourcePaths[template.URL(url)] = testFilepath
+	}
 
 	// Adding the page to the tags map with the corresponding tags
 	for _, tag := range page.Frontmatter.Tags {
@@ -262,6 +270,12 @@ func (p *Parser) ParseConfig(inFilePath string) {
 		p.ErrorLogger.Fatal(err)
 	}
 
+	configInfo, err := os.Stat(inFilePath)
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+	p.BuildInputsModTime = maxTime(p.BuildInputsModTime, configInfo.ModTime())
+
 	err = json.Unmarshal(configFile, &p.LayoutConfig)
 	if err != nil {
 		p.ErrorLogger.Println("Error at:", inFilePath)
@@ -316,12 +330,34 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	})
 
 	// Parsing all files in the layout/ dir hich match the "*.html" pattern
-	templ, err := templ.ParseGlob(p.SiteDataPath + "layout/*.html")
+	layoutFiles, err := filepath.Glob(p.SiteDataPath + "layout/*.html")
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+	for _, layoutFile := range layoutFiles {
+		layoutInfo, err := os.Stat(layoutFile)
+		if err != nil {
+			p.ErrorLogger.Fatal(err)
+		}
+		p.BuildInputsModTime = maxTime(p.BuildInputsModTime, layoutInfo.ModTime())
+	}
+	templ, err = templ.ParseGlob(p.SiteDataPath + "layout/*.html")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
 
 	// Parsing all files in the partials/ dir which match the "*.html" pattern
+	partialFiles, err := filepath.Glob(p.SiteDataPath + "layout/partials/*.html")
+	if err != nil {
+		p.ErrorLogger.Fatal(err)
+	}
+	for _, partialFile := range partialFiles {
+		partialInfo, err := os.Stat(partialFile)
+		if err != nil {
+			p.ErrorLogger.Fatal(err)
+		}
+		p.BuildInputsModTime = maxTime(p.BuildInputsModTime, partialInfo.ModTime())
+	}
 	templ, err = templ.ParseGlob(p.SiteDataPath + "layout/partials/*.html")
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
@@ -371,4 +407,11 @@ func (p *Parser) parseCollectionLayoutEntries() {
 	for collectionURL, layoutName := range p.LayoutConfig.CollectionLayouts {
 		p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
 	}
+}
+
+func maxTime(left time.Time, right time.Time) time.Time {
+	if right.After(left) {
+		return right
+	}
+	return left
 }
