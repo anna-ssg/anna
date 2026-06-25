@@ -159,8 +159,62 @@ hyperfine -p 'sync' -w "$warm" \
   -n hugo         "cd $BENCH_DIR/hugo && hugo" \
   | tee -a "$BENCH_DIR/bench_results.txt"
 
+# generate markdown report
+{
+    echo "## Benchmark Results"
+    echo
+
+    echo "| Rank | Benchmark | Mean | Std Dev | User | System |"
+    echo "|------|-----------|------|---------|------|--------|"
+
+    awk '
+    /^Benchmark [0-9]+:/ {
+        bench=$3
+    }
+
+    /Time \(mean ± σ\):/ {
+        mean=$4
+        std=$7
+
+        match($0, /User: ([0-9.]+ ms)/)
+        user=substr($0, RSTART+6, RLENGTH-6)
+
+        match($0, /System: ([0-9.]+ ms)/)
+        system=substr($0, RSTART+8, RLENGTH-8)
+
+        print bench "|" mean "|" std "|" user "|" system
+    }
+    ' "$BENCH_DIR/bench_results.txt" |
+    sort -t'|' -k2,2n |
+    awk -F'|' '
+    {
+        printf("| %d | %s | %s ms | %s ms | %s | %s |\n",
+            NR, $1, $2, $3, $4, $5)
+    }
+    '
+
+    echo
+    echo "### Relative Performance"
+    echo
+
+    awk '
+    /^Summary$/ { p=1; next }
+    p && NF { print }
+    ' "$BENCH_DIR/bench_results.txt"
+
+    echo
+    echo "## Commit Hashes"
+    echo
+
+    cat "$BENCH_DIR/commit_hashes.txt"
+
+} > "$BENCH_DIR/bench_report.md"
+
+
 echo
 echo "Results written to:"
 echo "  $BENCH_DIR/bench_results.txt"
 echo "Commit hashes written to:"
 echo "  $BENCH_DIR/commit_hashes.txt"
+echo "Markdown report written to:"
+echo "  $BENCH_DIR/bench_report.md"
