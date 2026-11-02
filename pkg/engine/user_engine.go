@@ -9,11 +9,7 @@ import (
 func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.Template) {
 	numCPU := runtime.NumCPU()
 	numTemplates := len(e.DeepDataMerge.Templates)
-	concurrency := numCPU * 2 // Adjust the concurrency factor based on system hardware resources
-
-	if numTemplates < concurrency {
-		concurrency = numTemplates
-	}
+	concurrency := min(numCPU*2, numTemplates)
 
 	templateURLs := make([]string, 0, numTemplates)
 	for templateURL := range e.DeepDataMerge.Templates {
