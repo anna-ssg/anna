@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -306,12 +307,7 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	// Function to check if an element is present in a slice
 	templ := template.New("templates").Funcs(template.FuncMap{
 		"strSliceContains": func(items []string, search string) bool {
-			for _, item := range items {
-				if search == item {
-					return true
-				}
-			}
-			return false
+			return slices.Contains(items, search)
 		},
 	})
 
@@ -334,32 +330,37 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 func (p *Parser) collectionsParser(page TemplateData) {
 	// Iterating over all sets of collections defined in the frontmatter
 	for _, collectionSet := range page.Frontmatter.Collections {
-
 		var collections []string
+
 		// Collections will be nested using > as the separator - "posts>tech>Go"
-		for _, item := range strings.Split(collectionSet, ">") {
+		for item := range strings.SplitSeq(collectionSet, ">") {
 			collections = append(collections, strings.TrimSpace(item))
 		}
 
 		for i := range len(collections) {
-			collectionKey := "collections/"
+			var collectionKey strings.Builder
+			collectionKey.Grow(24) // Initial alloc of 24 bytes which is large enough for most collection URLs
+
+			collectionKey.WriteString("collections/")
 			for j := range i + 1 {
-				collectionKey += collections[j]
+				collectionKey.WriteString(collections[j])
 				if j != i {
-					collectionKey += "/"
+					collectionKey.WriteString("/")
 				}
 
 			}
-			collectionKey += ".html"
+			collectionKey.WriteString(".html")
 
+			collectionKeyStr := collectionKey.String()
 			var found bool
-			for _, map_page := range p.CollectionsMap[template.URL(collectionKey)] {
+
+			for _, map_page := range p.CollectionsMap[template.URL(collectionKeyStr)] {
 				if map_page.CompleteURL == page.CompleteURL {
 					found = true
 				}
 			}
 			if !found {
-				p.CollectionsMap[template.URL(collectionKey)] = append(p.CollectionsMap[template.URL(collectionKey)], page)
+				p.CollectionsMap[template.URL(collectionKeyStr)] = append(p.CollectionsMap[template.URL(collectionKeyStr)], page)
 			}
 
 		}
