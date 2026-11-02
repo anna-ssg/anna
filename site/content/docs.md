@@ -271,9 +271,8 @@ Anna has the following pre-defined template function:
 
 # Frontmatter
 
-All markdown content files **must** start with YAML frontmatter. Anna requires at minimum a `title` field, or it will throw an error.
-
-Frontmatter is written as YAML between `---` delimiters at the top of your markdown file:
+Markdown content files can be optionally prefixed with YAML frontmatter written between `---` delimiters at the top of the file.
+If the horizontal divider/rule is present at the top of your markdown file (`---`) and no frontmatter is specified, anna will throw an error.
 
 ```yaml
 ---

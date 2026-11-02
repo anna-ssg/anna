@@ -33,7 +33,13 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.
 				wg.Done()
 			}()
 
-			e.RenderPage(fileOutPath, template.URL(templateURL), templates, e.DeepDataMerge.Templates[template.URL(templateURL)].Frontmatter.Layout)
+			templateType := e.DeepDataMerge.Templates[template.URL(templateURL)].Frontmatter.Layout
+			if templateType == "" {
+				// Fallback to the default template used for rendering all user defined content pages
+				templateType = "page"
+			}
+
+			e.RenderPage(fileOutPath, template.URL(templateURL), templates, templateType)
 		}(templateURL)
 	}
 

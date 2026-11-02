@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -167,45 +166,36 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 }
 
 func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmatter, string, string, bool) {
-	var parsedFrontmatter Frontmatter
-	var markdown string
+
+	// Frontmatter can be optionally specified
+	// If the frontmatter is not specified, the title of the page is derived from the file name
+
 	/*
+	   [OPTIONAL - Start]
 	   ---
 	   frontmatter_content
 	   ---
+	   [OPTIONAL - End]
 
 	   markdown content
-	   --- => markdown divider and not to be touched while yaml parsing
+	   --- => markdown divider, not to be touched during frontmatter yaml parsing
 	*/
-	splitContents := strings.Split(filecontent, "---")
-	frontmatterSplit := ""
 
-	if len(splitContents) <= 1 {
-		p.ErrorLogger.Fatal("Frontmatter missing on path: ", path)
+	var parsedFrontmatter Frontmatter
+	var markdown string
+
+	// If a horizontal divider ("---") is present at the top (prefix) of the trimmed file, frontmatter is expected to be present
+	// A failure is thrown if no frontmatter is specified post the divider
+	trimmedContent := strings.TrimSpace(filecontent)
+	if strings.HasPrefix(trimmedContent, "---\n") || strings.HasPrefix(trimmedContent, "---\r\n") {
+		markdown = p.ParseFrontMatter(filecontent, path, &parsedFrontmatter)
+	} else {
+		_, filename, _ := strings.CutLast(path, "/")
+		pageTitle, _ := strings.CutSuffix(filename, ".md")
+
+		parsedFrontmatter.Title = pageTitle
+		markdown = filecontent
 	}
-
-	// If the first section of the page contains a title field, continue parsing
-	// Else, prevent parsing of the current file
-	regex := regexp.MustCompile(`title(.*): (.*)`)
-	match := regex.FindStringSubmatch(splitContents[1])
-
-	if match == nil {
-		p.ErrorLogger.Fatal("Title field missing from frontmatter missing on path: ", path)
-	}
-
-	frontmatterSplit = splitContents[1]
-	// Parsing YAML frontmatter
-	err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
-	if err != nil {
-		p.ErrorLogger.Println("Error at path: ", path)
-		p.ErrorLogger.Fatal(err)
-	}
-
-	if parsedFrontmatter.Layout == "" {
-		parsedFrontmatter.Layout = "page"
-	}
-
-	markdown = strings.Join(strings.Split(filecontent, "---")[2:], "---")
 
 	// Parsing markdown to HTML
 	var parsedMarkdown bytes.Buffer
@@ -246,6 +236,28 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 	}
 
 	return parsedFrontmatter, parsedMarkdown.String(), markdown, true
+}
+
+func (p *Parser) ParseFrontMatter(trimmedFileContent string, path string, parsedFrontmatter *Frontmatter) string {
+	var markdown string
+
+	splitContents := strings.Split(trimmedFileContent, "---")
+	frontmatterSplit := ""
+
+	if len(splitContents) <= 1 {
+		p.ErrorLogger.Fatal("Frontmatter divider present but frontmatter missing on path: ", path)
+	}
+
+	frontmatterSplit = splitContents[1]
+	// Parsing YAML frontmatter
+	err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
+	if err != nil {
+		p.ErrorLogger.Println("Error at path: ", path)
+		p.ErrorLogger.Fatal(err)
+	}
+
+	markdown = strings.Join(splitContents[2:], "---")
+	return markdown
 }
 
 func (p *Parser) DateParse(date string) time.Time {
