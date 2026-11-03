@@ -5,18 +5,18 @@
 <body class="site-body">
     {{template "header" .}}
     <main class="container site-main" role="main">
-        <article class="content">
-            <section class="posts">
+        <article class="content prose">
+            <!-- <header class="page-intro"><p class="eyebrow">Writing</p><h1>Posts</h1><p>A running log of work, experiments, and progress.</p></header> -->
+            <ul class="post-list">
                 {{range $Post := index .DeepDataMerge.CollectionsMap .PageURL}}
-                <a class="post-card" href="/{{$Post.CompleteURL}}">
-                    <div class="post-card-div">
-                        <h3>{{$Post.Frontmatter.Title}}</h3>
-                        <p>{{$Post.Frontmatter.Description}}</p>
-                        <p>{{$Post.Frontmatter.Date}}</p>
-                    </div>
-                </a>
+                <li class="post-list-element">
+                    <p class="post-list-content">
+                        <a class="post-list-title" href="{{if eq $Post.CompleteURL "posts/building-anna/index.html"}}/posts/building-anna/{{else}}/{{$Post.CompleteURL}}{{end}}">{{$Post.Frontmatter.Title}}</a>
+                        <span class="post-list-date">{{$Post.Frontmatter.Date}}</span>
+                    </p>
+                </li>
                 {{end}}
-            </section>
+            </ul>
         </article>
     </main>
 

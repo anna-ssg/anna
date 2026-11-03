@@ -5,24 +5,30 @@
 <body class="site-body">
     {{template "header" .}}
     <main class="container site-main" role="main">
-        <article class="content">
-            <!--1. index page content -->
+        <article class="content prose">
             {{$CollectionIndexData := index .DeepDataMerge.Templates .PageURL}}
+
             {{ $CollectionIndexData.Body }}
 
-            <!--2. Range over CollectionHierarchy .ChildCollections -->
             {{$CollectionHierarchy := index .DeepDataMerge.CollectionsHierarchyData .PageURL }}
-            {{range $CollectionHierarchy.ChildCollections}}
-                <a href="/{{.}}">{{.}}</a>
+            {{if $CollectionHierarchy.ChildCollections}}
+            <b>Collections</b>
+            <ul class="folder-list">
+                {{range $CollectionHierarchy.ChildCollections}}
+                <li><a href="/{{.}}">{{cutSuffix . "/index.html"}}</a></li>
+                {{end}}
+            </ul>
             {{end}}
 
-            <section class="tagged-posts">
-                <!--DONE 3. Range over CollectionMap -->
+            <b>Pages</b>
+            <ul class="file-list">
                 {{$CollectionSet := index .DeepDataMerge.CollectionsMap .PageURL}}
                 {{range $CollectionSet }}
-                <a href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>
+                {{if ne .CompleteURL $.PageURL}}
+                <li><a href="{{if eq .CompleteURL "index.html"}}/{{else}}/{{.CompleteURL}}{{end}}">{{.Frontmatter.Title}}</a>{{if .Frontmatter.Date}} <small>{{.Frontmatter.Date}}</small>{{end}}</li>
                 {{end}}
-            </section>
+                {{end}}
+            </ul>
         </article>
     </main>
 

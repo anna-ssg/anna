@@ -65,7 +65,7 @@ site
 │   │   │   ├── images
 │   │   │   │   ├── bench.png
 │   │   │   │   └── wizard.gif
-│   │   │   ├── index.md
+│   │   │   └── index.md
 │   │   └── weekly-progress
 │   │       ├── week-1.md
 │   │       ├── week-2.md
@@ -76,10 +76,10 @@ site
 │   ├── config.json*
 │   ├── page.html*
 │   ├── partials
-│   │   ├── head.html
+│   │   └── head.html
 │   ├── robots.txt*
 │   ├── tag-subpage.html*
-│   |── tags.html*
+│   ├── tags.html*
 │   ├── collection-subpage.html*
 │   └── collections.html*
 ├── public
@@ -90,8 +90,8 @@ site
     ├── scripts
     │   └── light.js
     ├── style.css
-    ├── styles
-       └── tokyo.css
+    └── styles
+        └── tokyo.css
 ```
 
 Files marked `*` are required and cannot be omitted
@@ -492,7 +492,7 @@ Add stylesheets to your layout files:
 
 ```html
 <!-- External stylesheet in static/ -->
-<link rel="stylesheet" href="/static/styles/main.css">
+<link rel="stylesheet" href="/static/styles/style.css">
 
 <!-- Inline styles -->
 <style>
@@ -517,8 +517,6 @@ Include scripts in layouts or pages:
 
 ```html
 <!-- Global scripts in layout files -->
-<script src="/static/scripts/analytics.js"></script>
-
 <!-- Page-specific scripts via frontmatter -->
 ```
 
@@ -548,7 +546,7 @@ Store font files in `static/fonts/`:
 ```
 site/static/
 ├── styles/
-│   ├── main.css
+│   ├── style.css
 │   ├── theme.css
 │   └── components/
 │       ├── button.css
@@ -925,7 +923,7 @@ The `config.json` file stores configuration for your site's layout and behavior.
   ],
   "author": "Jane Doe",
   "copyright": "Copyright 2024. All rights reserved.",
-  "themeURL": "/static/styles/main.css",
+  "themeURL": "/static/styles/style.css",
   "socials": {
     "github": "https://github.com/yourname",
     "twitter": "https://twitter.com/yourname",
@@ -1004,4 +1002,3 @@ Example with baseURL: `"https://example.com"`
 4. **Use keywords in tags** - Make tags searchable and relevant
 5. **Structure with headings** - Use proper heading hierarchy for accessibility
 6. **Enable table of contents** - Use `toc: true` for long-form content
-
