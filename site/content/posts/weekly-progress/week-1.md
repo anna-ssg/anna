@@ -8,7 +8,7 @@ authors:
   - Aditya
   - Anirudh
   - Nathan
-collections: ["progress>week-1", "anna", "posts"]
+collections: ["progress/week-1", "anna", "posts/building-anna"]
 ---
 
 # Week-1

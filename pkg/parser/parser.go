@@ -59,6 +59,11 @@ type TemplateData struct {
 	LiveReload  bool
 }
 
+type CollectionHierarchyData struct {
+	ChildCollections     []string
+	IsIndexMdUserDefined bool
+}
+
 type Date int64
 
 type Parser struct {
@@ -70,13 +75,18 @@ type Parser struct {
 	TagsMap map[template.URL][]TemplateData
 
 	// Collections stores template data of files in collections
+	//
+	// Detailed examples are present in collectionsParser()
 	CollectionsMap map[template.URL][]TemplateData
 
 	// CollectionsHierarchy stores all the sub collections associated with the parent collection via the template.URL
 	//
-	// Example: For ["topics/languages", "topics/storage"], the CollectionsHierarchy will store
-	// CollectionsHierarchy[topics] = []string{"topics/languages", "topics/storage"}
-	CollectionsHierarchy map[template.URL][]string
+	// Example:
+	// {
+	// 	“index.html”: {IsIndexMdUserDefined: false, ChildCollections: [“posts/index.html”]},
+	// 	“posts/index.html“: {IsIndexMdUserDefined: true, ChildCollections: [“posts/tech/index.html”, “posts/person/index.html”]}
+	// }
+	CollectionsHierarchy map[template.URL]*CollectionHierarchyData
 
 	// K-V pair storing the template layout name for a particular collection in the site
 	CollectionsSubPageLayouts map[template.URL]string
@@ -150,27 +160,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	key, _ := strings.CutPrefix(testFilepath, p.SiteDataPath+"content/")
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
-
-	// The entire site grows from an index root path, which is its own collection
-	if len(frontmatter.Collections) == 0 {
-		var pathCollection strings.Builder
-		pathCollection.Grow(24) // probably have more, paths could be deeper ?
-		if i := strings.LastIndex(key, "/"); i != -1 {
-			pathCollection.WriteString(key[:i])
-			// "site/content/photos/trips/mysuru.md
-			// "site/content/blogs/abc.md (collection: ["photos"])
-			//
-			// /photos/index.html -> mysuru (/photos/mysuru.html), abc (/blogs/abc.html), trips/ (sub-collection)
-			// /photos
-			//
-			// "" -> "posts" , "til", "clicks"
-			// "/posts" --> all mds with posts
-			// "/til" --> all mds with til
-		} else {
-			pathCollection.WriteString("")
-		}
-		frontmatter.Collections = []string{}
-	}
 
 	page := TemplateData{
 		CompleteURL: template.URL(url),
@@ -352,6 +341,17 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 		"strSliceContains": func(items []string, search string) bool {
 			return slices.Contains(items, search)
 		},
+		"cutSuffix": func(s string, suffix string) string {
+			res, _ := strings.CutSuffix(strings.TrimSpace(s), strings.TrimSpace(suffix))
+			return res
+		},
+		"cutPrefix": func(s string, prefix string) string {
+			res, _ := strings.CutPrefix(strings.TrimSpace(s), strings.TrimSpace(prefix))
+			return res
+		},
+		"toString": func(url template.URL) string {
+			return string(url)
+		},
 	})
 
 	// Parsing all files in the layout/ dir hich match the "*.html" pattern
@@ -371,17 +371,38 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 
 // Adding the page to the collections map with the corresponding collections and sub-collections
 func (p *Parser) collectionsParser(pageToAdd TemplateData) {
-	// Iterating over all sets of collections defined in the frontmatter
-	// ["posts/tech/go", "til/2026"]
-	for _, collection := range pageToAdd.Frontmatter.Collections {
+	// Iterating over all collections defined in the frontmatter
+	// collection: ["posts/tech/go", "til/2026"]
+	//
+	// Example for how collections exist
+	// ./site/content/index.md -> /
+	// ./site/content/index/index.md -> index
+	// ./site/content/index/foo.md -> index
+	// ./site/content/posts/hello.md (collection: [index]) -> posts
+	// ./site/content/foo.md -> /
+	//
+	// index.html -> {pages: [/index.html, /foo.html], hierarchy: [/index/index.html, /posts/index.html] }
+	// index/index.html -> {pages: [/index/foo.html, /posts/hello.html] hierarchy: []}
+	// posts/index.html -> {pages: [/posts/hello.html], hierarchy: []}
+	//
+	var filePathPrefix string
+	var ok bool
+	if filePathPrefix, _, ok = strings.CutLast(string(pageToAdd.CompleteURL), "/"); !ok {
+		// case: post/tech/go.html -> post/tech -> post/tech/index.html
+		// case: index/foo.html -> index  -> index/index.html
+		// case: page.html -> index -> index.html
+		filePathPrefix = ""
+	}
 
+	pageCollectionParents := append(pageToAdd.Frontmatter.Collections, filePathPrefix)
+
+	for _, collection := range pageCollectionParents {
 		var prefix strings.Builder
 		prefix.Grow(24)
 		parentPath := ""
 
 		for item := range strings.SplitSeq(collection, "/") {
-			// build up the prefix of collection names
-			// "posts", "posts/tech", "posts/tech/go"
+
 			if prefix.String() == "" {
 				prefix.WriteString(item)
 			} else {
@@ -391,18 +412,35 @@ func (p *Parser) collectionsParser(pageToAdd TemplateData) {
 
 			prefixStr := prefix.String()
 
-			// Initialise the CollectionsMap with empty list of pages as template data
-			if _, ok := p.CollectionsMap[template.URL(prefixStr+".html")]; !ok {
-				p.CollectionsMap[template.URL(prefixStr+".html")] = []TemplateData{}
+			collectionsMapKey := prefixStr
+			// If the file is at the root "/", then the map key is "index.html"
+			// else "abc" + "/" + "index.html"
+			if prefixStr != "" {
+				collectionsMapKey += "/"
+			}
+			collectionsMapKey += "index.html"
+
+			if _, ok := p.CollectionsMap[template.URL(collectionsMapKey)]; !ok {
+				p.CollectionsMap[template.URL(collectionsMapKey)] = []TemplateData{}
 			}
 
-			// Adding sub-collection in the hierarchy to a parent collection in the Collection Hierarchy map
-			if strings.Contains(prefix.String(), "/") {
-				if _, ok := p.CollectionsHierarchy[template.URL(parentPath)]; !ok {
-					p.CollectionsHierarchy[template.URL(parentPath)] = []string{prefixStr}
+			// Adding sub-collection in the hierarchy to a parent collection in the Collection Hierarchy map unless it is the root collection
+			if prefixStr != "" {
+				collectionsHierarchyKey := parentPath
+				if parentPath != "" {
+					collectionsHierarchyKey += "/"
+				}
+				collectionsHierarchyKey += "index.html"
+
+				if _, ok := p.CollectionsHierarchy[template.URL(collectionsHierarchyKey)]; !ok {
+					p.CollectionsHierarchy[template.URL(collectionsHierarchyKey)] = &CollectionHierarchyData{
+						ChildCollections:     []string{collectionsMapKey},
+						IsIndexMdUserDefined: false,
+					}
 				} else {
-					if !slices.Contains(p.CollectionsHierarchy[template.URL(parentPath)], prefixStr) {
-						p.CollectionsHierarchy[template.URL(parentPath)] = append(p.CollectionsHierarchy[template.URL(parentPath)], prefix.String())
+					v := p.CollectionsHierarchy[template.URL(collectionsHierarchyKey)]
+					if !slices.Contains(v.ChildCollections, collectionsMapKey) {
+						v.ChildCollections = append(v.ChildCollections, collectionsMapKey)
 					}
 				}
 			}
@@ -410,11 +448,29 @@ func (p *Parser) collectionsParser(pageToAdd TemplateData) {
 			parentPath = prefixStr
 		}
 
-		collectionURLStr := collection + ".html"
-		if !slices.ContainsFunc(p.CollectionsMap[template.URL(collectionURLStr)], func(want TemplateData) bool {
+		collectionsMapKey := collection
+		if collection != "" {
+			collectionsMapKey += "/"
+		}
+		collectionsMapKey += "index.html"
+		if !slices.ContainsFunc(p.CollectionsMap[template.URL(collectionsMapKey)], func(want TemplateData) bool {
 			return want.CompleteURL == pageToAdd.CompleteURL
 		}) {
-			p.CollectionsMap[template.URL(collectionURLStr)] = append(p.CollectionsMap[template.URL(collectionURLStr)], pageToAdd)
+			p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], pageToAdd)
+		}
+
+		// Example:
+		// "posts/index.md" is defined by the user
+		// Results in a render of "posts/index.html"
+		if collectionsMapKey == string(pageToAdd.CompleteURL) {
+			if _, ok := p.CollectionsHierarchy[template.URL(collectionsMapKey)]; !ok {
+				p.CollectionsHierarchy[template.URL(collectionsMapKey)] = &CollectionHierarchyData{
+					ChildCollections:     []string{},
+					IsIndexMdUserDefined: true,
+				}
+			} else {
+				p.CollectionsHierarchy[template.URL(collectionsMapKey)].IsIndexMdUserDefined = true
+			}
 		}
 	}
 }
