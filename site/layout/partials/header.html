@@ -6,8 +6,8 @@
 <header>
     <nav>
         <p>
-            <a href="/">{{ .DeepDataMerge.LayoutConfig.SiteTitle }}</a> /
-            {{range $_, $map := .DeepDataMerge.LayoutConfig.Navbar}}
+            <a href="/">{{ .DeepDataMerge.Config.SiteTitle }}</a> /
+            {{range $_, $map := .DeepDataMerge.Config.Navbar}}
                 {{range $key, $value := $map}}
                 <a href="/{{ $value }}" style="padding-right: 5px;">{{ $key }}</a>
                 {{end}}

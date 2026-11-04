@@ -135,7 +135,7 @@ The `{{.PageURL}}` is of the form `index.html`, `collections/tech/go.html` and s
 - `{{.DeepDataMerge.Collections}}` - A map that stores the template data of the collection sub-pages for a particular collection url
 - `{{.DeepDataMerge.CollectionsMap}}` - A map that stores a slice of templates of all pages for a particular collection url
 - `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site (primarily used for search and graphing of tags)
-- `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.json`
+- `{{.DeepDataMerge.Config}}` - Stores the layout parsed from `config.json`
 - `{{.DeepDataMerge.Pages}}` - A map that stores the template data of all the pages of the site for the particular url(the URL is the PageURL for the specified page)
 - `{{.DeepDataMerge.Tags}}` - A map that stores the template data of the tag sub-pages for a particular tag url
 - `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all pages for a particular tag url

@@ -22,7 +22,7 @@ type DeepDataMerge struct {
 	TagsMap map[template.URL][]parser.PageData
 
 	// Stores data parsed from layout/config.yml
-	LayoutConfig parser.LayoutConfig
+	Config parser.Config
 
 	Collections map[template.URL]parser.PageData
 

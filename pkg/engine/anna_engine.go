@@ -148,7 +148,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 
 			layoutName := e.DeepDataMerge.CollectionsSubPageLayouts[collection]
 			if layoutName == "" {
-				layoutName = e.DeepDataMerge.LayoutConfig.DefaultCollectionIndexLayout
+				layoutName = e.DeepDataMerge.Config.DefaultCollectionIndexLayout
 			}
 
 			e.RenderPage(fileOutPath, collection, templ, layoutName)
@@ -221,7 +221,7 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 
 	// Iterate over parsed markdown files
 	for _, PageData := range e.DeepDataMerge.Pages {
-		url := e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(PageData.CompleteURL)
+		url := e.DeepDataMerge.Config.BaseURL + "/" + string(PageData.CompleteURL)
 		buffer.WriteString("\t<url>\n")
 
 		buffer.WriteString("\t\t<loc>")
@@ -263,29 +263,29 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n")
 	buffer.WriteString("  <channel>\n")
 	buffer.WriteString("   <title>")
-	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.SiteTitle)); err != nil {
+	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.SiteTitle)); err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
 	buffer.WriteString("</title>\n")
 
 	buffer.WriteString("   <link>")
-	buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
+	buffer.WriteString(e.DeepDataMerge.Config.BaseURL)
 	buffer.WriteString("/")
 	buffer.WriteString("</link>\n")
 
 	buffer.WriteString("   <description>Recent content on ")
-	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.SiteTitle)); err != nil {
+	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.SiteTitle)); err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
 	buffer.WriteString("</description>\n")
 	buffer.WriteString("   <language>en-IN</language>\n")
 	buffer.WriteString("   <webMaster>")
-	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Author)); err != nil {
+	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Author)); err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
 	buffer.WriteString("</webMaster>\n")
 	buffer.WriteString("   <copyright>")
-	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Copyright)); err != nil {
+	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Copyright)); err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
 	buffer.WriteString("</copyright>\n")
@@ -295,7 +295,7 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("</lastBuildDate>\n")
 
 	buffer.WriteString("   <atom:link href=\"")
-	buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
+	buffer.WriteString(e.DeepDataMerge.Config.BaseURL)
 	buffer.WriteString("/feed.xml\" rel=\"self\" type=\"application/rss+xml\" />\n")
 
 	var posts []parser.PageData
@@ -320,7 +320,7 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("</title>\n")
 
 		buffer.WriteString("      <link>")
-		buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
+		buffer.WriteString(e.DeepDataMerge.Config.BaseURL)
 		buffer.WriteString("/")
 		buffer.WriteString(string(PageData.CompleteURL))
 		buffer.WriteString("</link>\n")
@@ -330,13 +330,13 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("</pubDate>\n")
 
 		buffer.WriteString("      <author>")
-		if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.LayoutConfig.Author)); err != nil {
+		if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Author)); err != nil {
 			e.ErrorLogger.Fatal(err)
 		}
 		buffer.WriteString("</author>\n")
 
 		buffer.WriteString("      <guid>")
-		buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
+		buffer.WriteString(e.DeepDataMerge.Config.BaseURL)
 		buffer.WriteString("/")
 		buffer.WriteString(string(PageData.CompleteURL))
 		buffer.WriteString("</guid>\n")

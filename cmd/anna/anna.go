@@ -62,7 +62,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
 	e.DeepDataMerge.CollectionsSubPageLayouts = p.CollectionsSubPageLayouts
-	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
+	e.DeepDataMerge.Config = p.Config
 	for k, v := range p.CollectionsHierarchy {
 		e.DeepDataMerge.CollectionsHierarchyData[k] = *v
 	}

@@ -39,7 +39,7 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.
 				if strings.HasSuffix(templateURL, "index.html") {
 					var ok bool
 					if templateType, ok = e.DeepDataMerge.CollectionsSubPageLayouts[template.URL(templateURL)]; !ok {
-						templateType = e.DeepDataMerge.LayoutConfig.DefaultCollectionIndexLayout
+						templateType = e.DeepDataMerge.Config.DefaultCollectionIndexLayout
 					}
 				} else {
 					// Fallback to the default template used for rendering all user defined content pages

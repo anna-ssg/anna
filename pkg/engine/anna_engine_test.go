@@ -19,7 +19,7 @@ func TestRenderTags(t *testing.T) {
 	}
 	e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
-	e.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
+	e.DeepDataMerge.Config.BaseURL = "example.org"
 
 	fileOutPath := "../../test/engine/render_tags/"
 
@@ -182,7 +182,7 @@ func TestGenerateSitemap(t *testing.T) {
 			},
 		}
 
-		testEngine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
+		testEngine.DeepDataMerge.Config.BaseURL = "example.org"
 		// setting up testEngine
 		testEngine.DeepDataMerge.Pages["index"] = t1
 		testEngine.DeepDataMerge.Pages["about"] = t2

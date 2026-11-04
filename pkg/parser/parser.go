@@ -24,7 +24,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type LayoutConfig struct {
+type Config struct {
 	Navbar                       []map[string]string `json:"navbar"`
 	BaseURL                      string              `json:"baseURL"`
 	SiteTitle                    string              `json:"siteTitle"`
@@ -95,7 +95,7 @@ type Parser struct {
 	CollectionsSubPageLayouts map[template.URL]string
 
 	// Stores data parsed from layout/config.yml
-	LayoutConfig LayoutConfig
+	Config Config
 
 	MdFilesName []string
 	MdFilesPath []string
@@ -298,7 +298,7 @@ func (p *Parser) ParseConfig(inFilePath string) {
 		p.ErrorLogger.Fatal(err)
 	}
 
-	err = json.Unmarshal(configFile, &p.LayoutConfig)
+	err = json.Unmarshal(configFile, &p.Config)
 	if err != nil {
 		p.ErrorLogger.Println("Error at:", inFilePath)
 		p.ErrorLogger.Fatal(err)
@@ -314,7 +314,7 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 	}
 
 	var buffer bytes.Buffer
-	err = tmpl.Execute(&buffer, p.LayoutConfig)
+	err = tmpl.Execute(&buffer, p.Config)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
@@ -479,7 +479,7 @@ func (p *Parser) collectionsParser(pageToAdd PageData) {
 }
 
 func (p *Parser) parseCollectionLayoutEntries() {
-	for collectionURL, layoutName := range p.LayoutConfig.CollectionLayouts {
+	for collectionURL, layoutName := range p.Config.CollectionLayouts {
 		p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
 	}
 }
