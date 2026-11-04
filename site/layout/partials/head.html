@@ -1,7 +1,7 @@
 {{ define "head" }}
 <!-- If the template for a particular url does not exist(posts.html), setting it to the specific page template data -->
-{{ $PageData := index .DeepDataMerge.Templates .PageURL }} {{if eq $PageData nil
-}} {{ $PageData = .TemplateData }} {{end}}
+{{ $PageData := index .DeepDataMerge.Pages .PageURL }} {{if eq $PageData nil
+}} {{ $PageData = .PageData }} {{end}}
 
 <!doctype html>
 <html lang="en">

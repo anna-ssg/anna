@@ -16,17 +16,17 @@ import (
 	"github.com/anna-ssg/anna/pkg/parser"
 )
 
-type TagRootTemplateData struct {
+type TagRootPageData struct {
 	DeepDataMerge DeepDataMerge
 	PageURL       template.URL
-	TemplateData  parser.TemplateData
+	PageData      parser.PageData
 	TagNames      []string
 }
 
-type CollectionRootTemplateData struct {
+type CollectionRootPageData struct {
 	DeepDataMerge   DeepDataMerge
 	PageURL         template.URL
-	TemplateData    parser.TemplateData
+	PageData        parser.PageData
 	CollectionNames []string
 }
 
@@ -53,19 +53,19 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		tagNames = append(tagNames, tagString)
 	}
 
-	tagRootTemplataData := parser.TemplateData{
+	tagRootTemplateData := parser.PageData{
 		Frontmatter: parser.Frontmatter{Title: "Tags"},
 	}
 
-	tagTemplateData := TagRootTemplateData{
+	tagPageData := TagRootPageData{
 		DeepDataMerge: e.DeepDataMerge,
 		PageURL:       "tags.html",
-		TemplateData:  tagRootTemplataData,
+		PageData:      tagRootTemplateData,
 		TagNames:      tagNames,
 	}
 
 	// Rendering the page displaying all tags
-	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagTemplateData)
+	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagPageData)
 	if err != nil {
 		e.ErrorLogger.Fatal(err)
 	}
@@ -79,17 +79,17 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	// Create a wait group to wait for all goroutines to finish
 	var wg sync.WaitGroup
 
-	e.DeepDataMerge.Tags = make(map[template.URL]parser.TemplateData)
+	e.DeepDataMerge.Tags = make(map[template.URL]parser.PageData)
 
 	for tag := range e.DeepDataMerge.TagsMap {
-		slices.SortFunc(e.DeepDataMerge.TagsMap[tag], func(a, b parser.TemplateData) int {
+		slices.SortFunc(e.DeepDataMerge.TagsMap[tag], func(a, b parser.PageData) int {
 			return cmp.Compare(b.Date, a.Date)
 		})
 		tagString := string(tag)
 		tagString, _ = strings.CutPrefix(tagString, "tags/")
 		tagString, _ = strings.CutSuffix(tagString, ".html")
 
-		e.DeepDataMerge.Tags[tag] = parser.TemplateData{
+		e.DeepDataMerge.Tags[tag] = parser.PageData{
 			Frontmatter: parser.Frontmatter{
 				Title: tagString,
 			},
@@ -99,7 +99,7 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	// Rendering the subpages with merged tagged posts
 	for tag, taggedTemplates := range e.DeepDataMerge.TagsMap {
 		wg.Add(1)
-		go func(tag template.URL, taggedTemplates []parser.TemplateData) {
+		go func(tag template.URL, taggedTemplates []parser.PageData) {
 			defer wg.Done()
 
 			e.RenderPage(fileOutPath, tag, templ, "tag-subpage")
@@ -113,10 +113,10 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template) {
 	var wg sync.WaitGroup
 
-	e.DeepDataMerge.Collections = make(map[template.URL]parser.TemplateData)
+	e.DeepDataMerge.Collections = make(map[template.URL]parser.PageData)
 
 	for collection := range e.DeepDataMerge.CollectionsMap {
-		slices.SortFunc(e.DeepDataMerge.CollectionsMap[collection], func(a, b parser.TemplateData) int {
+		slices.SortFunc(e.DeepDataMerge.CollectionsMap[collection], func(a, b parser.PageData) int {
 			return cmp.Compare(b.Date, a.Date)
 		})
 
@@ -129,7 +129,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 		collectionString, _ = strings.CutSuffix(collectionString, "/")
 		_, collectionString, _ = strings.CutLast(collectionString, "/")
 
-		e.DeepDataMerge.Collections[collection] = parser.TemplateData{
+		e.DeepDataMerge.Collections[collection] = parser.PageData{
 			Frontmatter: parser.Frontmatter{
 				Title: collectionString,
 				Date:  time.Now().Format(time.DateOnly),
@@ -143,7 +143,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 		}
 
 		wg.Add(1)
-		go func(collection template.URL, collectionTemplates []parser.TemplateData) {
+		go func(collection template.URL, collectionTemplates []parser.PageData) {
 			defer wg.Done()
 
 			layoutName := e.DeepDataMerge.CollectionsSubPageLayouts[collection]
@@ -160,7 +160,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 
 func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// This function creates an index of the site for search
-	// It extracts data from the e.Templates slice
+	// It extracts data from the e.Pages slice
 	// The index.json file is created during every VanillaRender()
 
 	jsonFile, err := os.Create(outFilePath + "rendered/static/index.json")
@@ -174,13 +174,13 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 		}
 	}()
 
-	// Copying contents from e.Templates to new JsonMerged struct
+	// Copying contents from e.Pages to new JsonMerged struct
 	jsonIndexTemplate := make(map[template.URL]JSONIndexTemplate)
-	for templateURL, templateData := range e.DeepDataMerge.Templates {
+	for templateURL, PageData := range e.DeepDataMerge.Pages {
 		jsonIndexTemplate[templateURL] = JSONIndexTemplate{
-			CompleteURL: templateData.CompleteURL,
-			Frontmatter: templateData.Frontmatter,
-			Tags:        templateData.Frontmatter.Tags,
+			CompleteURL: PageData.CompleteURL,
+			Frontmatter: PageData.Frontmatter,
+			Tags:        PageData.Frontmatter.Tags,
 		}
 	}
 
@@ -206,22 +206,22 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 	buffer.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
 
 	// Sorting templates by key
-	keys := make([]string, 0, len(e.DeepDataMerge.Templates))
-	for k := range e.DeepDataMerge.Templates {
+	keys := make([]string, 0, len(e.DeepDataMerge.Pages))
+	for k := range e.DeepDataMerge.Pages {
 		keys = append(keys, string(k))
 	}
 	sort.Strings(keys)
 
-	tempTemplates := make(map[template.URL]parser.TemplateData)
+	tempTemplates := make(map[template.URL]parser.PageData)
 	for _, templateURL := range keys {
-		tempTemplates[template.URL(templateURL)] = e.DeepDataMerge.Templates[template.URL(templateURL)]
+		tempTemplates[template.URL(templateURL)] = e.DeepDataMerge.Pages[template.URL(templateURL)]
 	}
 
-	e.DeepDataMerge.Templates = tempTemplates
+	e.DeepDataMerge.Pages = tempTemplates
 
 	// Iterate over parsed markdown files
-	for _, templateData := range e.DeepDataMerge.Templates {
-		url := e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(templateData.CompleteURL)
+	for _, PageData := range e.DeepDataMerge.Pages {
+		url := e.DeepDataMerge.LayoutConfig.BaseURL + "/" + string(PageData.CompleteURL)
 		buffer.WriteString("\t<url>\n")
 
 		buffer.WriteString("\t\t<loc>")
@@ -229,7 +229,7 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 		buffer.WriteString("</loc>\n")
 
 		buffer.WriteString("\t\t<lastmod>")
-		buffer.WriteString(templateData.Frontmatter.Date)
+		buffer.WriteString(PageData.Frontmatter.Date)
 		buffer.WriteString("</lastmod>\n")
 
 		buffer.WriteString("\t</url>\n")
@@ -298,23 +298,23 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
 	buffer.WriteString("/feed.xml\" rel=\"self\" type=\"application/rss+xml\" />\n")
 
-	var posts []parser.TemplateData
-	for _, templateData := range e.DeepDataMerge.Templates {
-		if !templateData.Frontmatter.Draft {
-			posts = append(posts, templateData)
+	var posts []parser.PageData
+	for _, PageData := range e.DeepDataMerge.Pages {
+		if !PageData.Frontmatter.Draft {
+			posts = append(posts, PageData)
 		}
 	}
 
 	// sort by publication date
-	slices.SortFunc(posts, func(a, b parser.TemplateData) int {
+	slices.SortFunc(posts, func(a, b parser.PageData) int {
 		return cmp.Compare(b.Date, a.Date) // assuming Date is Unix timestamp
 	})
 
 	// Iterate over sorted posts
-	for _, templateData := range posts {
+	for _, PageData := range posts {
 		buffer.WriteString("    <item>\n")
 		buffer.WriteString("      <title>")
-		if err := xml.EscapeText(&buffer, []byte(templateData.Frontmatter.Title)); err != nil {
+		if err := xml.EscapeText(&buffer, []byte(PageData.Frontmatter.Title)); err != nil {
 			e.ErrorLogger.Fatal(err)
 		}
 		buffer.WriteString("</title>\n")
@@ -322,11 +322,11 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("      <link>")
 		buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
 		buffer.WriteString("/")
-		buffer.WriteString(string(templateData.CompleteURL))
+		buffer.WriteString(string(PageData.CompleteURL))
 		buffer.WriteString("</link>\n")
 
 		buffer.WriteString("      <pubDate>")
-		buffer.WriteString(time.Unix(templateData.Date, 0).Format(time.RFC1123Z))
+		buffer.WriteString(time.Unix(PageData.Date, 0).Format(time.RFC1123Z))
 		buffer.WriteString("</pubDate>\n")
 
 		buffer.WriteString("      <author>")
@@ -338,11 +338,11 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("      <guid>")
 		buffer.WriteString(e.DeepDataMerge.LayoutConfig.BaseURL)
 		buffer.WriteString("/")
-		buffer.WriteString(string(templateData.CompleteURL))
+		buffer.WriteString(string(PageData.CompleteURL))
 		buffer.WriteString("</guid>\n")
 
 		buffer.WriteString("      <description>")
-		if err := xml.EscapeText(&buffer, []byte(templateData.Body)); err != nil {
+		if err := xml.EscapeText(&buffer, []byte(PageData.Body)); err != nil {
 			e.ErrorLogger.Fatal(err)
 		}
 		buffer.WriteString("</description>\n")
