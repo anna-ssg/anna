@@ -31,6 +31,9 @@ type DeepDataMerge struct {
 	// K-V pair storing all templates corresponding to a particular collection in the site
 	CollectionsMap map[template.URL][]parser.TemplateData
 
+	// CollectionsHierarchy stores all the sub collections associated with the parent collection via the template.URL
+	CollectionsHierarchyData map[template.URL]parser.CollectionHierarchyData
+
 	// K-V pair storing the template layout name for a particular collection in the site
 	CollectionsSubPageLayouts map[template.URL]string
 

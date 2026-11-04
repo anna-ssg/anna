@@ -27,6 +27,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 		Templates:                 make(map[template.URL]parser.TemplateData, 10),
 		TagsMap:                   make(map[template.URL][]parser.TemplateData, 10),
 		CollectionsMap:            make(map[template.URL][]parser.TemplateData, 10),
+		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData, 10),
 		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
 		SiteDataPath:              siteDirPath,
 		ErrorLogger:               logger.New(os.Stderr),
@@ -41,6 +42,7 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
 	e.DeepDataMerge.CollectionsMap = make(map[template.URL][]parser.TemplateData, 10)
+	e.DeepDataMerge.CollectionsHierarchyData = make(map[template.URL]parser.CollectionHierarchyData, 10)
 
 	helper := helpers.Helper{
 		ErrorLogger: e.ErrorLogger,
@@ -61,6 +63,9 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
 	e.DeepDataMerge.CollectionsSubPageLayouts = p.CollectionsSubPageLayouts
 	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
+	for k, v := range p.CollectionsHierarchy {
+		e.DeepDataMerge.CollectionsHierarchyData[k] = *v
+	}
 
 	// Copies the contents of the 'static/' directory to 'rendered/'
 	helper.CopyDirectoryContents(siteDirPath+"static/", siteDirPath+"rendered/static/")

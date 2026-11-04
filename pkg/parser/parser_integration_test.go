@@ -12,9 +12,11 @@ import (
 func TestParseMDDir(t *testing.T) {
 	t.Run("reading markdown files and rendering without drafts", func(t *testing.T) {
 		p := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: logger.New(os.Stderr),
+			Templates:            make(map[template.URL]parser.TemplateData),
+			TagsMap:              make(map[template.URL][]parser.TemplateData),
+			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
+			ErrorLogger:          logger.New(os.Stderr),
 		}
 		p.RenderDrafts = false
 
@@ -32,9 +34,11 @@ func TestParseMDDir(t *testing.T) {
 
 	t.Run("reading all markdown files inluding drafts", func(t *testing.T) {
 		p := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: logger.New(os.Stderr),
+			Templates:            make(map[template.URL]parser.TemplateData),
+			TagsMap:              make(map[template.URL][]parser.TemplateData),
+			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
+			ErrorLogger:          logger.New(os.Stderr),
 		}
 		p.RenderDrafts = true
 

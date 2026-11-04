@@ -1,4 +1,4 @@
-{{ define "collection-subpage"}}
+{{ define "collection-index"}}
 {{$PageData := index .DeepDataMerge.Collections .PageURL}}
 {{ template "head" .}}
 
@@ -6,7 +6,18 @@
     {{template "header" .}}
     <main class="container site-main" role="main">
         <article class="content">
+            <!--1. index page content -->
+            {{$CollectionIndexData := index .DeepDataMerge.Templates .PageURL}}
+            {{ $CollectionIndexData.Body }}
+
+            <!--2. Range over CollectionHierarchy .ChildCollections -->
+            {{$CollectionHierarchy := index .DeepDataMerge.CollectionsHierarchyData .PageURL }}
+            {{range $CollectionHierarchy.ChildCollections}}
+                <a href="/{{.}}">{{.}}</a>
+            {{end}}
+
             <section class="tagged-posts">
+                <!--DONE 3. Range over CollectionMap -->
                 {{$CollectionSet := index .DeepDataMerge.CollectionsMap .PageURL}}
                 {{range $CollectionSet }}
                 <a href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>

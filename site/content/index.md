@@ -3,7 +3,6 @@ date: 2024-02-24
 title: Henlo!
 previewimage: "/static/images/anna.png"
 description: "Homepage+Docs for Anna"
-layout: page
 ---
 
 Anna is a lightning fast static site generator written in Go, designed for simplicity and ease of use. With a focus on performance and minimal configuration, [Anna](https://github.com/anna-ssg/anna) allows you to create beautiful static websites with ease.

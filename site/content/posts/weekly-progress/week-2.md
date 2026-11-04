@@ -8,7 +8,7 @@ authors:
   - Aditya
   - Anirudh
   - Nathan
-collections: ["progress>week-2", "anna", "posts"]
+collections: ["progress/week-2", "anna", "posts"]
 ---
 
 # Week-2
