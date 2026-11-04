@@ -15,9 +15,12 @@ const TestDirPath = "../../test/parser/"
 
 func TestAddFileAndRender(t *testing.T) {
 	gotParser := parser.Parser{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[template.URL][]parser.TemplateData),
-		ErrorLogger: logger.New(os.Stderr),
+		Templates:                 make(map[template.URL]parser.TemplateData),
+		TagsMap:                   make(map[template.URL][]parser.TemplateData),
+		CollectionsMap:            make(map[template.URL][]parser.TemplateData),
+		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
+		CollectionsSubPageLayouts: make(map[template.URL]string),
+		ErrorLogger:               logger.New(os.Stderr),
 	}
 
 	wantLayout := parser.LayoutConfig{
@@ -32,15 +35,18 @@ func TestAddFileAndRender(t *testing.T) {
 		Author:    "Anna",
 	}
 	gotParser.LayoutConfig = wantLayout
-	t.Run("parsing data out of one markdown post", func(t *testing.T) {
+	t.Run("parsing frontmatter and body from a markdown file", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 		wantParser := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: gotParser.ErrorLogger,
+			Templates:                 make(map[template.URL]parser.TemplateData),
+			TagsMap:                   make(map[template.URL][]parser.TemplateData),
+			CollectionsMap:            make(map[template.URL][]parser.TemplateData),
+			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
+			CollectionsSubPageLayouts: make(map[template.URL]string),
+			ErrorLogger:               gotParser.ErrorLogger,
 		}
 		sampleFrontmatter, _, markdownContent, parseSuccess := gotParser.ParseMarkdownContent(string(inputMd), "sample_test_path")
 		sampleBody := "sample_body"
@@ -57,9 +63,11 @@ func TestAddFileAndRender(t *testing.T) {
 			Date:        wantParser.DateParse(sampleFrontmatter.Date).Unix(),
 			Frontmatter: sampleFrontmatter,
 			Body:        template.HTML(sampleBody),
-			// Layout:      want_layout,
 		}
 		wantParser.LayoutConfig = wantLayout
+		wantParser.CollectionsMap[template.URL("index.html")] = []parser.TemplateData{
+			wantPage,
+		}
 
 		wantParser.Templates["testpost.html"] = wantPage
 		for _, tag := range sampleFrontmatter.Tags {
@@ -77,9 +85,11 @@ func TestAddFileAndRender(t *testing.T) {
 
 func TestParseMarkdownContent(t *testing.T) {
 	p := parser.Parser{
-		Templates:   make(map[template.URL]parser.TemplateData),
-		TagsMap:     make(map[template.URL][]parser.TemplateData),
-		ErrorLogger: logger.New(os.Stderr),
+		Templates:            make(map[template.URL]parser.TemplateData),
+		TagsMap:              make(map[template.URL][]parser.TemplateData),
+		CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+		CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
+		ErrorLogger:          logger.New(os.Stderr),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
@@ -129,9 +139,11 @@ func TestParseMarkdownContent(t *testing.T) {
 func TestParseConfig(t *testing.T) {
 	t.Run("unmarshal `config.json` to LayoutConfig", func(t *testing.T) {
 		gotParser := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: logger.New(os.Stderr),
+			Templates:            make(map[template.URL]parser.TemplateData),
+			TagsMap:              make(map[template.URL][]parser.TemplateData),
+			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
+			ErrorLogger:          logger.New(os.Stderr),
 		}
 
 		wantLayout := parser.LayoutConfig{
@@ -158,9 +170,11 @@ func TestParseConfig(t *testing.T) {
 func TestParseRobots(t *testing.T) {
 	t.Run("parse and render `robots.txt`", func(t *testing.T) {
 		testParser := parser.Parser{
-			Templates:   make(map[template.URL]parser.TemplateData),
-			TagsMap:     make(map[template.URL][]parser.TemplateData),
-			ErrorLogger: logger.New(os.Stderr),
+			Templates:            make(map[template.URL]parser.TemplateData),
+			TagsMap:              make(map[template.URL][]parser.TemplateData),
+			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
+			ErrorLogger:          logger.New(os.Stderr),
 		}
 		testParser.LayoutConfig.BaseURL = "example.org"
 
