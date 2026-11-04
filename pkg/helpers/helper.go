@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/anna-ssg/anna/v4/pkg/logger"
-	embeddedsite "github.com/anna-ssg/anna/v4/site"
+	"github.com/anna-ssg/anna/pkg/logger"
+	embeddedsite "github.com/anna-ssg/anna/site"
 )
 
 type Helper struct {
