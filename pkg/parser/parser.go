@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/anna-ssg/anna/pkg/helpers"
-	"github.com/anna-ssg/anna/pkg/logger"
 
 	figure "github.com/mangoumbrella/goldmark-figure"
+	"github.com/rs/zerolog"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -104,7 +104,7 @@ type Parser struct {
 	RenderDrafts bool
 
 	// Common logger for all parser functions
-	ErrorLogger *logger.Logger
+	ErrorLogger *zerolog.Logger
 
 	Helper *helpers.Helper
 
@@ -129,7 +129,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 				if filepath.Ext(path) == ".md" {
 					content, err := os.ReadFile(baseDirPath + path)
 					if err != nil {
-						p.ErrorLogger.Fatal(err)
+						p.ErrorLogger.Fatal().Err(err)
 					}
 
 					frontmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
@@ -144,7 +144,7 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 		return nil
 	})
 	if err != nil {
-		helper.ErrorLogger.Fatal(err)
+		helper.ErrorLogger.Fatal().Err(err)
 	}
 }
 
@@ -255,7 +255,7 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 	}
 
 	if err := md.Convert([]byte(markdown), &parsedMarkdown); err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	return parsedFrontmatter, parsedMarkdown.String(), markdown, true
@@ -268,7 +268,7 @@ func (p *Parser) ParseFrontMatter(trimmedFileContent string, path string, parsed
 	frontmatterSplit := ""
 
 	if len(splitContents) <= 1 {
-		p.ErrorLogger.Fatal("Frontmatter divider present but frontmatter missing on path: ", path)
+		p.ErrorLogger.Fatal().Msgf("Frontmatter divider present but frontmatter missing on path: %s\n", path)
 	}
 
 	frontmatterSplit = splitContents[1]
@@ -276,7 +276,7 @@ func (p *Parser) ParseFrontMatter(trimmedFileContent string, path string, parsed
 	err := yaml.Unmarshal([]byte(frontmatterSplit), &parsedFrontmatter)
 	if err != nil {
 		p.ErrorLogger.Println("Error at path: ", path)
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	markdown = strings.Join(splitContents[2:], "---")
@@ -286,7 +286,7 @@ func (p *Parser) ParseFrontMatter(trimmedFileContent string, path string, parsed
 func (p *Parser) DateParse(date string) time.Time {
 	parsedTime, err := time.Parse(time.DateOnly, date)
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 	return parsedTime
 }
@@ -295,13 +295,13 @@ func (p *Parser) ParseConfig(inFilePath string) {
 	// Read and parse the configuration file.
 	configFile, err := os.ReadFile(inFilePath)
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	err = json.Unmarshal(configFile, &p.Config)
 	if err != nil {
 		p.ErrorLogger.Println("Error at:", inFilePath)
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	if p.Config.DefaultPageLayout == "" {
@@ -317,29 +317,29 @@ func (p *Parser) ParseConfig(inFilePath string) {
 func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 	tmpl, err := template.ParseFiles(inFilePath)
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	var buffer bytes.Buffer
 	err = tmpl.Execute(&buffer, p.Config)
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	outputFile, err := os.Create(outFilePath)
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 	defer func() {
 		err = outputFile.Close()
 		if err != nil {
-			p.ErrorLogger.Fatal(err)
+			p.ErrorLogger.Fatal().Err(err)
 		}
 	}()
 
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 }
 
@@ -367,13 +367,13 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 	// Parsing all files in the layout/ dir hich match the "*.html" pattern
 	templ, err := templ.ParseGlob(p.SiteDataPath + "layout/*.html")
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	// Parsing all files in the partials/ dir which match the "*.html" pattern
 	templ, err = templ.ParseGlob(p.SiteDataPath + "layout/partials/*.html")
 	if err != nil {
-		p.ErrorLogger.Fatal(err)
+		p.ErrorLogger.Fatal().Err(err)
 	}
 
 	return templ

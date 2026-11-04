@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/anna-ssg/anna/pkg/helpers"
-	"github.com/anna-ssg/anna/pkg/logger"
 )
 
 var HelperTestDirPath = "../../test/helpers/"
@@ -15,7 +14,7 @@ var HelperTestDirPath = "../../test/helpers/"
 func TestCopyDirectoryContents(t *testing.T) {
 	t.Run("recursively copying directory contents", func(t *testing.T) {
 		helper := helpers.Helper{
-			ErrorLogger: logger.New(os.Stderr),
+			ErrorLogger: helpers.InitErrLogger(os.Stderr),
 		}
 		helper.CopyDirectoryContents(HelperTestDirPath+"copy_dir/", HelperTestDirPath+"copy_dir/rendered/")
 
@@ -53,7 +52,7 @@ func testfuncTraverseDirectory(baseDirFS fs.FS, t *testing.T) error {
 func TestCopyFiles(t *testing.T) {
 	t.Run("copy file and create nested parent directories", func(t *testing.T) {
 		helper := helpers.Helper{
-			ErrorLogger: logger.New(os.Stderr),
+			ErrorLogger: helpers.InitErrLogger(os.Stderr),
 		}
 		helper.CopyFiles(HelperTestDirPath+"copy_files/input.txt", HelperTestDirPath+"copy_files/rendered/output.txt")
 

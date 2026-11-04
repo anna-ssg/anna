@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/anna-ssg/anna/pkg/logger"
+	"github.com/anna-ssg/anna/pkg/helpers"
 	"github.com/anna-ssg/anna/pkg/parser"
 )
 
@@ -20,7 +20,7 @@ func TestAddFileAndRender(t *testing.T) {
 		CollectionsMap:            make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 		CollectionsSubPageLayouts: make(map[template.URL]string),
-		ErrorLogger:               logger.New(os.Stderr),
+		ErrorLogger:               helpers.InitErrLogger(os.Stderr),
 	}
 
 	wantLayout := parser.Config{
@@ -89,7 +89,7 @@ func TestParseMarkdownContent(t *testing.T) {
 		TagsMap:              make(map[template.URL][]parser.PageData),
 		CollectionsMap:       make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-		ErrorLogger:          logger.New(os.Stderr),
+		ErrorLogger:          helpers.InitErrLogger(os.Stderr),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
@@ -144,7 +144,7 @@ func TestParseConfig(t *testing.T) {
 			CollectionsMap:            make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 			CollectionsSubPageLayouts: make(map[template.URL]string),
-			ErrorLogger:               logger.New(os.Stderr),
+			ErrorLogger:               helpers.InitErrLogger(os.Stderr),
 		}
 
 		wantLayout := parser.Config{
@@ -180,7 +180,7 @@ func TestParseRobots(t *testing.T) {
 			TagsMap:              make(map[template.URL][]parser.PageData),
 			CollectionsMap:       make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			ErrorLogger:          helpers.InitErrLogger(os.Stderr),
 		}
 		testParser.Config.BaseURL = "example.org"
 
