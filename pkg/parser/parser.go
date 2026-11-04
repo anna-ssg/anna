@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"html/template"
 	"io/fs"
 	"os"

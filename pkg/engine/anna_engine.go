@@ -3,7 +3,7 @@ package engine
 import (
 	"bytes"
 	"cmp"
-	"encoding/json"
+	"encoding/json/v2"
 	"encoding/xml"
 	"html/template"
 	"os"
