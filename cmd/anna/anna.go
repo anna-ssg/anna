@@ -6,8 +6,8 @@ import (
 
 	"github.com/anna-ssg/anna/pkg/engine"
 	"github.com/anna-ssg/anna/pkg/helpers"
-	"github.com/anna-ssg/anna/pkg/logger"
 	"github.com/anna-ssg/anna/pkg/parser"
+	"github.com/rs/zerolog"
 )
 
 type Cmd struct {
@@ -17,8 +17,8 @@ type Cmd struct {
 	SiteDirPath  string
 
 	// Common logger for all cmd functions
-	ErrorLogger *logger.Logger
-	InfoLogger  *logger.Logger
+	ErrorLogger *zerolog.Logger
+	InfoLogger  *zerolog.Logger
 }
 
 func (cmd *Cmd) VanillaRender(siteDirPath string) int {
@@ -30,14 +30,14 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData, 10),
 		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
 		SiteDataPath:              siteDirPath,
-		ErrorLogger:               logger.New(os.Stderr),
+		ErrorLogger:               helpers.InitErrLogger(os.Stderr),
 		RenderDrafts:              cmd.RenderDrafts,
 		LiveReload:                cmd.LiveReload,
 	}
 
 	e := engine.Engine{
 		SiteDataPath: siteDirPath,
-		ErrorLogger:  logger.New(os.Stderr),
+		ErrorLogger:  helpers.InitErrLogger(os.Stderr),
 	}
 	e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData, 10)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData, 10)

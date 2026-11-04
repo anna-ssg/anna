@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/anna-ssg/anna/pkg/logger"
+	"github.com/anna-ssg/anna/pkg/helpers"
 	"github.com/anna-ssg/anna/pkg/parser"
 )
 
@@ -16,7 +16,7 @@ func TestParseMDDir(t *testing.T) {
 			TagsMap:              make(map[template.URL][]parser.PageData),
 			CollectionsMap:       make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			ErrorLogger:          helpers.InitErrLogger(os.Stderr),
 		}
 		p.RenderDrafts = false
 
@@ -38,7 +38,7 @@ func TestParseMDDir(t *testing.T) {
 			TagsMap:              make(map[template.URL][]parser.PageData),
 			CollectionsMap:       make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			ErrorLogger:          helpers.InitErrLogger(os.Stderr),
 		}
 		p.RenderDrafts = true
 
