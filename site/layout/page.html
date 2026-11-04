@@ -6,43 +6,36 @@
 
     {{template "header" .}}
     <main class="container site-main" role="main">
-        <article class="content">
+        <article class="content prose">
             <section class="body">
 
                 {{ if ne (len $PageData.Frontmatter.Title) 0 }}
-                <div class="post-description">
+                <header class="post-header">
                     <h1>{{ $PageData.Frontmatter.Title }}</h1>
                     <div class="page-date">
                         {{ if ne (len $PageData.Frontmatter.Date) 0 }}
                         Published on {{$PageData.Frontmatter.Date}}
                         {{end}}
                     </div>
-                    <div class="authors-placeholder">
+                    <div class="post-meta">
                         {{ if ne (len $PageData.Frontmatter.Authors) 0 }}
-                        <p>Authors: {{range $i, $a := $PageData.Frontmatter.Authors}}{{if $i}}, {{end}}{{ $a }}{{end}}
-                        </p>
+                        By {{range $i, $a := $PageData.Frontmatter.Authors}}{{if $i}}, {{end}}{{ $a }}{{end}}
                         {{ end }}
                     </div>
-                    <div class="tags-placeholder">
+                    <div class="tags">
                         {{ if ne (len $PageData.Frontmatter.Tags) 0 }}
                         {{range $PageData.Frontmatter.Tags}}
-                        <a class="tag" href="/tags/{{.}}.html">{{.}}</a>
+                        <a class="tag" href="/tags/{{.}}.html"><code>{{.}}</code></a>
                         {{end}}
                         {{ end }}
                     </div>
-                </div>
+                </header>
                 {{ end }}
 
                 {{$PageData.Body}}
             </section>
         </article>
 
-        {{ if ne (len $PageData.Frontmatter.Tags) 0 }}
-        <section class="graph-bottom" aria-label="Graph view">
-            <h3 class="graph-bottom-title">Graph View</h3>
-            <div id="mini-graph" class="graph-container mini"></div>
-        </section>
-        {{ end }}
     </main>
 
     {{template "footer" .}}

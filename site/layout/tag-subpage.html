@@ -6,11 +6,19 @@
     {{template "header" .}}
     <main class="container site-main" role="main">
         <article class="content">
-            <section class="tagged-posts">
+            <section class="prose">
+                <h3 class="tag-category-span">Posts tagged <code>{{ $PageData.Frontmatter.Title }}</code></h3>
                 {{$TagSet := index .DeepDataMerge.TagsMap .PageURL}}
-                {{range $TagSet }}
-                <a href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>
-                {{end}}
+                <ul class="post-list">
+                    {{range $TagSet }}
+                    <li class="post-list-element">
+                        <p class="post-list-content">
+                            <a class="post-list-title" href="/{{.CompleteURL}}">{{.Frontmatter.Title}}</a>
+                            <span class="post-list-date">{{.Frontmatter.Date}}</span>
+                        </p>
+                    </li>
+                    {{end}}
+                </ul>
             </section>
         </article>
     </main>

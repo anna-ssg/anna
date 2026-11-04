@@ -6,19 +6,18 @@
     {{template "header" .}}
     <main class="container site-main" role="main">
         <article class="content">
-            <section class="posts">
+            <section class="prose">
+                <header class="page-intro">
+                    <p class="eyebrow">Browse tags</p>
+                </header>
                 <div class="all-tags">
                     {{range .TagNames}}
-                    <a href="/tags/{{.}}.html">{{.}}</a>
+                    <a href="/tags/{{.}}.html"><code>{{.}}</code></a>
                     {{end}}
                 </div>
             </section>
         </article>
     </main>
-
-    <div id="chart" class="graph-container" aria-label="Tags graph" role="img"></div>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script defer src="/static/scripts/graph.js"></script>
 
     {{template "footer" .}}
 
