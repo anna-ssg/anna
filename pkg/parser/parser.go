@@ -13,6 +13,7 @@ import (
 
 	"github.com/anna-ssg/anna/pkg/helpers"
 	"github.com/anna-ssg/anna/pkg/logger"
+
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -24,15 +25,17 @@ import (
 )
 
 type LayoutConfig struct {
-	Navbar            []map[string]string `json:"navbar"`
-	BaseURL           string              `json:"baseURL"`
-	SiteTitle         string              `json:"siteTitle"`
-	SiteScripts       []string            `json:"siteScripts"`
-	Author            string              `json:"author"`
-	Copyright         string              `json:"copyright"`
-	ThemeURL          string              `json:"themeURL"`
-	Socials           map[string]string   `json:"socials"`
-	CollectionLayouts map[string]string   `json:"collectionLayouts"`
+	Navbar                       []map[string]string `json:"navbar"`
+	BaseURL                      string              `json:"baseURL"`
+	SiteTitle                    string              `json:"siteTitle"`
+	DefaultPageLayout            string              `json:"defaultPageLayout"`
+	DefaultCollectionIndexLayout string              `json:"defaultCollectionIndexLayout"`
+	CollectionLayouts            map[string]string   `json:"collectionLayouts"`
+	SiteScripts                  []string            `json:"siteScripts"`
+	Author                       string              `json:"author"`
+	Copyright                    string              `json:"copyright"`
+	ThemeURL                     string              `json:"themeURL"`
+	Socials                      map[string]string   `json:"socials"`
 }
 
 type Frontmatter struct {

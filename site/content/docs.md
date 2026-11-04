@@ -897,12 +897,14 @@ The `config.json` file stores configuration for your site's layout and behavior.
 - `navbar` - Array of navigation links (format: `[{"Label": "path/to/page.html"}]`)
 - `baseURL` - Base URL of your site (used for sitemaps, feeds, SEO; no trailing slash)
 - `siteTitle` - Title of your website
+- `defaultPageLayout` - The default template layout for all regular pages, unless overridden in the frontmatter
+- `defaultCollectionIndexLayout` - The default template layout for the collection index pages, unless overridden via the below `collectionLayouts` option in the config
+- `collectionLayouts` - Map collection URLs to custom layout templates
 - `siteScripts` - Global JavaScript files to include on all pages
 - `author` - Default author name
 - `copyright` - Copyright notice for your site
 - `themeURL` - URL to your main stylesheet (e.g., `/static/style.css`)
 - `socials` - Social media links (format: `{"twitter": "https://twitter.com/...", ...}`)
-- `collectionLayouts` - Map collection URLs to custom layout templates
 - `customFields` - Additional arbitrary key-value pairs for your layouts
 
 ## Complete Example

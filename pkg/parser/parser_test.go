@@ -139,11 +139,12 @@ func TestParseMarkdownContent(t *testing.T) {
 func TestParseConfig(t *testing.T) {
 	t.Run("unmarshal `config.json` to LayoutConfig", func(t *testing.T) {
 		gotParser := parser.Parser{
-			Pages:                make(map[template.URL]parser.PageData),
-			TagsMap:              make(map[template.URL][]parser.PageData),
-			CollectionsMap:       make(map[template.URL][]parser.PageData),
-			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			Pages:                     make(map[template.URL]parser.PageData),
+			TagsMap:                   make(map[template.URL][]parser.PageData),
+			CollectionsMap:            make(map[template.URL][]parser.PageData),
+			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
+			CollectionsSubPageLayouts: make(map[template.URL]string),
+			ErrorLogger:               logger.New(os.Stderr),
 		}
 
 		wantLayout := parser.LayoutConfig{
@@ -154,9 +155,14 @@ func TestParseConfig(t *testing.T) {
 				{"Posts": "posts.html"},
 			},
 
-			BaseURL:   "example.org",
-			SiteTitle: "ssg",
-			Author:    "Anna",
+			BaseURL:                      "example.org",
+			SiteTitle:                    "ssg",
+			Author:                       "Anna",
+			DefaultPageLayout:            "page-test",
+			DefaultCollectionIndexLayout: "collection-index-test",
+			CollectionLayouts: map[string]string{
+				"posts/index-test.html": "all-posts-test",
+			},
 		}
 
 		gotParser.ParseConfig(TestDirPath + "layout/config.json")

@@ -16,5 +16,10 @@
   "baseURL": "example.org",
   "siteTitle": "ssg",
   "siteScripts": null,
-  "author": "Anna"
+  "author": "Anna",
+  "defaultPageLayout": "page-test",
+  "defaultCollectionIndexLayout": "collection-index-test",
+  "collectionLayouts": {
+    "posts/index-test.html": "all-posts-test"
+  }
 }

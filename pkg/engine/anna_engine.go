@@ -148,7 +148,7 @@ func (e *Engine) RenderCollections(fileOutPath string, templ *template.Template)
 
 			layoutName := e.DeepDataMerge.CollectionsSubPageLayouts[collection]
 			if layoutName == "" {
-				layoutName = "collection-index"
+				layoutName = e.DeepDataMerge.LayoutConfig.DefaultCollectionIndexLayout
 			}
 
 			e.RenderPage(fileOutPath, collection, templ, layoutName)
