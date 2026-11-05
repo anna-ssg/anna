@@ -87,17 +87,17 @@ jobs:
             binary_src: anna-branch
             lang: go-branch
 
-          - name: saaru
-            repo: https://github.com/anirudhRowjee/saaru
-            build_cmd: cargo build --release --manifest-path saaru/Cargo.toml
-            binary_src: saaru/target/release/saaru
-            lang: rust
+          # - name: saaru
+          #   repo: https://github.com/anirudhRowjee/saaru
+          #   build_cmd: cargo build --release --manifest-path saaru/Cargo.toml
+          #   binary_src: saaru/target/release/saaru
+          #   lang: rust
 
-          - name: sapling
-            repo: https://github.com/NavinShrinivas/sapling
-            build_cmd: cargo build --release --manifest-path sapling/Cargo.toml
-            binary_src: sapling/target/release/sapling
-            lang: rust
+          # - name: sapling
+          #   repo: https://github.com/NavinShrinivas/sapling
+          #   build_cmd: cargo build --release --manifest-path sapling/Cargo.toml
+          #   binary_src: sapling/target/release/sapling
+          #   lang: rust
 
           - name: anna-main
             repo: https://github.com/anna-ssg/anna
@@ -178,7 +178,7 @@ jobs:
       - name: Tools/Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          hugo-version: "latest"
 
       - name: Dependencies
         run: sudo apt-get update && sudo apt-get install -y hyperfine jq rsync
@@ -189,17 +189,17 @@ jobs:
           name: bench-corpus
           path: ${{ env.BENCH_DIR }}/generated
 
-      - name: Download Binary/saaru
-        uses: actions/download-artifact@v4
-        with:
-          name: bin-saaru
-          path: ${{ env.BENCH_DIR }}/bins
+      # - name: Download Binary/saaru
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: bin-saaru
+      #     path: ${{ env.BENCH_DIR }}/bins
 
-      - name: Download Binary/sapling
-        uses: actions/download-artifact@v4
-        with:
-          name: bin-sapling
-          path: ${{ env.BENCH_DIR }}/bins
+      # - name: Download Binary/sapling
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: bin-sapling
+      #     path: ${{ env.BENCH_DIR }}/bins
 
       - name: Download Binary/anna-main
         uses: actions/download-artifact@v4
@@ -225,23 +225,24 @@ jobs:
       - name: Clone SSG Repos (structure only)
         run: |
           BENCH_DIR="${{ env.BENCH_DIR }}"
-          git clone --depth=1 https://github.com/anirudhRowjee/saaru    "$BENCH_DIR/saaru"
-          git clone --depth=1 https://github.com/NavinShrinivas/sapling  "$BENCH_DIR/sapling"
+          # git clone --depth=1 https://github.com/anirudhRowjee/saaru    "$BENCH_DIR/saaru"
+          # git clone --depth=1 https://github.com/NavinShrinivas/sapling  "$BENCH_DIR/sapling"
           git clone --depth=1 https://github.com/anna-ssg/anna           "$BENCH_DIR/anna-main"
 
           # Fix: Explicitly create target execution paths before copying paths
-          mkdir -p "$BENCH_DIR/saaru/target/release"
-          mkdir -p "$BENCH_DIR/sapling/target/release"
+          # mkdir -p "$BENCH_DIR/saaru/target/release"
+          # mkdir -p "$BENCH_DIR/sapling/target/release"
 
           # copy pre-built binaries into place
-          cp "$BENCH_DIR/bins/saaru"     "$BENCH_DIR/saaru/target/release/saaru"
-          cp "$BENCH_DIR/bins/sapling"   "$BENCH_DIR/sapling/target/release/sapling"
+          # cp "$BENCH_DIR/bins/saaru"     "$BENCH_DIR/saaru/target/release/saaru"
+          # cp "$BENCH_DIR/bins/sapling"   "$BENCH_DIR/sapling/target/release/sapling"
           cp "$BENCH_DIR/bins/anna-main" "$BENCH_DIR/anna-main/anna-main"
 
-          chmod +x \
-            "$BENCH_DIR/saaru/target/release/saaru" \
-            "$BENCH_DIR/sapling/target/release/sapling" \
-            "$BENCH_DIR/anna-main/anna-main"
+          # chmod +x \
+            # "$BENCH_DIR/saaru/target/release/saaru" \
+            # "$BENCH_DIR/sapling/target/release/sapling" \
+            # "$BENCH_DIR/anna-main/anna-main"
+          chmod +x "$BENCH_DIR/anna-main/anna-main"
 
       - name: Bootstrap Site Skeleton
         run: |
@@ -265,20 +266,32 @@ jobs:
 
       - name: Clean Content Dirs
         run: |
+          # rm -rf \
+          #   "$BENCH_DIR/anna-branch/site/content" \
+          #   "$BENCH_DIR/anna-main/site/content" \
+          #   "$BENCH_DIR/anna-release/site/content" \
+          #   "$BENCH_DIR/saaru/docs/src" \
+          #   "$BENCH_DIR/sapling/benchmark/content/blogs" \
+          #   "$BENCH_DIR/hugo/content"
+          #
+          # mkdir -p \
+          #   "$BENCH_DIR/anna-branch/site/content/posts" \
+          #   "$BENCH_DIR/anna-main/site/content/posts" \
+          #   "$BENCH_DIR/anna-release/site/content/posts" \
+          #   "$BENCH_DIR/saaru/docs/src" \
+          #   "$BENCH_DIR/sapling/benchmark/content/blogs" \
+          #   "$BENCH_DIR/hugo/content"
+
           rm -rf \
             "$BENCH_DIR/anna-branch/site/content" \
             "$BENCH_DIR/anna-main/site/content" \
             "$BENCH_DIR/anna-release/site/content" \
-            "$BENCH_DIR/saaru/docs/src" \
-            "$BENCH_DIR/sapling/benchmark/content/blogs" \
             "$BENCH_DIR/hugo/content"
 
           mkdir -p \
             "$BENCH_DIR/anna-branch/site/content/posts" \
             "$BENCH_DIR/anna-main/site/content/posts" \
             "$BENCH_DIR/anna-release/site/content/posts" \
-            "$BENCH_DIR/saaru/docs/src" \
-            "$BENCH_DIR/sapling/benchmark/content/blogs" \
             "$BENCH_DIR/hugo/content"
 
       - name: Link Corpus
@@ -288,8 +301,8 @@ jobs:
             ln "$f" "$BENCH_DIR/anna-branch/site/content/posts/$name"
             ln "$f" "$BENCH_DIR/anna-main/site/content/posts/$name"
             ln "$f" "$BENCH_DIR/anna-release/site/content/posts/$name"
-            ln "$f" "$BENCH_DIR/saaru/docs/src/$name"
-            ln "$f" "$BENCH_DIR/sapling/benchmark/content/blogs/$name"
+            # ln "$f" "$BENCH_DIR/saaru/docs/src/$name"
+            # ln "$f" "$BENCH_DIR/sapling/benchmark/content/blogs/$name"
             ln "$f" "$BENCH_DIR/hugo/content/$name"
           done
 
@@ -305,23 +318,39 @@ jobs:
           LATEST_TAG=$(curl -s https://api.github.com/repos/anna-ssg/anna/releases/latest | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p')
           RELEASE_SHA=$(git ls-remote --tags https://github.com/anna-ssg/anna.git "refs/tags/$LATEST_TAG^{}" "refs/tags/$LATEST_TAG" | awk 'NR==1{print $1}')
 
+          # {
+          #   get_commit_info "$GITHUB_WORKSPACE"          "anna-branch" "https://github.com/anna-ssg/anna"
+          #   get_commit_info "$BENCH_DIR/saaru"           "saaru"       "https://github.com/anirudhRowjee/saaru"
+          #   get_commit_info "$BENCH_DIR/sapling"         "sapling"     "https://github.com/NavinShrinivas/sapling"
+          #   get_commit_info "$BENCH_DIR/anna-main"       "anna-main"   "https://github.com/anna-ssg/anna"
+          #   echo "anna-release: [\`${RELEASE_SHA:0:7}\`](https://github.com/anna-ssg/anna/commit/$RELEASE_SHA)"
+          # } | tee "$BENCH_DIR/commit_hashes.txt"
+
           {
             get_commit_info "$GITHUB_WORKSPACE"          "anna-branch" "https://github.com/anna-ssg/anna"
-            get_commit_info "$BENCH_DIR/saaru"           "saaru"       "https://github.com/anirudhRowjee/saaru"
-            get_commit_info "$BENCH_DIR/sapling"         "sapling"     "https://github.com/NavinShrinivas/sapling"
             get_commit_info "$BENCH_DIR/anna-main"       "anna-main"   "https://github.com/anna-ssg/anna"
             echo "anna-release: [\`${RELEASE_SHA:0:7}\`](https://github.com/anna-ssg/anna/commit/$RELEASE_SHA)"
           } | tee "$BENCH_DIR/commit_hashes.txt"
 
       - name: Run Benchmark
         run: |
+          # hyperfine \
+          #   --warmup "$warm" \
+          #   --runs   "$runs" \
+          #   --ignore-failure \
+          #   --export-json "$BENCH_DIR/bench_results.json" \
+          #   -n saaru        "(cd $BENCH_DIR/saaru && ./target/release/saaru --base-path ./docs)" \
+          #   -n sapling      "(cd $BENCH_DIR/sapling/benchmark && ./../target/release/sapling run)" \
+          #   -n anna-release "(cd $BENCH_DIR/anna-release && ./anna)" \
+          #   -n anna-main    "(cd $BENCH_DIR/anna-main && ./anna-main)" \
+          #   -n anna-branch  "(cd $BENCH_DIR/anna-branch && ./anna)" \
+          #   -n hugo         "(cd $BENCH_DIR/hugo && hugo)"
+
           hyperfine \
             --warmup "$warm" \
             --runs   "$runs" \
             --ignore-failure \
             --export-json "$BENCH_DIR/bench_results.json" \
-            -n saaru        "(cd $BENCH_DIR/saaru && ./target/release/saaru --base-path ./docs)" \
-            -n sapling      "(cd $BENCH_DIR/sapling/benchmark && ./../target/release/sapling run)" \
             -n anna-release "(cd $BENCH_DIR/anna-release && ./anna)" \
             -n anna-main    "(cd $BENCH_DIR/anna-main && ./anna-main)" \
             -n anna-branch  "(cd $BENCH_DIR/anna-branch && ./anna)" \
