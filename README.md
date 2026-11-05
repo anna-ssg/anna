@@ -21,7 +21,6 @@ A static site generator in go
 [![GitHub Repo Stars](https://img.shields.io/github/stars/anna-ssg/Anna?style=flat-square&label=Stars&color=lightgreen&logo=github)](https://github.com/anna-ssg/anna)
 [![Anna Docs](https://img.shields.io/badge/anna-docs-0d7ebf)](https://anna-docs.netlify.app)
 [![Test Workflow](https://github.com/anna-ssg/anna/actions/workflows/tests.yml/badge.svg)](https://github.com/anna-ssg/anna/actions/workflows/tests.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/anna-ssg/v3/anna.svg)](https://pkg.go.dev/github.com/anna-ssg/anna/v4)
 
 > To setup your site, follow our [quick-start](https://anna-docs.netlify.app/quick-start) guide to download Anna
 
@@ -43,7 +42,7 @@ Anna ships as a single static binary, so most hosts deploy it the same way: fetc
 
 #### GitHub Pages
 
-1. Settings → Pages → Source: **GitHub Actions**
+1. Settings -> Pages -> Source: **GitHub Actions**
 2. Look at the **Build and Deploy** workflow from our Actions tab
 3. `deploy.sh` fetches a `Linux_x86_64` release binary, which matches the default Linux runners on all three platforms above.
 

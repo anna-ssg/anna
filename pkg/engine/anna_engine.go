@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anna-ssg/anna/v4/pkg/parser"
+	"github.com/anna-ssg/anna/pkg/parser"
 )
 
 type TagRootTemplateData struct {
