@@ -31,7 +31,7 @@ func main() {
 
 	console := zerolog.ConsoleWriter{
 		Out:        os.Stdout,
-		TimeFormat: time.Kitchen,
+		TimeFormat: time.TimeOnly,
 		NoColor:    false,
 	}
 	globalLogger := zerolog.New(console).With().Timestamp().Stack().Logger()
