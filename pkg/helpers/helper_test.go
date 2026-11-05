@@ -1,20 +1,34 @@
 package helpers_test
 
 import (
+	"io"
 	"io/fs"
 	"os"
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/anna-ssg/anna/pkg/helpers"
+
+	"github.com/rs/zerolog"
 )
 
 var HelperTestDirPath = "../../test/helpers/"
 
+func InitLogger(out io.Writer) *zerolog.Logger {
+	console := zerolog.ConsoleWriter{
+		Out:        out,
+		TimeFormat: time.Kitchen,
+		NoColor:    false,
+	}
+	logger := zerolog.New(console).With().Timestamp().Caller().Stack().Logger()
+	return &logger
+}
+
 func TestCopyDirectoryContents(t *testing.T) {
 	t.Run("recursively copying directory contents", func(t *testing.T) {
 		helper := helpers.Helper{
-			ErrorLogger: helpers.InitErrLogger(os.Stderr),
+			Logger: InitLogger(os.Stdout),
 		}
 		helper.CopyDirectoryContents(HelperTestDirPath+"copy_dir/", HelperTestDirPath+"copy_dir/rendered/")
 
@@ -52,7 +66,7 @@ func testfuncTraverseDirectory(baseDirFS fs.FS, t *testing.T) error {
 func TestCopyFiles(t *testing.T) {
 	t.Run("copy file and create nested parent directories", func(t *testing.T) {
 		helper := helpers.Helper{
-			ErrorLogger: helpers.InitErrLogger(os.Stderr),
+			Logger: InitLogger(os.Stdout),
 		}
 		helper.CopyFiles(HelperTestDirPath+"copy_files/input.txt", HelperTestDirPath+"copy_files/rendered/output.txt")
 

@@ -2,16 +2,29 @@ package engine_test
 
 import (
 	"html/template"
+	"io"
 	"os"
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/anna-ssg/anna/pkg/engine"
-	"github.com/anna-ssg/anna/pkg/helpers"
 	"github.com/anna-ssg/anna/pkg/parser"
+
+	"github.com/rs/zerolog"
 )
 
 const TestDirPath = "../../test/engine/"
+
+func InitLogger(out io.Writer) *zerolog.Logger {
+	console := zerolog.ConsoleWriter{
+		Out:        out,
+		TimeFormat: time.Kitchen,
+		NoColor:    false,
+	}
+	logger := zerolog.New(console).With().Timestamp().Caller().Stack().Logger()
+	return &logger
+}
 
 func TestRenderPage(t *testing.T) {
 	if err := os.MkdirAll(TestDirPath+"render_page/rendered", 0750); err != nil {
@@ -20,7 +33,7 @@ func TestRenderPage(t *testing.T) {
 
 	t.Run("render a single page while creating a new directory", func(t *testing.T) {
 		testEngine := engine.Engine{
-			ErrorLogger: helpers.InitErrLogger(os.Stderr),
+			Logger: InitLogger(os.Stdout),
 		}
 		testEngine.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)

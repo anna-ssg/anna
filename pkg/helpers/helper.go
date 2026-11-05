@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	embeddedsite "github.com/anna-ssg/anna/site"
 
@@ -17,7 +16,7 @@ import (
 )
 
 type Helper struct {
-	ErrorLogger *zerolog.Logger
+	Logger *zerolog.Logger
 }
 
 /*
@@ -27,12 +26,12 @@ Copies the contents of the dirPath directory to outDirPath
 func (h *Helper) CopyDirectoryContents(dirPath string, outDirPath string) {
 	dirEntries, err := os.ReadDir(dirPath)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 
 	err = os.MkdirAll(outDirPath, 0750)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 
 	for _, entry := range dirEntries {
@@ -47,11 +46,11 @@ func (h *Helper) CopyDirectoryContents(dirPath string, outDirPath string) {
 func (h *Helper) CopyFiles(srcPath string, destPath string) {
 	source, err := os.Open(srcPath)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 	defer func() {
-		if cerr := source.Close(); cerr != nil {
-			h.ErrorLogger.Fatal().Err(cerr)
+		if err := source.Close(); err != nil {
+			h.Logger.Fatal().Err(err).Send()
 		}
 	}()
 
@@ -62,35 +61,35 @@ func (h *Helper) CopyFiles(srcPath string, destPath string) {
 
 		err := os.MkdirAll(pagePathWithoutFilename, 0750)
 		if err != nil {
-			h.ErrorLogger.Fatal().Err(err)
+			h.Logger.Fatal().Err(err).Send()
 		}
 	}
 
 	destination, err := os.Create(destPath)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 	defer func() {
-		if cerr := destination.Close(); cerr != nil {
-			h.ErrorLogger.Fatal().Err(cerr)
+		if err := destination.Close(); err != nil {
+			h.Logger.Fatal().Err(err).Send()
 		}
 	}()
 
 	_, err = io.Copy(destination, source)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 }
 
 func (h *Helper) CreateRenderedDir(fileOutPath string) {
 	err := os.RemoveAll(fileOutPath + "rendered/")
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 
 	err = os.MkdirAll(fileOutPath+"rendered/", 0750)
 	if err != nil {
-		h.ErrorLogger.Fatal().Err(err)
+		h.Logger.Fatal().Err(err).Send()
 	}
 }
 
@@ -154,7 +153,7 @@ func (h *Helper) BootstrapEmbedded(overwrite bool) error {
 		return err
 	}
 
-	h.ErrorLogger.Println("Bootstrapped embedded site.")
+	h.Logger.Info().Msg("Bootstrapped embedded site.")
 	return nil
 }
 
@@ -181,24 +180,4 @@ func (h *Helper) EnsureSiteExists() error {
 	}
 
 	return h.BootstrapEmbedded(false)
-}
-
-func InitErrLogger(out io.Writer) *zerolog.Logger {
-	console := zerolog.ConsoleWriter{
-		Out:        out,
-		TimeFormat: time.Kitchen,
-		NoColor:    false,
-	}
-	logger := zerolog.New(console).With().Timestamp().Caller().Stack().Logger()
-	return &logger
-}
-
-func InitInfoLogger(out io.Writer) *zerolog.Logger {
-	console := zerolog.ConsoleWriter{
-		Out:        out,
-		TimeFormat: time.Kitchen,
-		NoColor:    false,
-	}
-	logger := zerolog.New(console).With().Timestamp().Logger()
-	return &logger
 }

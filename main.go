@@ -10,6 +10,8 @@ import (
 
 	"github.com/anna-ssg/anna/cmd/anna"
 	"github.com/anna-ssg/anna/pkg/helpers"
+
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +29,13 @@ func main() {
 	var version bool
 	var siteDirPath string
 
+	console := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: time.Kitchen,
+		NoColor:    false,
+	}
+	globalLogger := zerolog.New(console).With().Timestamp().Stack().Logger()
+
 	rootCmd := &cobra.Command{
 		Use:   "anna",
 		Short: "Static Site Generator",
@@ -36,20 +45,19 @@ func main() {
 				if FullCommitHash != "" {
 					ver = fmt.Sprintf("%s (commit: %s)", Version, FullCommitHash)
 				}
-				fmt.Println(ver)
+				globalLogger.Info().Msg(ver)
 				return
 			}
 
 			siteDirPath = path.Clean(siteDirPath) + "/"
 
 			helper := helpers.Helper{
-				ErrorLogger: helpers.InitErrLogger(os.Stderr),
+				Logger: &globalLogger,
 			}
 
 			// Bootstrap a new site if one doesn't exist.
 			if err := helper.EnsureSiteExists(); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				globalLogger.Fatal().Err(err).Send()
 			}
 
 			annaCmd := anna.Cmd{
@@ -57,8 +65,7 @@ func main() {
 				Addr:         addr,
 				LiveReload:   serve,
 				SiteDirPath:  siteDirPath,
-				ErrorLogger:  helpers.InitErrLogger(os.Stderr),
-				InfoLogger:   helpers.InitInfoLogger(os.Stdout),
+				Logger:       &globalLogger,
 			}
 
 			if serve {
@@ -72,7 +79,7 @@ func main() {
 				count := annaCmd.VanillaRender(siteDirPath)
 				elapsed := time.Since(start)
 				annaCmd.PrintStats(elapsed)
-				annaCmd.InfoLogger.Info().Msgf("Built %d pages in %s\n", count, elapsed)
+				globalLogger.Info().Msgf("Built %d pages in %s\n", count, elapsed)
 				built = true
 			}
 
@@ -80,7 +87,7 @@ func main() {
 				start := time.Now()
 				count := annaCmd.VanillaRender(siteDirPath)
 				elapsed := time.Since(start)
-				annaCmd.InfoLogger.Info().Msgf("Built %d pages in %s\n", count, elapsed)
+				globalLogger.Info().Msgf("Built %d pages in %s\n", count, elapsed)
 			}
 		},
 	}
@@ -138,36 +145,33 @@ func main() {
 		Use:   "bootstrap",
 		Short: "Extract the embedded starter site",
 		Run: func(cmd *cobra.Command, args []string) {
-			info := helpers.InitInfoLogger(os.Stdout)
-
 			if _, err := os.Stat("site"); err == nil && !bsYes {
-				info.Println("site/ already exists. Use --yes to overwrite.")
+				globalLogger.Info().Msg("site/ already exists. Use --yes to overwrite.")
 				return
 			}
 
 			if !bsYes {
-				fmt.Print("Extract the embedded starter site into ./site? (y/N): ")
+				globalLogger.Info().Msg("Extract the embedded starter site into ./site? (y/N): ")
 
 				reader := bufio.NewReader(os.Stdin)
 				line, _ := reader.ReadString('\n')
 				line = strings.TrimSpace(strings.ToLower(line))
 
 				if line != "y" && line != "yes" {
-					info.Println("Aborted.")
+					globalLogger.Info().Msg("Aborted.")
 					return
 				}
 			}
 
 			helper := helpers.Helper{
-				ErrorLogger: helpers.InitErrLogger(os.Stderr),
+				Logger: &globalLogger,
 			}
 
 			if err := helper.BootstrapEmbedded(bsYes); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				globalLogger.Fatal().Err(err).Send()
 			}
 
-			info.Println("Bootstrapped embedded site successfully.")
+			globalLogger.Info().Msg("Bootstrapped embedded site successfully.")
 		},
 	}
 
@@ -182,7 +186,6 @@ func main() {
 	rootCmd.AddCommand(bootstrapCmd)
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		globalLogger.Fatal().Err(err).Send()
 	}
 }
