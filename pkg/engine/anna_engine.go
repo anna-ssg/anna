@@ -67,13 +67,13 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 	// Rendering the page displaying all tags
 	err := templ.ExecuteTemplate(&tagsBuffer, "all-tags", tagPageData)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 
 	// Flushing 'tags.html' to the disk
 	err = os.WriteFile(fileOutPath+"rendered/tags.html", tagsBuffer.Bytes(), 0666)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 
 	// Create a wait group to wait for all goroutines to finish
@@ -165,12 +165,12 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 
 	jsonFile, err := os.Create(outFilePath + "rendered/static/index.json")
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	defer func() {
 		err = jsonFile.Close()
 		if err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 	}()
 
@@ -189,12 +189,12 @@ func (e *Engine) GenerateJSONIndex(outFilePath string) {
 	// Marshal the contents of jsonMergedData
 	jsonMergedMarshaledData, err := json.Marshal(jsonIndexTemplate)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 
 	_, err = jsonFile.Write(jsonMergedMarshaledData)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 }
 
@@ -238,19 +238,19 @@ func (e *Engine) GenerateSitemap(outFilePath string) {
 	// e.SiteDataPath is the DirPath
 	outputFile, err := os.Create(outFilePath)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 
 	defer func() {
 		err = outputFile.Close()
 		if err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 	}()
 
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 }
 
@@ -264,7 +264,7 @@ func (e *Engine) GenerateFeed() {
 	buffer.WriteString("  <channel>\n")
 	buffer.WriteString("   <title>")
 	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.SiteTitle)); err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	buffer.WriteString("</title>\n")
 
@@ -275,18 +275,18 @@ func (e *Engine) GenerateFeed() {
 
 	buffer.WriteString("   <description>Recent content on ")
 	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.SiteTitle)); err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	buffer.WriteString("</description>\n")
 	buffer.WriteString("   <language>en-IN</language>\n")
 	buffer.WriteString("   <webMaster>")
 	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Author)); err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	buffer.WriteString("</webMaster>\n")
 	buffer.WriteString("   <copyright>")
 	if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Copyright)); err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	buffer.WriteString("</copyright>\n")
 
@@ -315,7 +315,7 @@ func (e *Engine) GenerateFeed() {
 		buffer.WriteString("    <item>\n")
 		buffer.WriteString("      <title>")
 		if err := xml.EscapeText(&buffer, []byte(PageData.Frontmatter.Title)); err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 		buffer.WriteString("</title>\n")
 
@@ -331,7 +331,7 @@ func (e *Engine) GenerateFeed() {
 
 		buffer.WriteString("      <author>")
 		if err := xml.EscapeText(&buffer, []byte(e.DeepDataMerge.Config.Author)); err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 		buffer.WriteString("</author>\n")
 
@@ -343,7 +343,7 @@ func (e *Engine) GenerateFeed() {
 
 		buffer.WriteString("      <description>")
 		if err := xml.EscapeText(&buffer, []byte(PageData.Body)); err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 		buffer.WriteString("</description>\n")
 		buffer.WriteString("    </item>\n")
@@ -354,17 +354,17 @@ func (e *Engine) GenerateFeed() {
 
 	outputFile, err := os.Create(e.SiteDataPath + "rendered/feed.xml")
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 	defer func() {
 		err = outputFile.Close()
 		if err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 	}()
 
 	_, err = outputFile.Write(buffer.Bytes())
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 }

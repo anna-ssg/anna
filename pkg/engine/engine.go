@@ -45,7 +45,7 @@ type Engine struct {
 	DeepDataMerge DeepDataMerge
 
 	// Common logger for all engine functions
-	ErrorLogger *zerolog.Logger
+	Logger *zerolog.Logger
 
 	// The path to the directory being rendered
 	SiteDataPath string
@@ -85,7 +85,7 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template 
 
 		err := os.MkdirAll(fileOutPath+"rendered/"+pagePathWithoutFilename, 0750)
 		if err != nil {
-			e.ErrorLogger.Fatal().Err(err)
+			e.Logger.Fatal().Err(err).Send()
 		}
 	}
 
@@ -100,13 +100,12 @@ func (e *Engine) RenderPage(fileOutPath string, pagePath template.URL, template 
 	// Storing the rendered HTML file to a buffer
 	err := template.ExecuteTemplate(&buffer, templateStartString, pageData)
 	if err != nil {
-		e.ErrorLogger.Println("Error at path: ", pagePath)
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Msgf("Error at path: %s\n", pagePath)
 	}
 
 	// Flushing data from the buffer to the disk
 	err = os.WriteFile(filepath, buffer.Bytes(), 0666)
 	if err != nil {
-		e.ErrorLogger.Fatal().Err(err)
+		e.Logger.Fatal().Err(err).Send()
 	}
 }
