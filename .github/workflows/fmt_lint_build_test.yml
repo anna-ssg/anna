@@ -1,0 +1,45 @@
+name: Format Lint Build Test Flow
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  fmt-lint-build-test:
+    name: Format Lint Build Test
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: "go.mod"
+
+      - name: Display Go version
+        run: go version
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Formatting checks
+        run: make fmt-check
+
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v9.3.0
+        with:
+          version: latest
+          args: --timeout=3m
+
+      - name: Build code
+        run: make build
+
+      - name: Run tests with coverage
+        run: make tests-coverage
+
+      - name: Govulncheck
+        run: make govulncheck
