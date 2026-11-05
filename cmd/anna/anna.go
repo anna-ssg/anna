@@ -24,9 +24,9 @@ type Cmd struct {
 func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	// Defining Engine and Parser Structures
 	p := parser.Parser{
-		Templates:                 make(map[template.URL]parser.TemplateData, 10),
-		TagsMap:                   make(map[template.URL][]parser.TemplateData, 10),
-		CollectionsMap:            make(map[template.URL][]parser.TemplateData, 10),
+		Pages:                     make(map[template.URL]parser.PageData, 10),
+		TagsMap:                   make(map[template.URL][]parser.PageData, 10),
+		CollectionsMap:            make(map[template.URL][]parser.PageData, 10),
 		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData, 10),
 		CollectionsSubPageLayouts: make(map[template.URL]string, 10),
 		SiteDataPath:              siteDirPath,
@@ -39,9 +39,9 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 		SiteDataPath: siteDirPath,
 		ErrorLogger:  logger.New(os.Stderr),
 	}
-	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData, 10)
-	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData, 10)
-	e.DeepDataMerge.CollectionsMap = make(map[template.URL][]parser.TemplateData, 10)
+	e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData, 10)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData, 10)
+	e.DeepDataMerge.CollectionsMap = make(map[template.URL][]parser.PageData, 10)
 	e.DeepDataMerge.CollectionsHierarchyData = make(map[template.URL]parser.CollectionHierarchyData, 10)
 
 	helper := helpers.Helper{
@@ -58,11 +58,11 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 
 	templ := p.ParseLayoutFiles()
 
-	e.DeepDataMerge.Templates = p.Templates
+	e.DeepDataMerge.Pages = p.Pages
 	e.DeepDataMerge.TagsMap = p.TagsMap
 	e.DeepDataMerge.CollectionsMap = p.CollectionsMap
 	e.DeepDataMerge.CollectionsSubPageLayouts = p.CollectionsSubPageLayouts
-	e.DeepDataMerge.LayoutConfig = p.LayoutConfig
+	e.DeepDataMerge.Config = p.Config
 	for k, v := range p.CollectionsHierarchy {
 		e.DeepDataMerge.CollectionsHierarchyData[k] = *v
 	}
@@ -94,5 +94,5 @@ func (cmd *Cmd) VanillaRender(siteDirPath string) int {
 	e.RenderCollections(siteDirPath, templ)
 
 	// Return number of templates/pages rendered for reporting
-	return len(e.DeepDataMerge.Templates)
+	return len(e.DeepDataMerge.Pages)
 }

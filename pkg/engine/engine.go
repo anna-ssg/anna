@@ -12,24 +12,22 @@ import (
 
 // DeepDataMerge This struct holds all the ssg data
 type DeepDataMerge struct {
-	// Templates stores the template data of all the pages of the site
-	// Access the data for a particular page by using the relative path to the file as the key
-	Templates map[template.URL]parser.TemplateData
+	//Pages stores the template data of all the pages of the site
+	// Access the data for a particular page by using the path to the file as the key
+	Pages map[template.URL]parser.PageData
 
-	// Templates stores the template data of all tag sub-pages of the site
-	Tags map[template.URL]parser.TemplateData
+	Tags map[template.URL]parser.PageData
 
 	// K-V pair storing all templates corresponding to a particular tag in the site
-	TagsMap map[template.URL][]parser.TemplateData
+	TagsMap map[template.URL][]parser.PageData
 
 	// Stores data parsed from layout/config.yml
-	LayoutConfig parser.LayoutConfig
+	Config parser.Config
 
-	// Templates stores the template data of all collection sub-pages of the site
-	Collections map[template.URL]parser.TemplateData
+	Collections map[template.URL]parser.PageData
 
 	// K-V pair storing all templates corresponding to a particular collection in the site
-	CollectionsMap map[template.URL][]parser.TemplateData
+	CollectionsMap map[template.URL][]parser.PageData
 
 	// CollectionsHierarchy stores all the sub collections associated with the parent collection via the template.URL
 	CollectionsHierarchyData map[template.URL]parser.CollectionHierarchyData

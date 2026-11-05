@@ -6,7 +6,7 @@
     {{template "header" .}}
     <main class="container site-main" role="main">
         <article class="content prose">
-            {{$CollectionIndexData := index .DeepDataMerge.Templates .PageURL}}
+            {{$CollectionIndexData := index .DeepDataMerge.Pages .PageURL}}
 
             {{ $CollectionIndexData.Body }}
 

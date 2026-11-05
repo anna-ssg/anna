@@ -15,15 +15,15 @@ const TestDirPath = "../../test/parser/"
 
 func TestAddFileAndRender(t *testing.T) {
 	gotParser := parser.Parser{
-		Templates:                 make(map[template.URL]parser.TemplateData),
-		TagsMap:                   make(map[template.URL][]parser.TemplateData),
-		CollectionsMap:            make(map[template.URL][]parser.TemplateData),
+		Pages:                     make(map[template.URL]parser.PageData),
+		TagsMap:                   make(map[template.URL][]parser.PageData),
+		CollectionsMap:            make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 		CollectionsSubPageLayouts: make(map[template.URL]string),
 		ErrorLogger:               logger.New(os.Stderr),
 	}
 
-	wantLayout := parser.LayoutConfig{
+	wantLayout := parser.Config{
 		Navbar: []map[string]string{
 			{"Index": "index.html"},
 			{"Docs": "docs.html"},
@@ -34,16 +34,16 @@ func TestAddFileAndRender(t *testing.T) {
 		SiteTitle: "ssg",
 		Author:    "Anna",
 	}
-	gotParser.LayoutConfig = wantLayout
+	gotParser.Config = wantLayout
 	t.Run("parsing frontmatter and body from a markdown file", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
 		if err != nil {
 			t.Errorf("%v", err)
 		}
 		wantParser := parser.Parser{
-			Templates:                 make(map[template.URL]parser.TemplateData),
-			TagsMap:                   make(map[template.URL][]parser.TemplateData),
-			CollectionsMap:            make(map[template.URL][]parser.TemplateData),
+			Pages:                     make(map[template.URL]parser.PageData),
+			TagsMap:                   make(map[template.URL][]parser.PageData),
+			CollectionsMap:            make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 			CollectionsSubPageLayouts: make(map[template.URL]string),
 			ErrorLogger:               gotParser.ErrorLogger,
@@ -58,18 +58,18 @@ func TestAddFileAndRender(t *testing.T) {
 		fileURL := "testpost.html"
 		wantParser.MdFilesName = append(wantParser.MdFilesName, filename)
 		wantParser.MdFilesPath = append(wantParser.MdFilesPath, filename)
-		wantPage := parser.TemplateData{
+		wantPage := parser.PageData{
 			CompleteURL: template.URL(fileURL),
 			Date:        wantParser.DateParse(sampleFrontmatter.Date).Unix(),
 			Frontmatter: sampleFrontmatter,
 			Body:        template.HTML(sampleBody),
 		}
-		wantParser.LayoutConfig = wantLayout
-		wantParser.CollectionsMap[template.URL("index.html")] = []parser.TemplateData{
+		wantParser.Config = wantLayout
+		wantParser.CollectionsMap[template.URL("index.html")] = []parser.PageData{
 			wantPage,
 		}
 
-		wantParser.Templates["testpost.html"] = wantPage
+		wantParser.Pages["testpost.html"] = wantPage
 		for _, tag := range sampleFrontmatter.Tags {
 			wantParser.TagsMap[template.URL(tag)] = append(wantParser.TagsMap[template.URL(tag)], wantPage)
 		}
@@ -85,9 +85,9 @@ func TestAddFileAndRender(t *testing.T) {
 
 func TestParseMarkdownContent(t *testing.T) {
 	p := parser.Parser{
-		Templates:            make(map[template.URL]parser.TemplateData),
-		TagsMap:              make(map[template.URL][]parser.TemplateData),
-		CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+		Pages:                make(map[template.URL]parser.PageData),
+		TagsMap:              make(map[template.URL][]parser.PageData),
+		CollectionsMap:       make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
 		ErrorLogger:          logger.New(os.Stderr),
 	}
@@ -137,16 +137,17 @@ func TestParseMarkdownContent(t *testing.T) {
 }
 
 func TestParseConfig(t *testing.T) {
-	t.Run("unmarshal `config.json` to LayoutConfig", func(t *testing.T) {
+	t.Run("unmarshal `config.json` to Config", func(t *testing.T) {
 		gotParser := parser.Parser{
-			Templates:            make(map[template.URL]parser.TemplateData),
-			TagsMap:              make(map[template.URL][]parser.TemplateData),
-			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
-			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			Pages:                     make(map[template.URL]parser.PageData),
+			TagsMap:                   make(map[template.URL][]parser.PageData),
+			CollectionsMap:            make(map[template.URL][]parser.PageData),
+			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
+			CollectionsSubPageLayouts: make(map[template.URL]string),
+			ErrorLogger:               logger.New(os.Stderr),
 		}
 
-		wantLayout := parser.LayoutConfig{
+		wantLayout := parser.Config{
 			Navbar: []map[string]string{
 				{"Index": "index.html"},
 				{"Docs": "docs.html"},
@@ -154,15 +155,20 @@ func TestParseConfig(t *testing.T) {
 				{"Posts": "posts.html"},
 			},
 
-			BaseURL:   "example.org",
-			SiteTitle: "ssg",
-			Author:    "Anna",
+			BaseURL:                      "example.org",
+			SiteTitle:                    "ssg",
+			Author:                       "Anna",
+			DefaultPageLayout:            "page-test",
+			DefaultCollectionIndexLayout: "collection-index-test",
+			CollectionLayouts: map[string]string{
+				"posts/index-test.html": "all-posts-test",
+			},
 		}
 
 		gotParser.ParseConfig(TestDirPath + "layout/config.json")
 
-		if !reflect.DeepEqual(gotParser.LayoutConfig, wantLayout) {
-			t.Errorf("got \n%v want \n%v", gotParser.LayoutConfig, wantLayout)
+		if !reflect.DeepEqual(gotParser.Config, wantLayout) {
+			t.Errorf("got \n%v want \n%v", gotParser.Config, wantLayout)
 		}
 	})
 }
@@ -170,13 +176,13 @@ func TestParseConfig(t *testing.T) {
 func TestParseRobots(t *testing.T) {
 	t.Run("parse and render `robots.txt`", func(t *testing.T) {
 		testParser := parser.Parser{
-			Templates:            make(map[template.URL]parser.TemplateData),
-			TagsMap:              make(map[template.URL][]parser.TemplateData),
-			CollectionsMap:       make(map[template.URL][]parser.TemplateData),
+			Pages:                make(map[template.URL]parser.PageData),
+			TagsMap:              make(map[template.URL][]parser.PageData),
+			CollectionsMap:       make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
 			ErrorLogger:          logger.New(os.Stderr),
 		}
-		testParser.LayoutConfig.BaseURL = "example.org"
+		testParser.Config.BaseURL = "example.org"
 
 		testParser.ParseRobots(TestDirPath+"layout/robots_txt/robots.txt", TestDirPath+"layout/robots_txt/got_robots.txt")
 
