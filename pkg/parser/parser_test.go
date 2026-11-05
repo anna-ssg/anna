@@ -2,16 +2,29 @@ package parser_test
 
 import (
 	"html/template"
+	"io"
 	"os"
 	"reflect"
 	"slices"
 	"testing"
+	"time"
 
-	"github.com/anna-ssg/anna/pkg/logger"
 	"github.com/anna-ssg/anna/pkg/parser"
+
+	"github.com/rs/zerolog"
 )
 
 const TestDirPath = "../../test/parser/"
+
+func InitLogger(out io.Writer) *zerolog.Logger {
+	console := zerolog.ConsoleWriter{
+		Out:        out,
+		TimeFormat: time.Kitchen,
+		NoColor:    false,
+	}
+	logger := zerolog.New(console).With().Timestamp().Caller().Stack().Logger()
+	return &logger
+}
 
 func TestAddFileAndRender(t *testing.T) {
 	gotParser := parser.Parser{
@@ -20,7 +33,7 @@ func TestAddFileAndRender(t *testing.T) {
 		CollectionsMap:            make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 		CollectionsSubPageLayouts: make(map[template.URL]string),
-		ErrorLogger:               logger.New(os.Stderr),
+		Logger:                    InitLogger(os.Stdout),
 	}
 
 	wantLayout := parser.Config{
@@ -46,7 +59,7 @@ func TestAddFileAndRender(t *testing.T) {
 			CollectionsMap:            make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 			CollectionsSubPageLayouts: make(map[template.URL]string),
-			ErrorLogger:               gotParser.ErrorLogger,
+			Logger:                    gotParser.Logger,
 		}
 		sampleFrontmatter, _, markdownContent, parseSuccess := gotParser.ParseMarkdownContent(string(inputMd), "sample_test_path")
 		sampleBody := "sample_body"
@@ -89,7 +102,7 @@ func TestParseMarkdownContent(t *testing.T) {
 		TagsMap:              make(map[template.URL][]parser.PageData),
 		CollectionsMap:       make(map[template.URL][]parser.PageData),
 		CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-		ErrorLogger:          logger.New(os.Stderr),
+		Logger:               InitLogger(os.Stdout),
 	}
 	t.Run("render markdown files to html", func(t *testing.T) {
 		inputMd, err := os.ReadFile(TestDirPath + "parse_md/md_inp.md")
@@ -144,7 +157,7 @@ func TestParseConfig(t *testing.T) {
 			CollectionsMap:            make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy:      make(map[template.URL]*parser.CollectionHierarchyData),
 			CollectionsSubPageLayouts: make(map[template.URL]string),
-			ErrorLogger:               logger.New(os.Stderr),
+			Logger:                    InitLogger(os.Stdout),
 		}
 
 		wantLayout := parser.Config{
@@ -180,7 +193,7 @@ func TestParseRobots(t *testing.T) {
 			TagsMap:              make(map[template.URL][]parser.PageData),
 			CollectionsMap:       make(map[template.URL][]parser.PageData),
 			CollectionsHierarchy: make(map[template.URL]*parser.CollectionHierarchyData),
-			ErrorLogger:          logger.New(os.Stderr),
+			Logger:               InitLogger(os.Stdout),
 		}
 		testParser.Config.BaseURL = "example.org"
 

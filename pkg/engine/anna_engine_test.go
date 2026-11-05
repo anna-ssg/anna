@@ -9,13 +9,12 @@ import (
 	"testing"
 
 	"github.com/anna-ssg/anna/pkg/engine"
-	"github.com/anna-ssg/anna/pkg/logger"
 	"github.com/anna-ssg/anna/pkg/parser"
 )
 
 func TestRenderTags(t *testing.T) {
 	e := engine.Engine{
-		ErrorLogger: logger.New(os.Stderr),
+		Logger: InitLogger(os.Stdout),
 	}
 	e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
@@ -120,7 +119,7 @@ func TestGenerateMergedJson(t *testing.T) {
 
 	t.Run("test json creation for the search index", func(t *testing.T) {
 		e := engine.Engine{
-			ErrorLogger: logger.New(os.Stderr),
+			Logger: InitLogger(os.Stdout),
 		}
 		e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 		e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
@@ -156,7 +155,7 @@ func TestGenerateMergedJson(t *testing.T) {
 func TestGenerateSitemap(t *testing.T) {
 	t.Run("render sitemap.xml", func(t *testing.T) {
 		testEngine := engine.Engine{
-			ErrorLogger: logger.New(os.Stderr),
+			Logger: InitLogger(os.Stdout),
 		}
 		testEngine.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
