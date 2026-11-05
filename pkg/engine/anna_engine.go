@@ -53,14 +53,14 @@ func (e *Engine) RenderTags(fileOutPath string, templ *template.Template) {
 		tagNames = append(tagNames, tagString)
 	}
 
-	tagRootTemplateData := parser.PageData{
+	tagRootPageData := parser.PageData{
 		Frontmatter: parser.Frontmatter{Title: "Tags"},
 	}
 
 	tagPageData := TagRootPageData{
 		DeepDataMerge: e.DeepDataMerge,
 		PageURL:       "tags.html",
-		PageData:      tagRootTemplateData,
+		PageData:      tagRootPageData,
 		TagNames:      tagNames,
 	}
 
