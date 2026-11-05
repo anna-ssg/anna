@@ -897,8 +897,8 @@ The `config.json` file stores configuration for your site's layout and behavior.
 - `navbar` - Array of navigation links (format: `[{"Label": "path/to/page.html"}]`)
 - `baseURL` - Base URL of your site (used for sitemaps, feeds, SEO; no trailing slash)
 - `siteTitle` - Title of your website
-- `defaultPageLayout` - The default template layout for all regular pages, unless overridden in the frontmatter
-- `defaultCollectionIndexLayout` - The default template layout for the collection index pages, unless overridden via the below `collectionLayouts` option in the config
+- `defaultPageLayout` - The default template layout for all regular pages, unless overridden in the frontmatter. **If this field is not set, the default layout is set to "page"**
+- `defaultCollectionIndexLayout` - The default template layout for the collection index pages, unless overridden via the below `collectionLayouts` option in the config. **If this field is not set, the default layout is set to "collection-index"**
 - `collectionLayouts` - Map collection URLs to custom layout templates
 - `siteScripts` - Global JavaScript files to include on all pages
 - `author` - Default author name
@@ -919,6 +919,8 @@ The `config.json` file stores configuration for your site's layout and behavior.
   ],
   "baseURL": "https://example.com",
   "siteTitle": "My Awesome Site",
+  "defaultPageLayout": "my-default-page-layout",
+  "defaultCollectionIndexLayout": "my-default-collection-index-layout",
   "siteScripts": [
     "/static/scripts/analytics.js",
     "/static/scripts/search.js"

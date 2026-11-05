@@ -304,6 +304,13 @@ func (p *Parser) ParseConfig(inFilePath string) {
 		p.ErrorLogger.Fatal(err)
 	}
 
+	if p.Config.DefaultPageLayout == "" {
+		p.Config.DefaultPageLayout = "page"
+	}
+	if p.Config.DefaultCollectionIndexLayout == "" {
+		p.Config.DefaultCollectionIndexLayout = "collection-index"
+	}
+
 	p.parseCollectionLayoutEntries()
 }
 
