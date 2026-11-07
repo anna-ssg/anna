@@ -22,10 +22,10 @@ func TestRenderPage(t *testing.T) {
 		testEngine := engine.Engine{
 			ErrorLogger: logger.New(os.Stderr),
 		}
-		testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+		testEngine.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
+		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
 
-		testEngine.DeepDataMerge.Templates["posts/got.html"] = parser.TemplateData{
+		testEngine.DeepDataMerge.Pages["posts/got.html"] = parser.PageData{
 			CompleteURL: "got.html",
 			Frontmatter: parser.Frontmatter{
 				Title:       "Hello",

@@ -1,5 +1,5 @@
 {{ define "page"}}
-{{$PageData := index .DeepDataMerge.Templates .PageURL}}
+{{$PageData := index .DeepDataMerge.Pages .PageURL}}
 
 <body>
 
@@ -12,7 +12,7 @@
                         Published on {{$PageData.Frontmatter.Date}}
                         <!-- if length of frontmatter authors is 0 -->
                         {{ if eq (len $PageData.Frontmatter.Authors) 0 }}
-                        {{.DeepDataMerge.LayoutConfig.Author}}
+                        {{.DeepDataMerge.Config.Author}}
                         {{ else }}
                         {{range $PageData.Frontmatter.Authors }}
                         {{ . }},

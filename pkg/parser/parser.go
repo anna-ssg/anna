@@ -2,7 +2,7 @@ package parser
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"html/template"
 	"io/fs"
 	"os"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/anna-ssg/anna/pkg/helpers"
 	"github.com/anna-ssg/anna/pkg/logger"
+
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -23,16 +24,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type LayoutConfig struct {
-	Navbar            []map[string]string `json:"navbar"`
-	BaseURL           string              `json:"baseURL"`
-	SiteTitle         string              `json:"siteTitle"`
-	SiteScripts       []string            `json:"siteScripts"`
-	Author            string              `json:"author"`
-	Copyright         string              `json:"copyright"`
-	ThemeURL          string              `json:"themeURL"`
-	Socials           map[string]string   `json:"socials"`
-	CollectionLayouts map[string]string   `json:"collectionLayouts"`
+type Config struct {
+	Navbar                       []map[string]string `json:"navbar"`
+	BaseURL                      string              `json:"baseURL"`
+	SiteTitle                    string              `json:"siteTitle"`
+	DefaultPageLayout            string              `json:"defaultPageLayout"`
+	DefaultCollectionIndexLayout string              `json:"defaultCollectionIndexLayout"`
+	CollectionLayouts            map[string]string   `json:"collectionLayouts"`
+	SiteScripts                  []string            `json:"siteScripts"`
+	Author                       string              `json:"author"`
+	Copyright                    string              `json:"copyright"`
+	ThemeURL                     string              `json:"themeURL"`
+	Socials                      map[string]string   `json:"socials"`
 }
 
 type Frontmatter struct {
@@ -50,8 +53,8 @@ type Frontmatter struct {
 	CustomFields []map[string]string `yaml:"customFields"`
 }
 
-// TemplateData This struct holds all of the data required to render any page of the site
-type TemplateData struct {
+// PageData This struct holds all of the data required to render any page of the site
+type PageData struct {
 	CompleteURL template.URL
 	Date        int64
 	Frontmatter Frontmatter
@@ -67,17 +70,17 @@ type CollectionHierarchyData struct {
 type Date int64
 
 type Parser struct {
-	// Templates stores the template data of all the pages of the site
-	// Access the data for a particular page by using the relative path to the file as the key
-	Templates map[template.URL]TemplateData
+	//Pages stores the template data of all the pages of the site
+	// Access the data for a particular page by using the path to the file as the key
+	Pages map[template.URL]PageData
 
-	// K-V pair storing all templates correspoding to a particular tag in the site
-	TagsMap map[template.URL][]TemplateData
+	// K-V pair storing all templates corresponding to a particular tag in the site
+	TagsMap map[template.URL][]PageData
 
 	// Collections stores template data of files in collections
 	//
 	// Detailed examples are present in collectionsParser()
-	CollectionsMap map[template.URL][]TemplateData
+	CollectionsMap map[template.URL][]PageData
 
 	// CollectionsHierarchy stores all the sub collections associated with the parent collection via the template.URL
 	//
@@ -92,7 +95,7 @@ type Parser struct {
 	CollectionsSubPageLayouts map[template.URL]string
 
 	// Stores data parsed from layout/config.yml
-	LayoutConfig LayoutConfig
+	Config Config
 
 	MdFilesName []string
 	MdFilesPath []string
@@ -161,7 +164,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 	url, _ := strings.CutSuffix(key, ".md")
 	url += ".html"
 
-	page := TemplateData{
+	page := PageData{
 		CompleteURL: template.URL(url),
 		Date:        date,
 		Frontmatter: frontmatter,
@@ -169,7 +172,7 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 		LiveReload:  p.LiveReload,
 	}
 
-	p.Templates[template.URL(url)] = page
+	p.Pages[template.URL(url)] = page
 
 	// Adding the page to the tags map with the corresponding tags
 	for _, tag := range page.Frontmatter.Tags {
@@ -295,10 +298,17 @@ func (p *Parser) ParseConfig(inFilePath string) {
 		p.ErrorLogger.Fatal(err)
 	}
 
-	err = json.Unmarshal(configFile, &p.LayoutConfig)
+	err = json.Unmarshal(configFile, &p.Config)
 	if err != nil {
 		p.ErrorLogger.Println("Error at:", inFilePath)
 		p.ErrorLogger.Fatal(err)
+	}
+
+	if p.Config.DefaultPageLayout == "" {
+		p.Config.DefaultPageLayout = "page"
+	}
+	if p.Config.DefaultCollectionIndexLayout == "" {
+		p.Config.DefaultCollectionIndexLayout = "collection-index"
 	}
 
 	p.parseCollectionLayoutEntries()
@@ -311,7 +321,7 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 	}
 
 	var buffer bytes.Buffer
-	err = tmpl.Execute(&buffer, p.LayoutConfig)
+	err = tmpl.Execute(&buffer, p.Config)
 	if err != nil {
 		p.ErrorLogger.Fatal(err)
 	}
@@ -370,7 +380,7 @@ func (p *Parser) ParseLayoutFiles() *template.Template {
 }
 
 // Adding the page to the collections map with the corresponding collections and sub-collections
-func (p *Parser) collectionsParser(pageToAdd TemplateData) {
+func (p *Parser) collectionsParser(pageToAdd PageData) {
 	// Iterating over all collections defined in the frontmatter
 	// collection: ["posts/tech/go", "til/2026"]
 	//
@@ -421,7 +431,7 @@ func (p *Parser) collectionsParser(pageToAdd TemplateData) {
 			collectionsMapKey += "index.html"
 
 			if _, ok := p.CollectionsMap[template.URL(collectionsMapKey)]; !ok {
-				p.CollectionsMap[template.URL(collectionsMapKey)] = []TemplateData{}
+				p.CollectionsMap[template.URL(collectionsMapKey)] = []PageData{}
 			}
 
 			// Adding sub-collection in the hierarchy to a parent collection in the Collection Hierarchy map unless it is the root collection
@@ -453,7 +463,7 @@ func (p *Parser) collectionsParser(pageToAdd TemplateData) {
 			collectionsMapKey += "/"
 		}
 		collectionsMapKey += "index.html"
-		if !slices.ContainsFunc(p.CollectionsMap[template.URL(collectionsMapKey)], func(want TemplateData) bool {
+		if !slices.ContainsFunc(p.CollectionsMap[template.URL(collectionsMapKey)], func(want PageData) bool {
 			return want.CompleteURL == pageToAdd.CompleteURL
 		}) {
 			p.CollectionsMap[template.URL(collectionsMapKey)] = append(p.CollectionsMap[template.URL(collectionsMapKey)], pageToAdd)
@@ -476,7 +486,7 @@ func (p *Parser) collectionsParser(pageToAdd TemplateData) {
 }
 
 func (p *Parser) parseCollectionLayoutEntries() {
-	for collectionURL, layoutName := range p.LayoutConfig.CollectionLayouts {
+	for collectionURL, layoutName := range p.Config.CollectionLayouts {
 		p.CollectionsSubPageLayouts[template.URL(collectionURL)] = layoutName
 	}
 }

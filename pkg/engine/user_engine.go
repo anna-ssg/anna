@@ -9,11 +9,11 @@ import (
 
 func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.Template) {
 	numCPU := runtime.NumCPU()
-	numTemplates := len(e.DeepDataMerge.Templates)
+	numTemplates := len(e.DeepDataMerge.Pages)
 	concurrency := min(numCPU*2, numTemplates)
 
 	templateURLs := make([]string, 0, numTemplates)
-	for templateURL := range e.DeepDataMerge.Templates {
+	for templateURL := range e.DeepDataMerge.Pages {
 		templateURLs = append(templateURLs, string(templateURL))
 	}
 
@@ -34,12 +34,12 @@ func (e *Engine) RenderUserDefinedPages(fileOutPath string, templates *template.
 				wg.Done()
 			}()
 
-			templateType := e.DeepDataMerge.Templates[template.URL(templateURL)].Frontmatter.Layout
+			templateType := e.DeepDataMerge.Pages[template.URL(templateURL)].Frontmatter.Layout
 			if templateType == "" {
 				if strings.HasSuffix(templateURL, "index.html") {
 					var ok bool
 					if templateType, ok = e.DeepDataMerge.CollectionsSubPageLayouts[template.URL(templateURL)]; !ok {
-						templateType = "collection-index"
+						templateType = e.DeepDataMerge.Config.DefaultCollectionIndexLayout
 					}
 				} else {
 					// Fallback to the default template used for rendering all user defined content pages

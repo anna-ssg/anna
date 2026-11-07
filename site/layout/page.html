@@ -1,5 +1,5 @@
 {{ define "page"}}
-{{$PageData := index .DeepDataMerge.Templates .PageURL}}
+{{$PageData := index .DeepDataMerge.Pages .PageURL}}
 {{ template "head" .}}
 
 <body class="site-body">

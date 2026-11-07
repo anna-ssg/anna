@@ -18,14 +18,16 @@
   ],
   "baseURL": "https://anna-docs.netlify.app",
   "siteTitle": "anna-docs",
+  "defaultPageLayout": "page",
+  "defaultCollectionIndexLayout": "collection-index",
+  "collectionLayouts": {
+    "posts/index.html": "all-posts"
+  },
   "siteScripts": [],
   "author": "anna",
   "themeURL": null,
   "copyright": "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International.",
   "customFields": {
     "Github": "https://github.com/anna-ssg/anna"
-  },
-  "collectionLayouts": {
-    "posts/index.html": "all-posts"
   }
 }

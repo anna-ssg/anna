@@ -17,13 +17,13 @@ func TestRenderTags(t *testing.T) {
 	e := engine.Engine{
 		ErrorLogger: logger.New(os.Stderr),
 	}
-	e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
-	e.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
+	e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
+	e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
+	e.DeepDataMerge.Config.BaseURL = "example.org"
 
 	fileOutPath := "../../test/engine/render_tags/"
 
-	e.DeepDataMerge.TagsMap["tags/blogs.html"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["tags/blogs.html"] = []parser.PageData{
 		{
 			CompleteURL: "posts/file1.html",
 			Frontmatter: parser.Frontmatter{
@@ -40,7 +40,7 @@ func TestRenderTags(t *testing.T) {
 		},
 	}
 
-	e.DeepDataMerge.TagsMap["tags/tech.html"] = []parser.TemplateData{
+	e.DeepDataMerge.TagsMap["tags/tech.html"] = []parser.PageData{
 		{
 			CompleteURL: "posts/file2.html",
 			Frontmatter: parser.Frontmatter{
@@ -122,10 +122,10 @@ func TestGenerateMergedJson(t *testing.T) {
 		e := engine.Engine{
 			ErrorLogger: logger.New(os.Stderr),
 		}
-		e.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+		e.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
+		e.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
 
-		e.DeepDataMerge.Templates["docs.md"] = parser.TemplateData{
+		e.DeepDataMerge.Pages["docs.md"] = parser.PageData{
 			CompleteURL: "docs.html",
 			Frontmatter: parser.Frontmatter{
 				Title: "Anna Documentation",
@@ -158,35 +158,35 @@ func TestGenerateSitemap(t *testing.T) {
 		testEngine := engine.Engine{
 			ErrorLogger: logger.New(os.Stderr),
 		}
-		testEngine.DeepDataMerge.Templates = make(map[template.URL]parser.TemplateData)
-		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.TemplateData)
+		testEngine.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
+		testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)
 
-		t1 := parser.TemplateData{
+		t1 := parser.PageData{
 			CompleteURL: "index.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
-		t2 := parser.TemplateData{
+		t2 := parser.PageData{
 			CompleteURL: "about.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
-		t3 := parser.TemplateData{
+		t3 := parser.PageData{
 			CompleteURL: "research.html",
 			Frontmatter: parser.Frontmatter{
 				Date: "2024-02-23",
 			},
 		}
 
-		testEngine.DeepDataMerge.LayoutConfig.BaseURL = "example.org"
+		testEngine.DeepDataMerge.Config.BaseURL = "example.org"
 		// setting up testEngine
-		testEngine.DeepDataMerge.Templates["index"] = t1
-		testEngine.DeepDataMerge.Templates["about"] = t2
-		testEngine.DeepDataMerge.Templates["research"] = t3
+		testEngine.DeepDataMerge.Pages["index"] = t1
+		testEngine.DeepDataMerge.Pages["about"] = t2
+		testEngine.DeepDataMerge.Pages["research"] = t3
 
 		testEngine.GenerateSitemap(TestDirPath + "sitemap/got_sitemap.xml")
 

@@ -120,7 +120,7 @@ Files marked `*` are required and cannot be omitted
 - The `tags.html` page can access the following data:
   - `{{.DeepDataMerge}}`
   - `{{.PageURL}}`
-  - `{{.TemplateData}}`
+  - `{{.PageData}}`
   - `{{.TagNames}}`
 - The remaining pages can access the following data
   - `{{.DeepDataMerge}}`
@@ -135,8 +135,8 @@ The `{{.PageURL}}` is of the form `index.html`, `collections/tech/go.html` and s
 - `{{.DeepDataMerge.Collections}}` - A map that stores the template data of the collection sub-pages for a particular collection url
 - `{{.DeepDataMerge.CollectionsMap}}` - A map that stores a slice of templates of all pages for a particular collection url
 - `{{.DeepDataMerge.JSONIndex}}` - Stores the JSON index generated for a particular site (primarily used for search and graphing of tags)
-- `{{.DeepDataMerge.LayoutConfig}}` - Stores the layout parsed from `config.json`
-- `{{.DeepDataMerge.Templates}}` - A map that stores the template data of all the pages of the site for the particular url(the URL is the PageURL for the specified page)
+- `{{.DeepDataMerge.Config}}` - Stores the layout parsed from `config.json`
+- `{{.DeepDataMerge.Pages}}` - A map that stores the template data of all the pages of the site for the particular url(the URL is the PageURL for the specified page)
 - `{{.DeepDataMerge.Tags}}` - A map that stores the template data of the tag sub-pages for a particular tag url
 - `{{.DeepDataMerge.TagsMap}}` - A map that stores a slice of templates of all pages for a particular tag url
 
@@ -155,7 +155,7 @@ Partials have access to the same data context as the main layout templates, incl
 
 - `{{.DeepDataMerge}}` - All site data
 - `{{.PageURL}}` - Current page URL
-- `{{.TemplateData}}` - Page-specific template data
+- `{{.PageData}}` - Page-specific template data
 
 ### Example Partial Structure
 
@@ -180,7 +180,7 @@ layout/partials/
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{index .DeepDataMerge.Templates .PageURL | .Frontmatter.Title}}</title>
+    <title>{{index .DeepDataMerge.Pages .PageURL | .Frontmatter.Title}}</title>
     <!-- Additional head content -->
 </head>
 {{end}}
@@ -197,7 +197,7 @@ layout/partials/
     
     <main>
         <!-- Page content -->
-        {{index .DeepDataMerge.Templates .PageURL | .Body}}
+        {{index .DeepDataMerge.Pages .PageURL | .Body}}
     </main>
     
     {{template "footer" .}}
@@ -212,9 +212,9 @@ layout/partials/
 2. **Data Access**: Always check if page data exists before accessing it:
 
    ```html
-   {{$PageData := index .DeepDataMerge.Templates .PageURL}}
+   {{$PageData := index .DeepDataMerge.Pages .PageURL}}
    {{if eq $PageData nil}}
-   {{$PageData = .TemplateData}}
+   {{$PageData = .PageData}}
    {{end}}
    ```
 
@@ -240,14 +240,14 @@ The URL for the current page can be accessed using `{{.PageURL}}`
 To access the data for a particular page, use Go templating syntax:
 
 ```html
-{{$PageData := index .DeepDataMerge.Templates .PageURL}}
+{{$PageData := index .DeepDataMerge.Pages .PageURL}}
 {{$PageData.CompleteURL}}
 ```
 
 To access the page data for `collections.html`, `tags.html` and their respective partials, set
 
 ```html
-{{$PageData := .TemplateData}}
+{{$PageData := .PageData}}
 ```
 
 All of the following page data fields can be accessed in the above manner:
@@ -897,12 +897,14 @@ The `config.json` file stores configuration for your site's layout and behavior.
 - `navbar` - Array of navigation links (format: `[{"Label": "path/to/page.html"}]`)
 - `baseURL` - Base URL of your site (used for sitemaps, feeds, SEO; no trailing slash)
 - `siteTitle` - Title of your website
+- `defaultPageLayout` - The default template layout for all regular pages, unless overridden in the frontmatter. **If this field is not set, the default layout is set to "page"**
+- `defaultCollectionIndexLayout` - The default template layout for the collection index pages, unless overridden via the below `collectionLayouts` option in the config. **If this field is not set, the default layout is set to "collection-index"**
+- `collectionLayouts` - Map collection URLs to custom layout templates
 - `siteScripts` - Global JavaScript files to include on all pages
 - `author` - Default author name
 - `copyright` - Copyright notice for your site
 - `themeURL` - URL to your main stylesheet (e.g., `/static/style.css`)
 - `socials` - Social media links (format: `{"twitter": "https://twitter.com/...", ...}`)
-- `collectionLayouts` - Map collection URLs to custom layout templates
 - `customFields` - Additional arbitrary key-value pairs for your layouts
 
 ## Complete Example
@@ -917,6 +919,8 @@ The `config.json` file stores configuration for your site's layout and behavior.
   ],
   "baseURL": "https://example.com",
   "siteTitle": "My Awesome Site",
+  "defaultPageLayout": "my-default-page-layout",
+  "defaultCollectionIndexLayout": "my-default-collection-index-layout",
   "siteScripts": [
     "/static/scripts/analytics.js",
     "/static/scripts/search.js"
