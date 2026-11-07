@@ -70,7 +70,7 @@ type CollectionHierarchyData struct {
 type Date int64
 
 type Parser struct {
-	//Pages stores the template data of all the pages of the site
+	// Pages stores the template data of all the pages of the site
 	// Access the data for a particular page by using the path to the file as the key
 	Pages map[template.URL]PageData
 
@@ -185,7 +185,6 @@ func (p *Parser) AddFile(baseDirPath string, dirEntryPath string, frontmatter Fr
 }
 
 func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmatter, string, string, bool) {
-
 	// Frontmatter can be optionally specified
 	// If the frontmatter is not specified, the title of the page is derived from the file name
 
@@ -209,9 +208,11 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 	if strings.HasPrefix(trimmedContent, "---\n") || strings.HasPrefix(trimmedContent, "---\r\n") {
 		markdown = p.ParseFrontMatter(filecontent, path, &parsedFrontmatter)
 	} else {
-		_, filename, _ := strings.CutLast(path, "/")
+		filename := path
+		if strings.Contains(path, "/") {
+			_, filename, _ = strings.CutLast(path, "/")
+		}
 		pageTitle, _ := strings.CutSuffix(filename, ".md")
-
 		parsedFrontmatter.Title = pageTitle
 		markdown = filecontent
 	}
@@ -345,7 +346,6 @@ func (p *Parser) ParseRobots(inFilePath string, outFilePath string) {
 
 // ParseLayoutFiles Parse all the ".html" layout files in the layout/ directory
 func (p *Parser) ParseLayoutFiles() *template.Template {
-
 	// Function to check if an element is present in a slice
 	templ := template.New("templates").Funcs(template.FuncMap{
 		"strSliceContains": func(items []string, search string) bool {
