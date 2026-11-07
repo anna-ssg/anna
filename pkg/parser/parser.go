@@ -228,7 +228,8 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 		md = goldmark.New(
 			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 			goldmark.WithExtensions(
-				extension.TaskList,
+				extension.GFM,
+				extension.Footnote,
 				figure.Figure,
 				&toc.Extender{
 					Compact: true,
@@ -245,7 +246,8 @@ func (p *Parser) ParseMarkdownContent(filecontent string, path string) (Frontmat
 		md = goldmark.New(
 			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
 			goldmark.WithExtensions(
-				extension.TaskList,
+				extension.GFM,
+				extension.Footnote,
 				figure.Figure,
 			),
 			goldmark.WithRendererOptions(
