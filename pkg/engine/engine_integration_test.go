@@ -7,13 +7,12 @@ import (
 	"testing"
 
 	"github.com/anna-ssg/anna/pkg/engine"
-	"github.com/anna-ssg/anna/pkg/logger"
 	"github.com/anna-ssg/anna/pkg/parser"
 )
 
 func TestRenderUserDefinedPages(t *testing.T) {
 	testEngine := engine.Engine{
-		ErrorLogger: logger.New(os.Stderr),
+		Logger: InitLogger(os.Stdout),
 	}
 	testEngine.DeepDataMerge.Pages = make(map[template.URL]parser.PageData)
 	testEngine.DeepDataMerge.TagsMap = make(map[template.URL][]parser.PageData)

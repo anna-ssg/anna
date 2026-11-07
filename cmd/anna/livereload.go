@@ -8,20 +8,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/anna-ssg/anna/pkg/logger"
+	"github.com/rs/zerolog"
 )
 
 var reloadPageBool atomic.Bool
-
-// defaultLogger is a simple package-level logger used for rare errors
-// where an instance-specific logger isn't available. It respects TTY vs
-// non-TTY and will emit pretty colors locally.
-var defaultLogger = logger.New(os.Stderr)
+var defaultLogger *zerolog.Logger
 
 type liveReload struct {
-	infoLogger  *logger.Logger
-	errorLogger *logger.Logger
-	fileTimes   map[string]time.Time
+	logger    *zerolog.Logger
+	fileTimes map[string]time.Time
 
 	// Directories to monitor, so add or remove as needed
 	rootDirs []string
@@ -34,18 +29,11 @@ type liveReload struct {
 	siteDataPath string
 }
 
-func newLiveReload(siteDataPath string, infoLogger, errorLogger *logger.Logger) *liveReload {
-	if infoLogger == nil {
-		infoLogger = logger.New(os.Stderr)
-	}
-	if errorLogger == nil {
-		errorLogger = logger.New(os.Stderr)
-	}
+func newLiveReload(siteDataPath string, logger *zerolog.Logger) *liveReload {
 	lr := liveReload{
-		infoLogger:  infoLogger,
-		errorLogger: errorLogger,
-		fileTimes:   make(map[string]time.Time),
-		rootDirs:    []string{siteDataPath},
+		logger:    logger,
+		fileTimes: make(map[string]time.Time),
+		rootDirs:  []string{siteDataPath},
 		// empty/extensions==nil means watch all files
 		extensions:   nil,
 		siteDataPath: siteDataPath,
@@ -54,12 +42,9 @@ func newLiveReload(siteDataPath string, infoLogger, errorLogger *logger.Logger) 
 }
 
 func (cmd *Cmd) StartLiveReload(siteDataPath string) {
-	if cmd.InfoLogger != nil {
-		cmd.InfoLogger.Println("Live Reload is active")
-	} else {
-		defaultLogger.Println("Live Reload is active")
-	}
-	lr := newLiveReload(siteDataPath, cmd.InfoLogger, cmd.ErrorLogger)
+	cmd.Logger.Info().Msg("Live Reload is active")
+	defaultLogger = cmd.Logger
+	lr := newLiveReload(siteDataPath, cmd.Logger)
 	go lr.startServer(cmd.Addr)
 
 	for {
@@ -101,7 +86,7 @@ func (lr *liveReload) traverseDirectory(rootDir string) bool {
 		return nil
 	})
 	if err != nil {
-		lr.errorLogger.Fatal(err)
+		lr.logger.Fatal().Err(err).Send()
 	}
 	return filesChanged
 }
@@ -125,8 +110,8 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 	if !ok || !modTime.Equal(prevModTime) {
 		lr.fileTimes[path] = modTime
 		if lr.serverRunning {
-			lr.infoLogger.Printf("The following file has changed: %s", path)
-			lr.infoLogger.Println("-----------------------------")
+			lr.logger.Info().Msgf("The following file has changed: %s", path)
+			lr.logger.Info().Msg("-----------------------------")
 		}
 		return true
 	}
@@ -134,13 +119,13 @@ func (lr *liveReload) checkFile(path string, modTime time.Time) bool {
 }
 
 func (lr *liveReload) startServer(addr string) {
-	lr.infoLogger.Printf("Serving content at address: http://%s", addr)
-	lr.infoLogger.Printf("Profile data can be viewed at: http://%s", addr+"/debug/pprof")
+	lr.logger.Info().Msgf("Serving content at address: http://%s", addr)
+	lr.logger.Info().Msgf("Profile data can be viewed at: http://%s", addr+"/debug/pprof")
 	http.Handle("/", http.FileServer(http.Dir(lr.siteDataPath+"./rendered")))
 	http.HandleFunc("/events", eventsHandler)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
-		lr.errorLogger.Fatal(err)
+		lr.logger.Fatal().Err(err).Send()
 	}
 }
 
@@ -160,7 +145,7 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 	event := "event:\ndata:\n\n"
 	_, err := w.Write([]byte(event))
 	if err != nil {
-		defaultLogger.Error(err)
+		defaultLogger.Error().Err(err).Send()
 		return
 	}
 	w.(http.Flusher).Flush()
