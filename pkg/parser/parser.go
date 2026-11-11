@@ -28,6 +28,7 @@ type Config struct {
 	Navbar                       []map[string]string `json:"navbar"`
 	BaseURL                      string              `json:"baseURL"`
 	SiteTitle                    string              `json:"siteTitle"`
+	IgnoreDirs                   []string            `json:"ignoreDirs"`
 	DefaultPageLayout            string              `json:"defaultPageLayout"`
 	DefaultCollectionIndexLayout string              `json:"defaultCollectionIndexLayout"`
 	CollectionLayouts            map[string]string   `json:"collectionLayouts"`
@@ -120,27 +121,28 @@ func (p *Parser) ParseMDDir(baseDirPath string, baseDirFS fs.FS) {
 		Logger: p.Logger,
 	}
 	err := fs.WalkDir(baseDirFS, ".", func(path string, dir fs.DirEntry, err error) error {
-		if path != "." && path != ".obsidian" {
-			if dir.IsDir() {
-				subDir := os.DirFS(path)
-				p.ParseMDDir(path, subDir)
-			} else {
-				fileName := strings.TrimPrefix(path, baseDirPath)
-				if filepath.Ext(path) == ".md" {
-					content, err := os.ReadFile(baseDirPath + path)
-					if err != nil {
-						p.Logger.Fatal().Err(err).Send()
-					}
-
-					frontmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
-					if parseSuccess && (p.RenderDrafts || !frontmatter.Draft) {
-						p.AddFile(baseDirPath, fileName, frontmatter, markdownContent, body)
-					}
-				} else {
-					helper.CopyFiles(p.SiteDataPath+"content/"+fileName, p.SiteDataPath+"rendered/"+fileName)
-				}
+		if dir.IsDir() {
+			if slices.Contains(p.Config.IgnoreDirs, path) {
+				return filepath.SkipDir
 			}
+			return nil
 		}
+
+		fileName := strings.TrimPrefix(path, baseDirPath)
+		if filepath.Ext(path) == ".md" {
+			content, err := os.ReadFile(baseDirPath + path)
+			if err != nil {
+				p.Logger.Fatal().Err(err).Send()
+			}
+
+			frontmatter, body, markdownContent, parseSuccess := p.ParseMarkdownContent(string(content), path)
+			if parseSuccess && (p.RenderDrafts || !frontmatter.Draft) {
+				p.AddFile(baseDirPath, fileName, frontmatter, markdownContent, body)
+			}
+			return nil
+		}
+
+		helper.CopyFiles(p.SiteDataPath+"content/"+fileName, p.SiteDataPath+"rendered/"+fileName)
 		return nil
 	})
 	if err != nil {

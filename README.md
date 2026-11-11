@@ -57,13 +57,12 @@ cd anna
 make build
 ```
 
-`make build` automatically wires up a **pre-commit hook** (tracked in [`.github/githooks/`](.github/githooks/)) that runs, in order: `gofmt` check, lint (`go vet` + [`golangci-lint`](https://golangci-lint.run/welcome/install/) if installed), audit ([`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) if installed), the test suite, `golangci-lint` and `govulncheck` are optional; the hook skips those steps with a hint if they aren't installed.
-
-You can also install the hook explicitly, without doing a full build, by running:
-
-```sh
-make install-hooks
-```
+A **pre-commit hook** (tracked in [`.github/githooks/`](.github/githooks/)) that is available in `.github/githooks/pre-commit`. Install the hook with `make install-hook`. Below is the order of checks that are done, make sure the required dependencies are available. 
+- `fmt` check [gofmt](https://pkg.go.dev/cmd/gofmt)
+- lint with [`golangci-lint`](https://golangci-lint.run/welcome/install/)
+- build
+- test with coverage
+- audit with [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
 
 If you ever need to skip it (e.g. a WIP commit), use `git commit --no-verify`.
 

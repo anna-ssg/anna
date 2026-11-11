@@ -24,12 +24,7 @@ fmt-check:
 	gofmt -l .
 
 lint:
-	@if command -v golangci-lint >/dev/null 2>&1; then \
-		echo "running golangci-lint"; \
-		golangci-lint run ./...; \
-	else \
-		echo "golangci-lint not installed, skipping (see https://golangci-lint.run/welcome/install/)"; \
-	fi
+	golangci-lint run ./...; \
 
 govulncheck:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
