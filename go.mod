@@ -1,6 +1,6 @@
 module github.com/anna-ssg/anna
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/mangoumbrella/goldmark-figure v1.4.0
